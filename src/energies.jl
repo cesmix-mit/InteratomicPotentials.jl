@@ -120,7 +120,7 @@ function force(r::Vector{Position}, p::MixedPotential)
         for j = (i+1):n
             rtemp = r[i] - r[j]
             f[i] +=  force(rtemp, p, r[i].type, r[j].type) 
-            f[j] += f[i]
+            f[j] -= f[i]
         end
     end
     return f
