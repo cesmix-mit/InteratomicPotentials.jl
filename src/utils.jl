@@ -9,13 +9,26 @@ using Base: NamedTuple
 ################################################################################
 import Base.+
 import Base.-
+import Base.*
 ####################### Parameters #############################################
 # Abstract type
 import Base.NamedTuple as Parameter
 
 # Operators
+⊕(p::Parameter, q::Parameter) = merge(p, q)
+≅(p::Tuple, q::Tuple) = length(p) == length(q) && all([size(pp) == size(qq) for (pp, qq) in zip(p, q)])
+≅(x::NamedTuple{N,T}, y::NamedTuple{N2,T2}) where {N,T,N2,T2} =
+  all( [key1 == key2 for (key1, key2) in zip(keys(x), keys(y))] ) && (values(x) ≅ values(y))
 
-+(p::Parameter, q::Parameter) = merge(p, q)
++(p::Tuple, q::Tuple) = (length(p) == length(q)) ? [v1 + v2 for (v1, v2) in zip(values(p), values(q))] : AssertionError("p and q must have the same length and sizes.")
++(p::Parameter, q::Parameter) = ( p ≅ q ) ? Parameter{Tuple(keys(p))}( values(p) + values(q) ) : AssertionError("p and q must have the same keys and sizes.")
+
+-(p::Tuple, q::Tuple) = (length(p) == length(q)) ? [v1 - v2 for (v1, v2) in zip(values(p), values(q))] : AssertionError("p and q must have the same length and sizes.")
+-(p::Parameter, q::Parameter) = ( p ≅ q ) ? Parameter{Tuple(keys(p))}( values(p) - values(q) ) : AssertionError("p and q must have the same keys and sizes.")
+   
+*(a::Real, p::Parameter) = Parameter{Tuple(keys(p))}( a .* values(p) )
+        
+        
 
 
 ## Convert parameter (named tuple) to vector for use in fitting

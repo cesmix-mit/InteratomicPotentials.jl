@@ -84,12 +84,14 @@ function GaN()
 end
 
 function get_trainable_params(g::GaN)
-    p = [get_trainable_params(g.lj_Ga_Ga); get_trainable_params(g.lj_N_N); get_trainable_params(g.bm_Ga_N)]
+    p = Parameter{(:Ga_ϵ, :Ga_σ)}(values(get_trainable_params(g.lj_Ga_Ga)))
+    p = p ⊕ Parameter{(:N_ϵ, :N_σ)}(values(get_trainable_params(g.lj_Ga_Ga)))
+    p = p ⊕ get_trainable_params(g.bm_Ga_N)
     return p
 end
 
 function get_nontrainable_params(g::GaN)
-    p = [get_nontrainable_params(g.lj_Ga_Ga); get_nontrainable_params(g.lj_N_N); get_nontrainable_params(g.bm_Ga_N); get_nontrainable_params(g.c)]
+    p = get_nontrainable_params(g.c)
     return p
 end
 

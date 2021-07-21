@@ -23,6 +23,7 @@
 #       To do:
 #           1. Finish SNAP implementation 
 #           2. Make usable with PotentialLearning.jl and PotentialUQ.jl
+#           3. Implement stresses
 #
 #
 ################################################################################
@@ -33,6 +34,10 @@ using Base: Float64
 include("utils.jl")
 include("types.jl")
 include("energies.jl")
+include("forces.jl")
+include("virials.jl")
+include("gradients.jl")
+
 
 
 end
