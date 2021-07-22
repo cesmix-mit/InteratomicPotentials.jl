@@ -5,5 +5,7 @@ using Test
     include("lennard_jones_test.jl")
     print("\n")
     include("lennard_jones_parameter_estimation_test.jl")
+    print(" \n ")
+    include("lammps_test.jl")
 end
 end

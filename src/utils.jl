@@ -85,7 +85,7 @@ struct Position
     type ::Symbol
 end
 function Position(x, y, z)
-    return Position(x, y, z, nothing)
+    return Position(x, y, z, :nothing)
 end
 function norm(r::Position)
     return sqrt(r.x^2 + r.y^2 + r.z^2)
@@ -153,8 +153,16 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5,
     y_bounds            = [parse(Float64, ybounds_vec[1]), parse(Float64, ybounds_vec[2])]
     z_bounds            = [parse(Float64, zbounds_vec[1]), parse(Float64, zbounds_vec[2])]
 
-    r_cutoffs = rcutoff * ones(num_atom_types)
-    neighbor_weights = neighbor_weight * ones(num_atom_types)
+    if length(rcutoff) == num_atom_types
+        r_cutoffs = rcutoff
+    else
+        r_cutoffs = rcutoff * ones(num_atom_types)
+    end
+    if length(neighbor_weight) == num_atom_types
+        neighbor_weights = neighbor_weight 
+    else
+        neighbor_weights = neighbor_weight .* ones(num_atom_types)
+    end
 
     # Read Masses
     Masses = zeros(num_atom_types)
