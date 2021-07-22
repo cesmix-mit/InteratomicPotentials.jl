@@ -14,6 +14,7 @@
 #                   use configurations, instead of Positions).
 #           4. System
 #               - A system is a collection of Configurations. (Primarily used for training SNAP potentials)
+
 ################################################################################
 import Base.+
 import Base.-
@@ -104,6 +105,8 @@ struct Configuration
     num_atom_types              :: Int
     num_bond_types              :: Int 
     num_angle_types             :: Int 
+    r_cutoffs                   :: Vector{Float64}
+    neighbor_weights            :: Vector{Float64}
     x_bounds                    :: Vector{Float64}
     y_bounds                    :: Vector{Float64}
     z_bounds                    :: Vector{Float64}
@@ -130,7 +133,7 @@ struct Configuration
 end
 
 # Read Configuration information from DATA file at file_path
-function Configuration(file_path :: String; atom_names = nothing)
+function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5, neighbor_weight = 0.5)
     lines = readlines(file_path)
     strip(lines[1]) == "LAMMPS DATA file" ? nothing : AssertionError("path should point to LAMMPS DATA file")
     
@@ -150,6 +153,8 @@ function Configuration(file_path :: String; atom_names = nothing)
     y_bounds            = [parse(Float64, ybounds_vec[1]), parse(Float64, ybounds_vec[2])]
     z_bounds            = [parse(Float64, zbounds_vec[1]), parse(Float64, zbounds_vec[2])]
 
+    r_cutoffs = rcutoff * ones(num_atom_types)
+    neighbor_weights = neighbor_weight * ones(num_atom_types)
 
     # Read Masses
     Masses = zeros(num_atom_types)
@@ -198,7 +203,7 @@ function Configuration(file_path :: String; atom_names = nothing)
 
     return Configuration(file_path, num_atoms, num_bonds, num_angles, num_dihedrals,num_impropers, 
                         num_atom_types, num_bond_types, num_angle_types, 
-                        x_bounds, y_bounds, z_bounds, 
+                        r_cutoffs, neighbor_weights, x_bounds, y_bounds, z_bounds, 
                         Masses, NonBond_coeffs, Bond_coeffs, Angle_coeffs,
                         Dihedral_coeffs, Improper_coeffs, BondBond_coeffs, 
                         BondAngle_coeffs, MiddleBondTorsion_coeffs, EndBondTorsion_coeffs,
@@ -206,3 +211,5 @@ function Configuration(file_path :: String; atom_names = nothing)
                         Positions, Velocities, Bonds, Angles, Dihedrals, Impropers)
 
 end
+
+

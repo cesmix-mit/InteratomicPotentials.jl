@@ -30,6 +30,7 @@
 module Potentials
 
 using Base: Float64
+using LAMMPS
 
 include("utils.jl")
 include("types.jl")
