@@ -1,4 +1,4 @@
-# Potentials.jl
+# [WIP] Potentials.jl
 This module will implement a variety of interatomic potentials. 
 
 Here, 'implementation' means:
