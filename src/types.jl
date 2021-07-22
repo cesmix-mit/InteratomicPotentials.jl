@@ -98,12 +98,14 @@ end
 ##############################  SNAP  ###################################
 mutable struct SNAP <: Potential
     β :: Vector{Float64}
-    A :: Array{Float64}
-    b :: Vector{Float64}
+    r_cutoff_factor :: Float64 
+    twojmax         :: Int
 end
 
-function SNAP(n::Int, m::Int)
-    return SNAP(ones(n,1), randn(n,m), randn(m,1))
+function SNAP(r_cutoff_factor, twojmax)
+    J = twojmax / 2.0
+    ncoeff = round(Int, (J + 1) * (J + 2) * (( J + (1.5)) / 3. ) + 1)
+    return SNAP(ones(ncoeff), r_cutoff_factor, twojmax)
 end
 
 function get_trainable_params(snap::SNAP)
@@ -111,6 +113,6 @@ function get_trainable_params(snap::SNAP)
 end
 
 function get_nontrainable_params(snap::SNAP)
-    return (A = snap.A, b = snap.b)
+    return (r_cutoff_factor = snap.r_cutoff_factor, twojmax = snap.twojmax)
 end
 
