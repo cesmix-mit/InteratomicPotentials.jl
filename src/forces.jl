@@ -23,7 +23,7 @@ end
 
 function force(r:: Position, p::Coulomb)
     d = norm(r)
-    return p.q_1 * p.q_2 / (4.0 * π * p.ε0 * d) .* [r.x, r.y, r.z] ./ d
+    return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* [r.x, r.y, r.z] ./ d
 end
 
 ##############################   GaN  ###################################
@@ -42,26 +42,27 @@ end
 
 ##############################  SNAP  ###################################
 
-function force(c::Configuration, p::SNAP; return_positions = false)
+function force(c::Configuration, p::SNAP)
     A = get_snap(c, p)
     force = A[2:end-6, :] * p.β
-    if return_positions
-        l = Int(length(force) / 3)
-        force = reshape(force, 3, l)'
-        force_position = Vector{Position}(undef, l)
-        for i = 1:l
-            force_position[i] = Position(force[i, 1], force[i, 2], force[i,3])
-        end
-        return force_position
-    else
-        return force
-    end
+    return force
 end
+
+function force(r::Vector{Configuration}, p::SNAP)
+    n = length(r)
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
+    end
+    return f
+end
+
 
 ############################## Vectorize ################################
 
 function force(r::Vector{Position}, p::Potential)
     n = length(r)
+    # f = Array{Float64}(undef, n, 3)
     f = [zeros(3) for j = 1:n]
     for i = 1:(n-1)
         for j = (i+1):n
@@ -73,15 +74,43 @@ function force(r::Vector{Position}, p::Potential)
     return f
 end
 
+function force(c::Configuration, p::Potential)
+    return force(c.Positions, p)
+end
+
+function force(r::Vector{Configuration}, p::Potential)
+    n = length(r)
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
+    end
+    return f
+end
+
+
 function force(r::Vector{Position}, p::MixedPotential)
     n = length(r)
+    # f = Array{Float64}(undef, 3, n)
     f = [zeros(3) for j = 1:n]
     for i = 1:(n-1)
         for j = (i+1):n
             rtemp = r[i] - r[j]
             f[i] +=  force(rtemp, p, r[i].type, r[j].type) 
-            f[j] += f[i]
+            f[j] -= f[i]
         end
+    end
+    return f
+end
+
+function force(c::Configuration, p::MixedPotential)
+    return force(c.Positions, p)
+end
+
+function force(r::Vector{Configuration}, p::MixedPotential)
+    n = length(r)
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
     end
     return f
 end

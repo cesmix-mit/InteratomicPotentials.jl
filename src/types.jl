@@ -104,9 +104,9 @@ mutable struct SNAP <: FittedPotential
 end
 
 function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
-    J = twojmax / 2.0
-    ncoeff = Int(floor((J + 1) * (J + 2) * (( J + (1.5)) / 3. )))
-    return SNAP(ones(num_atom_types*ncoeff+1), r_cutoff_factor, twojmax, num_atom_types)
+    J = twojmax / num_atom_types
+    num_coeffs = Int(floor((J + 1.) * (J + 2.) * (( J + (1.5)) / 3. )))
+    return SNAP(ones(num_atom_types*num_coeffs+1), r_cutoff_factor, twojmax, num_atom_types)
 end
 
 function get_trainable_params(snap::SNAP)

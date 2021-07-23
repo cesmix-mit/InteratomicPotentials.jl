@@ -22,7 +22,7 @@ end
 ##############################   Coulomb  ###################################
 
 function potential_energy(r::Position, p::Coulomb)
-    return p.q_1 * p.q_2 / (4.0 * π * p.ε0 * norm(r))
+    return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * norm(r))
 end
 
 
@@ -61,9 +61,22 @@ function potential_energy(r::Vector{Position}, p::Potential)
     return pe
 end
 
+function potential_energy(c::Configuration, p::Potential)
+    return potential_energy(c.Positions, p)
+end
+
+function potential_energy(r::Vector{Configuration}, p::Potential)
+    n = length(r)
+    p_e = zeros(n)
+    for i = 1:n
+        p_e[i] = potential_energy(r[i], p)
+    end
+end
+
+
 function potential_energy(r::Vector{Configuration}, p::SNAP)
     n = length(r)
-    p_e = zeros(length(r))
+    p_e = zeros(n)
     for i = 1:n
         A = get_snap(r[i], p)
         p_e[i] = A[1, :] * p.β
@@ -81,4 +94,17 @@ function potential_energy(r::Vector{Position}, p::MixedPotential)
         end
     end
     return pe
+end
+
+
+function potential_energy(c::Configuration, p::MixedPotential)
+    return potential_energy(c.Positions, p)
+end
+
+function potential_energy(r::Vector{Configuration}, p::MixedPotential)
+    n = length(r)
+    p_e = zeros(n)
+    for i = 1:n
+        p_e[i] = potential_energy(r[i], p)
+    end
 end
