@@ -6,7 +6,7 @@
 
 abstract type ArbitraryPotential end
 abstract type Potential <:ArbitraryPotential end
-
+abstract type FittedPotential <:ArbitraryPotential end
 abstract type MixedPotential <:ArbitraryPotential end
 
 ############################## Lennard Jones ###################################
@@ -96,16 +96,17 @@ function get_nontrainable_params(g::GaN)
 end
 
 ##############################  SNAP  ###################################
-mutable struct SNAP <: Potential
+mutable struct SNAP <: FittedPotential
     β :: Vector{Float64}
     r_cutoff_factor :: Float64 
     twojmax         :: Int
+    num_atom_types  :: Int
 end
 
-function SNAP(r_cutoff_factor, twojmax)
+function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
     J = twojmax / 2.0
-    ncoeff = round(Int, (J + 1) * (J + 2) * (( J + (1.5)) / 3. ) + 1)
-    return SNAP(ones(ncoeff), r_cutoff_factor, twojmax)
+    ncoeff = Int(floor((J + 1) * (J + 2) * (( J + (1.5)) / 3. )))
+    return SNAP(ones(num_atom_types*ncoeff+1), r_cutoff_factor, twojmax, num_atom_types)
 end
 
 function get_trainable_params(snap::SNAP)

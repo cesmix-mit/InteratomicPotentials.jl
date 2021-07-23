@@ -41,9 +41,10 @@ end
 
 
 ##############################  SNAP  ###################################
-function potential_energy(r::Position, p::SNAP)
-    println("Not yet implmented.")
-    return 0.0
+function potential_energy(c::Configuration, p::SNAP)
+    A = get_snap(c, p)
+    p_e = dot(A[1, :]  ,  p.β )
+    return p_e
 end
 
 
@@ -56,6 +57,16 @@ function potential_energy(r::Vector{Position}, p::Potential)
             rtemp = r[i] - r[j]
             pe +=  potential_energy(rtemp, p)
         end
+    end
+    return pe
+end
+
+function potential_energy(r::Vector{Configuration}, p::SNAP)
+    n = length(r)
+    p_e = zeros(length(r))
+    for i = 1:n
+        A = get_snap(r[i], p)
+        p_e[i] = A[1, :] * p.β
     end
     return pe
 end

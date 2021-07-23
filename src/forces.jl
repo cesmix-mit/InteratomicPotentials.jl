@@ -42,9 +42,20 @@ end
 
 ##############################  SNAP  ###################################
 
-function force(r::Position, p::SNAP)
-    println("Not yet implemented.")
-    return 0.0
+function force(c::Configuration, p::SNAP; return_positions = false)
+    A = get_snap(c, p)
+    force = A[2:end-6, :] * p.β
+    if return_positions
+        l = Int(length(force) / 3)
+        force = reshape(force, 3, l)'
+        force_position = Vector{Position}(undef, l)
+        for i = 1:l
+            force_position[i] = Position(force[i, 1], force[i, 2], force[i,3])
+        end
+        return force_position
+    else
+        return force
+    end
 end
 
 ############################## Vectorize ################################

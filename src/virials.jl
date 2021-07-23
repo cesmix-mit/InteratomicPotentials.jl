@@ -16,6 +16,12 @@ function virial(r::Position, p::GaN, type1::Symbol, type2::Symbol)
     return f[1] * r.x + f[2] * r.y + f[3] * r.z
 end
 
+#####################################################################
+function virial(c:: Configuration, p::SNAP)
+    A = get_snap(c, p)
+    virial = A[end-5:end, :] * p.β
+    return virial
+end
 ############################ Vectorize ###############################
 function virial(r::Vector{Position}, p::Potential)
     n = length(r)
