@@ -1,11 +1,15 @@
 ################################################################################
 #
-#    This file contains virial methods for a variety of empirical atomic potentials  
+#    This file contains virial and virial stress tensor methods for a variety of empirical atomic potentials  
 #       Because virial depends on the force, a lot of the work done for typing force
 #       methods can be used to simplify virial implementations.
+#       Right now the methods are divided across simple potentials (type::Potential),
+#       the gan potential (type::Gan <: MixedPotential) and the snap potential (type::SNAP <: FittedPotential).
 ################################################################################
 
-############################## Virial ################################
+#############################################################################
+############################## Simple Virial ################################
+#############################################################################
 function virial(r::Position, p::Potential)
     f = force(r, p)
     return f[1] * r.x + f[2] * r.y + f[3] * r.z
@@ -68,45 +72,9 @@ function virial_stress(r::Vector{Configuration}, p::Potential)
     return v
 end
 
-
-
-########################### SNAP ######################################
-
-function virial(c:: Configuration, p::SNAP)
-    A = get_snap(c, p)
-    virial = A[end-5:end, :] * p.β
-    return sum(virial[1:3])
-end
-
-function virial(r:: Vector{Configuration}, p::SNAP)
-    n = length(r)
-    v = zeros(n)
-    for j = 1:n
-        v = virial(r.Configuration, p)
-    end
-    return v
-end
-
-function virial_stress(c:: Configuration, p::SNAP)
-    A = get_snap(c, p)
-    virial = A[end-5:end, :] * p.β
-    return virial
-end
-
-function virial_stress(r:: Vector{Configuration}, p::SNAP)
-    n = length(r)
-    v = [zeros(6) for i = 1:n]
-    for i = 1:n
-        v[i] = virial_stress(r[i], p)
-    end
-    return v
-end
-
-
-
-
+#####################################################################
 ####################### Mixed Potentials (GaN) ######################
-
+#####################################################################
 function virial(r::Position, p::GaN, type1::Symbol, type2::Symbol)
     f = force(r, p, type1, type2)
     return f[1] * r.x + f[2] * r.y + f[3] * r.z
@@ -168,3 +136,42 @@ function virial_stress(r::Vector{Configuration}, p::MixedPotential)
     end
     return v
 end
+
+
+
+#######################################################################
+########################### SNAP ######################################
+#######################################################################
+
+function virial(c:: Configuration, p::SNAP)
+    A = get_snap(c, p)
+    virial = A[end-5:end, :] * p.β
+    return sum(virial[1:3])
+end
+
+function virial(r:: Vector{Configuration}, p::SNAP)
+    n = length(r)
+    v = zeros(n)
+    for j = 1:n
+        v = virial(r.Configuration, p)
+    end
+    return v
+end
+
+function virial_stress(c:: Configuration, p::SNAP)
+    A = get_snap(c, p)
+    virial = A[end-5:end, :] * p.β
+    return virial
+end
+
+function virial_stress(r:: Vector{Configuration}, p::SNAP)
+    n = length(r)
+    v = [zeros(6) for i = 1:n]
+    for i = 1:n
+        v[i] = virial_stress(r[i], p)
+    end
+    return v
+end
+
+
+

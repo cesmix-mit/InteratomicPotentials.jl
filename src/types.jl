@@ -71,7 +71,9 @@ function get_nontrainable_params(c::Coulomb)
     return (q_1 = c.q_1, q_2 = c.q_2, ϵ0 = c.ϵ0)
 end
 
+#########################################################################
 ##############################   GaN  ###################################
+#########################################################################
 mutable struct GaN <: MixedPotential
     lj_Ga_Ga::LennardJones
     lj_N_N::LennardJones
@@ -95,7 +97,10 @@ function get_nontrainable_params(g::GaN)
     return p
 end
 
+#########################################################################
 ##############################  SNAP  ###################################
+#########################################################################
+
 mutable struct SNAP <: FittedPotential
     β :: Vector{Float64}
     r_cutoff_factor :: Float64 

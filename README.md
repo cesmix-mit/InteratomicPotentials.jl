@@ -17,3 +17,4 @@ Right now, this module contains the framework for the following potentials
 
 To do:
 - Make usable with PotentialLearning.jl and PotentialUQ.jl
+- Finish implemented gradients of energies, forces, stresses w.r.t. potential parameters.

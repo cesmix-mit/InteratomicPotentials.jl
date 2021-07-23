@@ -1,7 +1,18 @@
 ################################################################################
 #
 #    This file contains methods to calculate the bispectrum of a given Configuration  
-#       Requires Configuration (see utils.jl)
+#       Requires Configuration (see utils.jl). All of the command functions use LAMMPS.jl
+#       
+#       The following methods are useful but require fitted snap.β
+#       get_bispectrum calculates the bispectrum components using LAMMPS
+#       get_dbispectrum calculuates the derivative of the bispectrum components (used for forces)
+#       get_vbispectrum calculuates the virial contribution of the bispectrum components (used for virial stress tensor)
+#
+#       get_snap produces the A matrix in the SNAP potential fitting paradigm
+#           A β = b 
+#           where β is the coefficients of the bispectrum components to produce energies, forces, stresses.
+#           For detailed information, see http://dx.doi.org/10.1016/j.jcp.2014.12.018 (Thompson et al. 2014)
+#       get_snap is instrumental in the methods that calculate potential_energy, force, virial for the snap potential.
 ################################################################################
 
 function get_bispectrum(c::Configuration, snap::SNAP)
