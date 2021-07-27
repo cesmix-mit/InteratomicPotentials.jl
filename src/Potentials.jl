@@ -18,12 +18,11 @@
 #           2. Born - Mayer 
 #           3. Coulomb
 #           4. GaN (special mixed type, more of an application than a true potential)
-#           5. SNAP (energy, forces, and stress are yet to be implemented).
+#           5. SNAP 
 #
 #       To do:
-#           1. Finish SNAP implementation 
-#           2. Make usable with PotentialLearning.jl and PotentialUQ.jl
-#           3. Implement stresses
+#           1. Make usable with PotentialLearning.jl and PotentialUQ.jl
+#           2. Finish coding gradients of parameters with respect to energies, forces, stresses.
 #
 #
 ################################################################################
@@ -31,14 +30,16 @@ module Potentials
 
 using Base: Float64
 using LAMMPS
+using LinearAlgebra
 
 include("utils.jl")
 include("types.jl")
+include("bispectrum.jl")
 include("energies.jl")
 include("forces.jl")
 include("virials.jl")
 include("gradients.jl")
-include("bispectrum.jl")
+
 
 
 

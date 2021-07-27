@@ -12,7 +12,7 @@
 #               - Configurations are particularly important for SNAP implementation, since
 #                   SNAP potential, forces, virial, and learning makes use of LAMMPS (and hence should 
 #                   use configurations, instead of Positions).
-#           4. System
+#           4. System (not yet implemented)
 #               - A system is a collection of Configurations. (Primarily used for training SNAP potentials)
 
 ################################################################################

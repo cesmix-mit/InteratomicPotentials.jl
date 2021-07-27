@@ -13,8 +13,8 @@ Right now, this module contains the framework for the following potentials
 - Born - Mayer 
 - Coulomb
 - GaN (special mixed type, more of an application than a true potential)
-- SNAP (energy, forces, and stress yet to be implemented).
+- SNAP 
 
 To do:
-- Finish SNAP implementation 
 - Make usable with PotentialLearning.jl and PotentialUQ.jl
+- Finish implemented gradients of energies, forces, stresses w.r.t. potential parameters.

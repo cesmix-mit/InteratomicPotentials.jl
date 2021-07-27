@@ -1,7 +1,8 @@
 ################################################################################
 #
 #    This file contains force methods for a variety of empirical atomic potentials  
-#
+#       Right now the methods are divided across simple potentials (type::Potential),
+#       the gan potential (type::Gan <: MixedPotential) and the snap potential (type::SNAP <: FittedPotential).
 ################################################################################
 
 
@@ -23,11 +24,41 @@ end
 
 function force(r:: Position, p::Coulomb)
     d = norm(r)
-    return p.q_1 * p.q_2 / (4.0 * π * p.ε0 * d) .* [r.x, r.y, r.z] ./ d
+    return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* [r.x, r.y, r.z] ./ d
 end
 
-##############################   GaN  ###################################
+############################## Vectorize ################################
 
+function force(r::Vector{Position}, p::Potential)
+    n = length(r)
+    # f = Array{Float64}(undef, n, 3)
+    f = [zeros(3) for j = 1:n]
+    for i = 1:(n-1)
+        for j = (i+1):n
+            rtemp = r[i] - r[j]
+            f[i] +=  force(rtemp, p) 
+            f[j] -= f[i]
+        end
+    end
+    return f
+end
+
+function force(c::Configuration, p::Potential)
+    return force(c.Positions, p)
+end
+
+function force(r::Vector{Configuration}, p::Potential)
+    n = length(r)
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
+    end
+    return f
+end
+
+#########################################################################
+##############################   GaN  ###################################
+#########################################################################
 
 function force(r::Position, p::GaN, type1::Symbol, type2::Symbol)
     
@@ -40,37 +71,53 @@ function force(r::Position, p::GaN, type1::Symbol, type2::Symbol)
     end
 end
 
-##############################  SNAP  ###################################
 
-function force(r::Position, p::SNAP)
-    println("Not yet implemented.")
-    return 0.0
-end
-
-############################## Vectorize ################################
-
-function force(r::Vector{Position}, p::Potential)
+function force(r::Vector{Position}, p::MixedPotential)
     n = length(r)
+    # f = Array{Float64}(undef, 3, n)
     f = [zeros(3) for j = 1:n]
     for i = 1:(n-1)
         for j = (i+1):n
             rtemp = r[i] - r[j]
-            f[i] +=  force(rtemp, p) 
+            f[i] +=  force(rtemp, p, r[i].type, r[j].type) 
             f[j] -= f[i]
         end
     end
     return f
 end
 
-function force(r::Vector{Position}, p::MixedPotential)
+function force(c::Configuration, p::MixedPotential)
+    return force(c.Positions, p)
+end
+
+function force(r::Vector{Configuration}, p::MixedPotential)
     n = length(r)
-    f = [zeros(3) for j = 1:n]
-    for i = 1:(n-1)
-        for j = (i+1):n
-            rtemp = r[i] - r[j]
-            f[i] +=  force(rtemp, p, r[i].type, r[j].type) 
-            f[j] += f[i]
-        end
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
     end
     return f
 end
+
+
+#########################################################################
+##############################  SNAP  ###################################
+#########################################################################
+function force(c::Configuration, p::SNAP)
+    A = get_snap(c, p)
+    force = A[2:end-6, :] * p.β
+    return force
+end
+
+function force(r::Vector{Configuration}, p::SNAP)
+    n = length(r)
+    f = [zeros(r[i].num_atoms) for i = 1:n]
+    for i = 1:n
+        f[i] = force(r[i], p)
+    end
+    return f
+end
+
+
+
+

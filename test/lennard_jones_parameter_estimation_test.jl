@@ -13,6 +13,7 @@
 ################################################################################
 import Potentials
 using GalacticOptim, Optim
+using Statistics: mean
 println("Beginning test of correctness of LJ implementation.")
 # Set up Atoms (using a specific configuration)
 N = 38
@@ -74,11 +75,10 @@ function loss(ϵ, σ)
     lj_ = Potentials.LennardJones(ϵ, σ)
     loss = 0.5*(Potentials.potential_energy(r, lj_) - energies)^2 
     vec = (Potentials.force(r, lj_) - forces)
-    l = length(vec)
-    for v in vec
-        loss += 0.5*sum( v .^ 2 ) / l
-    end
 
+    for v in vec
+        loss += 0.5*sum( v.^2 )
+    end
     loss += 0.5*(Potentials.virial(r, lj_) - virials)^2
     return loss
 end
@@ -94,10 +94,9 @@ function dloss(ϵ, σ)
     
     vec = Potentials.force(r, lj_) - forces
 
-    l = length(vec)
-    for (v, dv) in zip(vec, grad_forces)
-        dloss_ϵ +=  sum( v .* dv[:dfdϵ] )/l
-        dloss_σ +=  sum( v .* dv[:dfdσ] )/l
+    for (v, gradf) in zip(vec, grad_forces)
+        dloss_ϵ +=  sum( v .* gradf[:dfdϵ] )
+        dloss_σ +=  sum( v .* gradf[:dfdσ] )
     end
 
     dloss_ϵ += (Potentials.virial(r, lj_) - virials) .* grad_virial[:dvdϵ] 
@@ -117,7 +116,7 @@ end
 lower = [1e-3, 1e-3]
 upper = [4.0, 4.0]
 
-initial = [1.2, 0.85]
+initial = [1.0, 0.9]
 println("Truth: ", (ϵ =  ϵ_true, σ = σ_true))
 println("Loss at truth = ", loss(ϵ_true, σ_true))
 println(" ")
@@ -125,7 +124,7 @@ println(" ")
 ff = OptimizationFunction(f, GalacticOptim.AutoForwardDiff())
 prob = OptimizationProblem(ff, initial, [], lb=lower, ub=upper)
 @time sol = solve(prob, SAMIN())
-println("Finite Difference Solver: ")
+println("AutoDiff Solver: ")
 print(sol)
 println(" ")
 println("AD Optimum: ", (ϵ = sol.u[1], σ = sol.u[2]))
