@@ -101,7 +101,7 @@ function virial(r::Vector{Configuration}, p::MixedPotential)
     n = length(r)
     v = zeros(n)
     for i = 1:n
-        v[i] = virial(r.Positions, p)
+        v[i] = virial(r[i].Positions, p)
     end
     return v
 end
@@ -132,7 +132,7 @@ function virial_stress(r::Vector{Configuration}, p::MixedPotential)
     n = length(r)
     v = [zeros(6) for i = 1:n]
     for i = 1:n
-        v[i] = virial_stress(r.Positions, p)
+        v[i] = virial_stress(r[i].Positions, p)
     end
     return v
 end
@@ -153,7 +153,7 @@ function virial(r:: Vector{Configuration}, p::SNAP)
     n = length(r)
     v = zeros(n)
     for j = 1:n
-        v = virial(r.Configuration, p)
+        v[j] = virial(r[j], p)
     end
     return v
 end
