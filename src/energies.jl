@@ -84,10 +84,11 @@ end
 
 function potential_energy(r::Vector{Configuration}, p::MixedPotential)
     n = length(r)
-    p_e = zeros(n)
+    pe = zeros(n)
     for i = 1:n
-        p_e[i] = potential_energy(r[i], p)
+        pe[i] = potential_energy(r[i], p)
     end
+    return pe
 end
 
 #########################################################################
@@ -101,10 +102,10 @@ end
 
 function potential_energy(r::Vector{Configuration}, p::SNAP)
     n = length(r)
-    p_e = zeros(n)
+    pe = zeros(n)
     for i = 1:n
         A = get_snap(r[i], p)
-        p_e[i] = A[1, :] * p.β
+        pe[i] = dot(A[1, :] , p.β)
     end
     return pe
 end

@@ -187,15 +187,21 @@ function get_snap(c::Configuration, snap::SNAP)
         end
         return bispectrum
     end
-    return A'
+    return copy(transpose(A))
 end
 
 function get_snap(r::Vector{Configuration}, p)
     n = length(r)
     l = length(p.β)
-    A = Array{Float64}(undef, 0, l)
+    Aenergy = Array{Float64}(undef, 0, l)
+    Aforce = Array{Float64}(undef, 0, l)
+    Astress = Array{Float64}(undef, 0, l)
     for j = 1:n
-       A = vcat(A, get_snap(r[j], p))  
+       A = get_snap(r[j], p)
+       Aenergy = vcat(Aenergy, reshape(A[1, :], 1, l))
+       Aforce = vcat(Aforce, A[2:end-6, :])
+       Astress = vcat(Astress, A[end-5:end, :])
     end
+    A = vcat(Aenergy, Aforce, Astress)
     return A
 end

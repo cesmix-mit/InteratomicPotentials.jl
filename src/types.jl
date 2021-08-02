@@ -115,7 +115,12 @@ function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
 end
 
 function get_trainable_params(snap::SNAP)
-    return (β = snap.β)
+    return (β = snap.β, )
+end
+
+function set_trainable_params!(snap::SNAP, params::NamedTuple)
+    snap.β = params.β
+    return snap
 end
 
 function get_nontrainable_params(snap::SNAP)
