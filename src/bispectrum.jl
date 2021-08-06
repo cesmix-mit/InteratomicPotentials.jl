@@ -149,8 +149,18 @@ end
 function get_snap(c::Configuration, snap::SNAP)
     read_data_str = "read_data " * c.file_path
     rcut_factor = snap.r_cutoff_factor 
+
     J = snap.twojmax/c.num_atom_types
-    num_coeffs = Int(floor((J + 1) * (J + 2) * (( J + (1.5)) / 3. )))
+    if J % 2 == 0
+        m = J/2 + 1
+        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
+    elseif J % 2 == 1
+        m = (J+1)/2
+        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
+    else
+        AssertionError("twojmax must be an integer multiple of the number of atom types!")
+    end
+    
     rcut_string = "" 
     neighbor_weight_string = ""
     for j = 1:c.num_atom_types
@@ -173,7 +183,7 @@ function get_snap(c::Configuration, snap::SNAP)
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute snap all snap $rcut_factor 0.99363 $(snap.twojmax) " * rcut_string * neighbor_weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute snap all snap $rcut_factor 0.99363 $(snap.twojmax) " * rcut_string * neighbor_weight_string 
             command(lmp, string_command)
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")

@@ -10,12 +10,12 @@
 #############################################################################
 ############################## Simple Virial ################################
 #############################################################################
-function virial(r::Position, p::Potential)
+function virial(r::Position, p::EmpiricalPotential)
     f = force(r, p)
     return f[1] * r.x + f[2] * r.y + f[3] * r.z
 end
 
-function virial(r::Vector{Position}, p::Potential)
+function virial(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     v = 0.0
     for i = 1:(n-1)
@@ -27,11 +27,11 @@ function virial(r::Vector{Position}, p::Potential)
     return v
 end
 
-function virial(c::Configuration, p::Potential)
+function virial(c::Configuration, p::EmpiricalPotential)
     return virial(c.Positions, p)
 end
 
-function virial(r::Vector{Configuration}, p::Potential)
+function virial(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
     v = zeros(n)
     for i = 1:n 
@@ -40,14 +40,14 @@ function virial(r::Vector{Configuration}, p::Potential)
     return v
 end
 
-function virial_stress(r::Position, p::Potential)
+function virial_stress(r::Position, p::EmpiricalPotential)
     f = force(r, p)
     vi = [r.x, r.y, r.z] * f'
     return [vi[1, 1], vi[2, 2], vi[3, 3], vi[2, 3], vi[1, 3], vi[1,2]]
 end
 
 
-function virial_stress(r::Vector{Position}, p::Potential)
+function virial_stress(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     v = zeros(6)
     for i = 1:(n-1)
@@ -59,11 +59,11 @@ function virial_stress(r::Vector{Position}, p::Potential)
     return v
 end
 
-function virial_stress(c::Configuration, p::Potential)
+function virial_stress(c::Configuration, p::EmpiricalPotential)
     return virial_stress(c.Positions, p)
 end
 
-function virial_stress(r::Vector{Configuration}, p::Potential)
+function virial_stress(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
     v = [zeros(6) for i = 1:n]
     for i = 1:n

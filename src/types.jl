@@ -5,12 +5,12 @@
 ################################################################################
 
 abstract type ArbitraryPotential end
-abstract type Potential <:ArbitraryPotential end
+abstract type EmpiricalPotential <:ArbitraryPotential end
 abstract type FittedPotential <:ArbitraryPotential end
 abstract type MixedPotential <:ArbitraryPotential end
 
 ############################## Lennard Jones ###################################
-mutable struct LennardJones <: Potential
+mutable struct LennardJones <: EmpiricalPotential
     ϵ::Float64
     σ::Float64
 end
@@ -31,7 +31,7 @@ function get_nontrainable_params(lj::LennardJones)
 end
 
 ##############################   Born-Mayer  ###################################
-mutable struct BornMayer <: Potential
+mutable struct BornMayer <: EmpiricalPotential
     A::Float64
     ρ::Float64
 end
@@ -51,7 +51,7 @@ function get_nontrainable_params(lj::BornMayer)
 end
 
 ##############################   Coulomb  ###################################
-mutable struct Coulomb <: Potential
+mutable struct Coulomb <: EmpiricalPotential
     q_1::Float64
     q_2::Float64
     ϵ0::Float64
@@ -110,7 +110,15 @@ end
 
 function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
     J = twojmax / num_atom_types
-    num_coeffs = Int(floor((J + 1.) * (J + 2.) * (( J + (1.5)) / 3. )))
+    if J % 2 == 0
+        m = J/2 + 1
+        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
+    elseif J % 2 == 1
+        m = (J+1)/2
+        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
+    else
+        AssertionError("twojmax must be an integer multiple of the number of atom types!")
+    end 
     return SNAP(ones(num_atom_types*num_coeffs+1), r_cutoff_factor, twojmax, num_atom_types)
 end
 

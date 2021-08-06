@@ -19,6 +19,8 @@
 import Base.+
 import Base.-
 import Base.*
+import Base.copy
+import Base.vec
 ####################### Parameters #############################################
 # Abstract type
 import Base.NamedTuple as Parameter
@@ -91,20 +93,48 @@ function norm(r::Position)
     return sqrt(r.x^2 + r.y^2 + r.z^2)
 end
 
-+(r1::Position, r2::Position) = Position(r1.x+r2.x, r1.y + r2.y, r1.z + r2.z)
--(r1::Position, r2::Position) = Position(r1.x-r2.x, r1.y-r2.y, r1.z-r2.z)
++(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x+r2.x, r1.y + r2.y, r1.z + r2.z, r1.type) : AssertionError("Atoms must have the same type for this operation!"))
+-(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x-r2.x, r1.y - r2.y, r1.z - r2.z, r1.type) : AssertionError("Atoms must have the same type for this operation!"))
+*(a::AbstractFloat, r::Position) = Position(a*r.x, a*r.y, a*r.z, r.type)
+*(r::Position, a::AbstractFloat) = Position(a*r.x, a*r.y, a*r.z, r.type)
 
++(a::AbstractFloat, r::Position) = Position(a + r.x, a + r.y, a + r.z, r.type)
++(a::Vector{Float64}, r::Position) = Position(a[1] + r.x, a[2] + r.y, a[3] + r.z, r.type)
++(r::Position, a::Vector{Float64}) = Position(a[1] + r.x, a[2] + r.y, a[3] + r.z, r.type)
+-(a::Vector{Float64}, r::Position) = Position(a[1] - r.x, a[2] - r.y, a[3] - r.z, r.type)
+
+vec(r::Position) = [r.x, r.y, r.z]
+vec(r::Vector{Position}) = [[ri.x, ri.y, ri.z] for ri in r]
+
+function get_interparticle_distance(ri::Position, rj::Position)
+    return norm(ri - rj)
+end
+function get_interparticle_distance(r::Vector{Position})
+    n = length(r)
+    distances = zeros(0)    
+    for i = 1:n
+        ri = r[i]
+        for j = (i+1):n 
+            d = get_interparticle_distance(ri, r[j])
+            push!(distances, d, d)
+        end
+    end
+    return distances
+end
 ##################### Configurations ##########################################
 struct Configuration
     file_path                   :: String
     num_atoms                   :: Int
     num_bonds                   :: Int
     num_angles                  :: Int 
-    num_dihdedrals              :: Int
+    num_dihedrals              :: Int
     num_impropers               :: Int 
     num_atom_types              :: Int
     num_bond_types              :: Int 
-    num_angle_types             :: Int 
+    num_angle_types             :: Int
+    num_dihedral_types          :: Int
+    num_improper_types          :: Int 
+    atom_names                  :: Vector{Symbol}
     r_cutoffs                   :: Vector{Float64}
     neighbor_weights            :: Vector{Float64}
     x_bounds                    :: Vector{Float64}
@@ -133,7 +163,7 @@ struct Configuration
 end
 
 # Read Configuration information from DATA file at file_path
-function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5, neighbor_weight = 0.5)
+function Configuration(file_path :: String; atom_names = nothing, rcutoff = [0.5], neighbor_weight =[1.0])
     lines = readlines(file_path)
     strip(lines[1]) == "LAMMPS DATA file" ? nothing : AssertionError("path should point to LAMMPS DATA file")
     
@@ -142,13 +172,35 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5,
     num_angles          = parse(Int, split(lines[5], " ")[1])
     num_dihedrals       = parse(Int, split(lines[6], " ")[1])
     num_impropers       = parse(Int, split(lines[7], " ")[1])
-    num_atom_types      = parse(Int, split(lines[9], " ")[1])
-    num_bond_types      = parse(Int, split(lines[10], " ")[1])
-    num_angle_types     = parse(Int, split(lines[11], " ")[1])
-    
-    xbounds_vec = split(lines[13], " ")
-    ybounds_vec = split(lines[14], " ")
-    zbounds_vec = split(lines[15], " ")
+
+ 
+    line_no = 9
+    num_types = zeros(Int, 5)
+    for (i, (nums, text)) in enumerate(zip([num_atoms, num_bonds, num_angles, num_dihedrals, num_impropers],
+                            ["atom", "bond", "angle", "dihedral", "improper"]))
+        if nums == 0
+            line_length = length(split(lines[line_no], " "))
+            if line_length > 1
+                line_no +=1
+            else
+                continue
+            end
+        
+        else text == split(lines[line_no], " ")[2]
+            num_types[i] = parse(Int, split(lines[line_no], " ")[1])
+            line_no += 1
+        end
+    end
+    num_atom_types = num_types[1]
+    num_bond_types = num_types[2]
+    num_angle_types = num_types[3]
+    num_dihedral_types = num_types[4]
+    num_improper_types = num_types[5]
+
+    line_no += 1
+    xbounds_vec = split(lines[line_no], " "); line_no += 1
+    ybounds_vec = split(lines[line_no], " ");        line_no += 1
+    zbounds_vec = split(lines[line_no], " ");      line_no += 1
     x_bounds            = [parse(Float64, xbounds_vec[1]), parse(Float64, xbounds_vec[2])]
     y_bounds            = [parse(Float64, ybounds_vec[1]), parse(Float64, ybounds_vec[2])]
     z_bounds            = [parse(Float64, zbounds_vec[1]), parse(Float64, zbounds_vec[2])]
@@ -156,7 +208,7 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5,
     if length(rcutoff) == num_atom_types
         r_cutoffs = rcutoff
     else
-        r_cutoffs = rcutoff * ones(num_atom_types)
+        r_cutoffs = rcutoff .* ones(num_atom_types)
     end
     if length(neighbor_weight) == num_atom_types
         neighbor_weights = neighbor_weight 
@@ -203,15 +255,15 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5,
     AngleAngleTorsion_coeffs    = Vector{Float64}(undef, 0)
     BondBond13_coeffs           = Vector{Float64}(undef, 0)
     AngleAngle_coeffs           = Vector{Float64}(undef, 0)
-    Velocities                  = Vector{Float64}(undef, 0)
+    Velocities                  = Vector{Position}(undef, num_atoms)
     Bonds                       = Vector{Float64}(undef, 0)
     Angles                      = Vector{Float64}(undef, 0)
     Dihedrals                   = Vector{Float64}(undef, 0)
     Impropers                   = Vector{Float64}(undef, 0)
 
-    return Configuration(file_path, num_atoms, num_bonds, num_angles, num_dihedrals,num_impropers, 
-                        num_atom_types, num_bond_types, num_angle_types, 
-                        r_cutoffs, neighbor_weights, x_bounds, y_bounds, z_bounds, 
+    return Configuration(file_path, num_atoms, num_bonds, num_angles, num_dihedrals, num_impropers, 
+                        num_atom_types, num_bond_types, num_angle_types, num_dihedral_types, num_improper_types,
+                        atom_names, r_cutoffs, neighbor_weights, x_bounds, y_bounds, z_bounds, 
                         Masses, NonBond_coeffs, Bond_coeffs, Angle_coeffs,
                         Dihedral_coeffs, Improper_coeffs, BondBond_coeffs, 
                         BondAngle_coeffs, MiddleBondTorsion_coeffs, EndBondTorsion_coeffs,
@@ -220,4 +272,87 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = 0.5,
 
 end
 
+function save_as_lammps_data(c::Configuration; file = "./DATA")
+    open(file, "w") do f
+        write(f, "LAMMPS Description \n")
+        write(f, "\n")
+        
+        #Specify holistic information 
+        for (d, text) in zip([c.num_atoms, c.num_bonds, c.num_angles, c.num_dihedrals, c.num_impropers], 
+                             ["atoms", "bonds", "angles", "dihedrals", "impropers"])
+            write(f, "$d $text\n")
+        end
+
+        write(f, "\n")
+
+        #Specify type information
+        for (d, text) in zip([c.num_atom_types, c.num_bond_types, c.num_angle_types, c.num_dihedral_types, c.num_improper_types],
+                            ["atom types", "bond types", "angle types", "dihedral types", "improper types"]) 
+            if d == 0
+                continue
+            else
+                write(f, "$d $text\n")
+            end
+        end
+
+        write(f, "\n")
+
+        #Specify bounds 
+        for (bound, text) in zip([c.x_bounds, c.y_bounds, c.z_bounds], ["xlo xhi", "ylo yhi", "zlo zhi"])
+            lo = bound[1]
+            hi = bound[2]
+            write(f, "$lo $hi $text\n")
+        end
+
+        write(f, "\n")
+
+        #Specify Masses
+        write(f, "Masses\n")
+        write(f, "\n")
+        for i = 1:c.num_atom_types
+            mass = c.Masses[i]
+            write(f, "$i $mass\n")
+        end
+
+
+        write(f, "\n")
+        #Specify Positions 
+        write(f, "Atoms\n")
+        write(f, "\n")
+        for i = 1:c.num_atoms
+            pos = c.Positions[i]
+            atom_id = findall(c.atom_names .== pos.type)[1]
+            x, y, z = pos.x, pos.y, pos.z
+            write(f, "$i $atom_id $x $y $z\n")
+        end
+
+    end
+
+end
+
+function get_interparticle_distance(c::Configuration)
+    return get_interparticle_distance(c.Positions)
+end
+
+function get_positions(r::Vector{Configuration})
+    N = length(r)
+    num_atoms = r[1].num_atoms
+
+    pos = Vector{Vector{Float64}}(undef, N)
+    for (i, ri) in enumerate(r)
+        pos[i] = Potentials.norm.(ri.Positions)
+    end
+    return pos 
+end
+
+function get_velocities(r::Vector{Configuration})
+    N = length(r)
+    num_atoms = r[1].num_atoms
+
+    pos = Vector{Vector{Float64}}(undef, N)
+    for (i, ri) in enumerate(r)
+        pos[i] = Potentials.norm.(ri.Velocities)
+    end
+    return pos 
+end
 

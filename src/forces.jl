@@ -29,7 +29,7 @@ end
 
 ############################## Vectorize ################################
 
-function force(r::Vector{Position}, p::Potential)
+function force(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     # f = Array{Float64}(undef, n, 3)
     f = [zeros(3) for j = 1:n]
@@ -43,14 +43,16 @@ function force(r::Vector{Position}, p::Potential)
     return f
 end
 
-function force(c::Configuration, p::Potential)
+function force(c::Configuration, p::EmpiricalPotential)
     return force(c.Positions, p)
 end
 
-function force(r::Vector{Configuration}, p::Potential)
+function force(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    f = [zeros(r[i].num_atoms) for i = 1:n]
+    f = [[zeros(3) for j = 1:r[i].num_atoms] for i = 1:n]
+    # println("f ", f)
     for i = 1:n
+        # println("force ", force(r[i], p))
         f[i] = force(r[i], p)
     end
     return f

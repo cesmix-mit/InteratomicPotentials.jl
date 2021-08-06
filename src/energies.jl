@@ -27,7 +27,7 @@ end
 
 ############################## Vectorize ################################
 
-function potential_energy(r::Vector{Position}, p::Potential)
+function potential_energy(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     pe = 0.0
     for i = 1:(n-1)
@@ -39,16 +39,17 @@ function potential_energy(r::Vector{Position}, p::Potential)
     return pe
 end
 
-function potential_energy(c::Configuration, p::Potential)
+function potential_energy(c::Configuration, p::EmpiricalPotential)
     return potential_energy(c.Positions, p)
 end
 
-function potential_energy(r::Vector{Configuration}, p::Potential)
+function potential_energy(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
     p_e = zeros(n)
     for i = 1:n
         p_e[i] = potential_energy(r[i], p)
     end
+    return p_e
 end
 
 #########################################################################

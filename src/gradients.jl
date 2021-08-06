@@ -123,7 +123,7 @@ function grad_virial(r::Position, p::SNAP)
     return 0.0
 end
 ############################## Vectorize ################################
-function grad_potential_energy(r::Vector{Position}, p::Potential)
+function grad_potential_energy(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     pe = 0. * grad_potential_energy(r[1] - r[2], p)
     for i = 1:(n-1)
@@ -157,7 +157,7 @@ function grad_potential_energy(r::Vector{Position}, p::GaN)
     return pe
 end
 
-function grad_force(r::Vector{Position}, p::Potential)
+function grad_force(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     f = [0. * grad_force(r[1] - r[2], p) for j = 1:n]
     for i = 1:(n-1)
@@ -194,7 +194,7 @@ function grad_force(r::Vector{Position}, p::GaN)
     return f
 end
 
-function grad_virial(r::Vector{Position}, p::Potential)
+function grad_virial(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     v = 0. * grad_virial(r[1] - r[2], p)
     for i = 1:(n-1)
