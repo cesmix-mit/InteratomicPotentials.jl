@@ -93,8 +93,8 @@ function norm(r::Position)
     return sqrt(r.x^2 + r.y^2 + r.z^2)
 end
 
-+(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x+r2.x, r1.y + r2.y, r1.z + r2.z, r1.type) : AssertionError("Atoms must have the same type for this operation!"))
--(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x-r2.x, r1.y - r2.y, r1.z - r2.z, r1.type) : AssertionError("Atoms must have the same type for this operation!"))
++(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x+r2.x, r1.y + r2.y, r1.z + r2.z, r1.type) : Position(r1.x + r2.x, r1.y + r2.y, r1.z + r2.z, :nothing))
+-(r1::Position, r2::Position) = (r1.type == r2.type ? Position(r1.x-r2.x, r1.y - r2.y, r1.z - r2.z, r1.type) : Position(r1.x - r2.x, r1.y - r2.y, r1.z - r2.z, :nothing))
 *(a::AbstractFloat, r::Position) = Position(a*r.x, a*r.y, a*r.z, r.type)
 *(r::Position, a::AbstractFloat) = Position(a*r.x, a*r.y, a*r.z, r.type)
 
@@ -124,10 +124,12 @@ end
 ##################### Configurations ##########################################
 struct Configuration
     file_path                   :: String
+    units                       :: String 
+    boundaries                  :: Vector{String}
     num_atoms                   :: Int
     num_bonds                   :: Int
     num_angles                  :: Int 
-    num_dihedrals              :: Int
+    num_dihedrals               :: Int
     num_impropers               :: Int 
     num_atom_types              :: Int
     num_bond_types              :: Int 
@@ -135,8 +137,8 @@ struct Configuration
     num_dihedral_types          :: Int
     num_improper_types          :: Int 
     atom_names                  :: Vector{Symbol}
-    r_cutoffs                   :: Vector{Float64}
-    neighbor_weights            :: Vector{Float64}
+    radii                       :: Vector{Float64}
+    weights                     :: Vector{Float64}
     x_bounds                    :: Vector{Float64}
     y_bounds                    :: Vector{Float64}
     z_bounds                    :: Vector{Float64}
@@ -163,41 +165,32 @@ struct Configuration
 end
 
 # Read Configuration information from DATA file at file_path
-function Configuration(file_path :: String; atom_names = nothing, rcutoff = [0.5], neighbor_weight =[1.0])
+function Configuration(file_path :: String; atom_names = nothing, radii = [3.5], weights =[1.0], boundaries = ["f", "f", "f"], units = "lj")
     lines = readlines(file_path)
-    strip(lines[1]) == "LAMMPS DATA file" ? nothing : AssertionError("path should point to LAMMPS DATA file")
     
-    num_atoms           = parse(Int, split(lines[3], " ")[1])
-    num_bonds           = parse(Int, split(lines[4], " ")[1])
-    num_angles          = parse(Int, split(lines[5], " ")[1])
-    num_dihedrals       = parse(Int, split(lines[6], " ")[1])
-    num_impropers       = parse(Int, split(lines[7], " ")[1])
-
- 
-    line_no = 9
-    num_types = zeros(Int, 5)
-    for (i, (nums, text)) in enumerate(zip([num_atoms, num_bonds, num_angles, num_dihedrals, num_impropers],
-                            ["atom", "bond", "angle", "dihedral", "improper"]))
-        if nums == 0
-            line_length = length(split(lines[line_no], " "))
-            if line_length > 1
-                line_no +=1
-            else
-                continue
-            end
-        
-        else text == split(lines[line_no], " ")[2]
-            num_types[i] = parse(Int, split(lines[line_no], " ")[1])
-            line_no += 1
+    dict = Dict([("atoms", 0), ("bonds", 0), ("angles", 0), ("dihedrals", 0), ("impropers", 0), 
+            ("atom types", 0), ("bond types", 0), ("angle types", 0), ("dihedral types", 0), ("improper types", 0)])
+    
+    for key = keys(dict)
+        line_no = findall(occursin.(key, lines))
+        if isempty(line_no)
+            continue
+        else
+            dict[key] = parse(Int, split(lines[line_no[1]], " ")[1])
         end
     end
-    num_atom_types = num_types[1]
-    num_bond_types = num_types[2]
-    num_angle_types = num_types[3]
-    num_dihedral_types = num_types[4]
-    num_improper_types = num_types[5]
+    num_atoms           = dict["atoms"]
+    num_bonds           = dict["bonds"]
+    num_angles          = dict["angles"]
+    num_dihedrals       = dict["dihedrals"]
+    num_impropers       = dict["impropers"]
+    num_atom_types      = dict["atom types"]
+    num_bond_types      = dict["bond types"]
+    num_angle_types     = dict["angle types"]
+    num_dihedral_types  = dict["dihedral types"]
+    num_improper_types  = dict["improper types"]
 
-    line_no += 1
+    line_no = findall(occursin.("xlo", lines))[1]
     xbounds_vec = split(lines[line_no], " "); line_no += 1
     ybounds_vec = split(lines[line_no], " ");        line_no += 1
     zbounds_vec = split(lines[line_no], " ");      line_no += 1
@@ -205,20 +198,20 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = [0.5
     y_bounds            = [parse(Float64, ybounds_vec[1]), parse(Float64, ybounds_vec[2])]
     z_bounds            = [parse(Float64, zbounds_vec[1]), parse(Float64, zbounds_vec[2])]
 
-    if length(rcutoff) == num_atom_types
-        r_cutoffs = rcutoff
+    if length(radii) == num_atom_types
+        radii = radii
     else
         r_cutoffs = rcutoff .* ones(num_atom_types)
     end
-    if length(neighbor_weight) == num_atom_types
-        neighbor_weights = neighbor_weight 
+    if length(weights) == num_atom_types
+        weights = weights
     else
-        neighbor_weights = neighbor_weight .* ones(num_atom_types)
+        weights = weights .* ones(num_atom_types)
     end
 
     # Read Masses
     Masses = zeros(num_atom_types)
-    line_num_masses = findall(lines .== "Masses")[1] + 1
+    line_num_masses = findall(occursin.("Masses", lines))[1] + 1
     for i = 1:num_atom_types
         Masses[i] = parse(Float64, split(lines[line_num_masses + i])[2])
     end
@@ -231,14 +224,28 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = [0.5
     end
 
     Positions = Vector{Position}(undef, num_atoms)
-    line_num_atoms = findall(lines .== "Atoms")[1] + 1
+    line_num_atoms = findall(occursin.("Atoms", lines))[1] + 1
     for i = 1:num_atoms
         info = split(lines[line_num_atoms+i])
-        Positions[i] = Position(parse(Float64, info[3]), 
+        Positions[parse(Int, info[1])] = Position(parse(Float64, info[3]), 
                                 parse(Float64, info[4]), 
                                 parse(Float64, info[5]), 
                                 atom_names[parse(Int, info[2])]
                                 )
+    end
+
+    Velocities = Vector{Position}(undef, num_atoms)
+    ind_velocities = findall(occursin.("Velocities", lines))
+    if ~isempty(ind_velocities)
+        line_num_atoms = findall(occursin.("Velocities", lines))[1] + 1
+        for i = 1:num_atoms
+            info = split(lines[line_num_atoms+i])
+            Velocities[parse(Int, info[1])] = Position(parse(Float64, info[2]), 
+                                    parse(Float64, info[3]), 
+                                    parse(Float64, info[4]), 
+                                    Positions[parse(Int, info[1])].type
+                                    )
+        end
     end
 
     # To do: Implement other keys
@@ -255,15 +262,15 @@ function Configuration(file_path :: String; atom_names = nothing, rcutoff = [0.5
     AngleAngleTorsion_coeffs    = Vector{Float64}(undef, 0)
     BondBond13_coeffs           = Vector{Float64}(undef, 0)
     AngleAngle_coeffs           = Vector{Float64}(undef, 0)
-    Velocities                  = Vector{Position}(undef, num_atoms)
+    # Velocities                  = Vector{Position}(undef, num_atoms)
     Bonds                       = Vector{Float64}(undef, 0)
     Angles                      = Vector{Float64}(undef, 0)
     Dihedrals                   = Vector{Float64}(undef, 0)
     Impropers                   = Vector{Float64}(undef, 0)
 
-    return Configuration(file_path, num_atoms, num_bonds, num_angles, num_dihedrals, num_impropers, 
+    return Configuration(file_path, units, boundaries, num_atoms, num_bonds, num_angles, num_dihedrals, num_impropers, 
                         num_atom_types, num_bond_types, num_angle_types, num_dihedral_types, num_improper_types,
-                        atom_names, r_cutoffs, neighbor_weights, x_bounds, y_bounds, z_bounds, 
+                        atom_names, radii, weights, x_bounds, y_bounds, z_bounds, 
                         Masses, NonBond_coeffs, Bond_coeffs, Angle_coeffs,
                         Dihedral_coeffs, Improper_coeffs, BondBond_coeffs, 
                         BondAngle_coeffs, MiddleBondTorsion_coeffs, EndBondTorsion_coeffs,
@@ -356,3 +363,101 @@ function get_velocities(r::Vector{Configuration})
     return pos 
 end
 
+function run_md_lj(c0::Configuration, Tend::Int, save_dir::String; dim = 3, seed = 1, Temp = 0.5, dt = 0.005, dT = 10)
+    d = LMP(["-screen", "none"]) do lmp
+        for i = 1
+            command(lmp, "log none")
+            command(lmp, "units lj")
+            command(lmp, "dimension $dim")
+            command(lmp, "atom_style atomic")
+            command(lmp, "atom_modify map array")
+            if dim == 2
+                command(lmp, "boundary $(c0.boundaries[1]) $(c0.boundaries[2]) p")
+            elseif dim == 3
+                command(lmp, "boundary $(c0.boundaries[1]) $(c0.boundaries[2]) $(c0.boundaries[3])")
+            end
+
+            # Setup box
+            command(lmp, "region mybox block $(c0.x_bounds[1]) $(c0.x_bounds[2]) $(c0.y_bounds[1]) $(c0.y_bounds[2]) $(c0.z_bounds[1]) $(c0.z_bounds[2])")
+            command(lmp, "create_box $(c0.num_atom_types) mybox")
+
+            # Create atoms
+            for j = 1:c0.num_atoms
+                atom_id = findall(c0.atom_names .== c0.Positions[j].type)[1]
+                command(lmp, "create_atoms $atom_id single $(c0.Positions[j].x) $(c0.Positions[j].y) $(c0.Positions[j].z)")
+            end
+
+            command(lmp, "mass 1 1")
+            command(lmp, "velocity all create $(0.25*Temp) $seed mom yes rot yes dist gaussian")
+
+            # Setup Forcefield
+            command(lmp, "pair_style hybrid lj/cut 3.4")
+            command(lmp, "pair_coeff 1 1 lj/cut 1 1")
+
+            # Apply fixes
+            # command(lmp, "fix l0 all langevin $Temp $Temp 0.001")
+            command(lmp, "fix l0 all nve langevin $Temp $Temp 1.0 $seed")
+            
+            # computes
+            command(lmp, "compute rdf all rdf 100 cutoff 2.5")      # radial distribution function 
+            command(lmp, "fix frdf all ave/time $dT $(Int(Tend/dT)-1) $Tend c_rdf[*] file $(save_dir)tmp.rdf mode vector")
+            
+            command(lmp, "compute pe all pe")                       # potential energy
+            command(lmp, "fix fpe all ave/time 1 100 100 c_pe[*] file $(save_dir)tmp.pe")
+            
+            command(lmp, "compute msd all msd com yes")
+            command(lmp, "fix fmsd all ave/time 1 100 100 c_msd[4] file $(save_dir)tmp.msd")
+            
+            # Outputs
+            command(lmp, "timestep $dt")
+            command(lmp, """run $Tend every $dT "write_data $(save_dir)DATA.*" """)
+            
+            command(lmp, "clear")
+        end
+    end
+
+    # Return rdf 
+    lines = readlines("$(save_dir)tmp.rdf")
+    n = length(lines) - 4
+    bins = zeros(n)
+    rdf = zeros(n)
+    coord = zeros(n)
+    for j = 1:n
+        v = split(lines[4+j], " ")
+        bins[j] = parse(Float64, v[2])
+        rdf[j] = parse(Float64, v[3])
+        coord[j] = parse(Float64, v[4])
+    end
+
+    # Return pe 
+    lines = readlines("$(save_dir)tmp.pe")
+    n = length(lines) - 2
+    t = zeros(n)
+    pe = zeros(n)
+    for j = 1:n
+        v = split(lines[2+j], " ")
+        t[j] = dt*parse(Float64, v[1])
+        pe[j] = parse(Float64, v[2])
+    end
+
+    # Return vacf, diffusivity
+    lines = readlines("$(save_dir)tmp.msd")
+    n = length(lines) - 2
+    t_msd = zeros(n)
+    msd = zeros(n)
+    # diffusivity = 0.0
+    for j = 1:n
+        v = split(lines[2+j], " ")
+        t_msd[j] = parse(Float64, v[1])
+        msd[j] = parse(Float64, v[2])
+    end
+    diffusivity = sum(msd[end-100:end] ./ t_msd[end-100:end]) / 100.0
+    if dim == 2
+        diffusivity *= 0.25
+    else
+        diffusivity *= 1.0 / 6.0
+    end
+
+    return (bins = bins, rdf = rdf, coord = coord), (t = t, pe = pe), (t = t_msd, msd = msd, diffusivity = diffusivity)
+
+end

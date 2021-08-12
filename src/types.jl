@@ -11,8 +11,8 @@ abstract type MixedPotential <:ArbitraryPotential end
 
 ############################## Lennard Jones ###################################
 mutable struct LennardJones <: EmpiricalPotential
-    ϵ::Float64
-    σ::Float64
+    ϵ::Real
+    σ::Real
 end
 
 function LennardJones()
@@ -103,13 +103,13 @@ end
 
 mutable struct SNAP <: FittedPotential
     β :: Vector{Float64}
-    r_cutoff_factor :: Float64 
+    rcutfac         :: Float64
     twojmax         :: Int
     num_atom_types  :: Int
 end
 
-function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
-    J = twojmax / num_atom_types
+function SNAP(rcutfac::Float64, twojmax::Int, num_atom_types::Int)
+    J = twojmax 
     if J % 2 == 0
         m = J/2 + 1
         num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
@@ -119,7 +119,7 @@ function SNAP(r_cutoff_factor::Float64, twojmax::Int, num_atom_types::Int)
     else
         AssertionError("twojmax must be an integer multiple of the number of atom types!")
     end 
-    return SNAP(ones(num_atom_types*num_coeffs+1), r_cutoff_factor, twojmax, num_atom_types)
+    return SNAP(ones(num_atom_types*num_coeffs+1), rcutfac, twojmax, num_atom_types)
 end
 
 function get_trainable_params(snap::SNAP)
@@ -132,6 +132,27 @@ function set_trainable_params!(snap::SNAP, params::NamedTuple)
 end
 
 function get_nontrainable_params(snap::SNAP)
-    return (r_cutoff_factor = snap.r_cutoff_factor, twojmax = snap.twojmax)
+    return (rcut = snap.rcut, twojmax = snap.twojmax)
+end
+
+function create_snap_files(c::Configuration, snap::SNAP, file)
+    open(file*".snapcoeff", "w") do f 
+        write(f, "#UNITS: $(c.units)\n")
+        write(f, "#LAMMPS SNAP COEFFICIENTS\n")
+        write(f, "$(c.num_atom_types) $(length(snap.β))\n")
+        for i = 1:snap.num_atom_types
+            write(f, "$(c.atom_names[i]) $(c.radii[i]) $(c.weights[i])\n")
+        end
+        for b = snap.β
+            write(f, "$b\n")
+        end
+    end
+
+    open(file*".snapparam", "w") do f
+        write(f, "#UNITS: $(c.units)\n")
+        write(f, "#LAMMPS SNAP PARAMETERS\n")
+        write(f, "rcutfac $(snap.rcutfac)\n")
+        write(f, "twojmax $(snap.twojmax)\n")
+    end
 end
 

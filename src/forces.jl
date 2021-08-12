@@ -32,12 +32,16 @@ end
 function force(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
     # f = Array{Float64}(undef, n, 3)
-    f = [zeros(3) for j = 1:n]
+    f = [Vector{Real}(undef, 3) for j = 1:n]
     for i = 1:(n-1)
         for j = (i+1):n
             rtemp = r[i] - r[j]
-            f[i] +=  force(rtemp, p) 
-            f[j] -= f[i]
+            f[i] = force(rtemp, p) 
+            if isdefined(f[j], 1)
+                f[j] -= -f[i]
+            else
+                f[j] = -f[i]
+            end
         end
     end
     return f
@@ -49,7 +53,7 @@ end
 
 function force(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    f = [[zeros(3) for j = 1:r[i].num_atoms] for i = 1:n]
+    f = [[Vector{Real}(undef, 3) for j = 1:r[i].num_atoms] for i = 1:n]
     # println("f ", f)
     for i = 1:n
         # println("force ", force(r[i], p))
@@ -109,13 +113,16 @@ end
 function force(c::Configuration, p::SNAP)
     A = get_snap(c, p)
     force = A[2:end-6, :] * p.β
+    n = length(force)
+    num_tuples = Int(n/3)
+    force = [[force[3*(j-1)+k] for k = 1:3] for j = 1:num_tuples]
     return force
 end
 
 function force(r::Vector{Configuration}, p::SNAP)
     n = length(r)
-    f = [zeros(r[i].num_atoms) for i = 1:n]
-    for i = 1:n
+    f = [[zeros(3) for j = 1:r[i].num_atoms] for i = 1:n]
+    for i = 1:n 
         f[i] = force(r[i], p)
     end
     return f

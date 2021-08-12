@@ -45,7 +45,7 @@ end
 
 function potential_energy(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    p_e = zeros(n)
+    p_e = Vector{Real}(undef, n)
     for i = 1:n
         p_e[i] = potential_energy(r[i], p)
     end

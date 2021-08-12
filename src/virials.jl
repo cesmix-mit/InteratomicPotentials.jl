@@ -33,7 +33,7 @@ end
 
 function virial(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    v = zeros(n)
+    v = Vector{Real}(undef, n)
     for i = 1:n 
         v[i] = virial(r[i], p)
     end
@@ -49,7 +49,8 @@ end
 
 function virial_stress(r::Vector{Position}, p::EmpiricalPotential)
     n = length(r)
-    v = zeros(6)
+    v = Vector{Real}(undef, 6)
+    v[:] .= 0.0
     for i = 1:(n-1)
         for j = (i+1):n
             rtemp = r[i] - r[j]
@@ -65,7 +66,7 @@ end
 
 function virial_stress(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    v = [zeros(6) for i = 1:n]
+    v = [Vector{Real}(undef, 6) for i = 1:n]
     for i = 1:n
         v[i] = virial_stress(r[i], p)
     end
@@ -151,7 +152,7 @@ end
 
 function virial(r:: Vector{Configuration}, p::SNAP)
     n = length(r)
-    v = zeros(n)
+    v = Vector{Real}(undef, n)
     for j = 1:n
         v[j] = virial(r[j], p)
     end
@@ -166,7 +167,7 @@ end
 
 function virial_stress(r:: Vector{Configuration}, p::SNAP)
     n = length(r)
-    v = [zeros(6) for i = 1:n]
+    v = [Vector{Real}(undef, 6) for i = 1:n]
     for i = 1:n
         v[i] = virial_stress(r[i], p)
     end
