@@ -44,6 +44,7 @@ function get_bispectrum(c::Configuration, snap::SNAP)
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute b all sna/atom $rcut_factor 0.99363 $twojmax " * rcut_string * neighbor_weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
             command(lmp, string_command)
+            command(lmp, "fix lo enforce2d")
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")
 

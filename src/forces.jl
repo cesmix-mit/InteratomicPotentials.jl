@@ -10,7 +10,7 @@
 
 function force(r::Position, p::LennardJones)
     d = norm(r)
-    return 12.0 * 4.0 * ( p.σ^12 / d^13 - 0.5*p.σ^6 / d^7 ) .* [r.x, r.y, r.z] ./ d
+    return 24.0 * p.ϵ * ( 2.0 * ( p.σ / d )^12 -  ( p.σ / d)^6 ) .* [r.x, r.y, r.z] ./ d ./ d
 end
 
 ##############################   Born-Mayer  ###################################
@@ -29,18 +29,18 @@ end
 
 ############################## Vectorize ################################
 
-function force(r::Vector{Position}, p::EmpiricalPotential)
+function force(r::Vector{Position}, p::EmpiricalPotential; rcut = 2.25)
     n = length(r)
     # f = Array{Float64}(undef, n, 3)
-    f = [Vector{Real}(undef, 3) for j = 1:n]
-    for i = 1:(n-1)
+    f = [zeros(Real, 3) for j = 1:n]
+    for i = 1:n
         for j = (i+1):n
             rtemp = r[i] - r[j]
-            f[i] = force(rtemp, p) 
-            if isdefined(f[j], 1)
-                f[j] -= -f[i]
+            if (norm(rtemp) < 1e-8) 
+                continue
             else
-                f[j] = -f[i]
+                f[i] += force(rtemp, p) 
+                f[j] -= f[i]
             end
         end
     end
@@ -48,7 +48,7 @@ function force(r::Vector{Position}, p::EmpiricalPotential)
 end
 
 function force(c::Configuration, p::EmpiricalPotential)
-    return force(c.Positions, p)
+    return force(c.Positions, p; rcut = maximum(c.radii))
 end
 
 function force(r::Vector{Configuration}, p::EmpiricalPotential)

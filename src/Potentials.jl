@@ -31,7 +31,7 @@ module Potentials
 using Base: Float64
 using LAMMPS
 using LinearAlgebra
-
+using Plots
 include("utils.jl")
 include("types.jl")
 include("bispectrum.jl")

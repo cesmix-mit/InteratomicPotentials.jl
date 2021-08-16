@@ -143,7 +143,8 @@ function create_snap_files(c::Configuration, snap::SNAP, file)
         for i = 1:snap.num_atom_types
             write(f, "$(c.atom_names[i]) $(c.radii[i]) $(c.weights[i])\n")
         end
-        for b = snap.β
+        write(f, "$(snap.β[end])\n")
+        for b = snap.β[1:end-1]
             write(f, "$b\n")
         end
     end
