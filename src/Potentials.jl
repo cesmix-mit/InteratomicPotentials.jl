@@ -32,14 +32,14 @@ using Base: Float64
 using LAMMPS
 using LinearAlgebra
 using Plots
-include("utils.jl")
-include("types.jl")
-include("bispectrum.jl")
-include("energies.jl")
-include("forces.jl")
-include("virials.jl")
-include("gradients.jl")
-include("md.jl")
+
+
+include("Utilities/utils.jl")
+include("IO/io.jl")
+include("PotentialTypes/types.jl")
+include("MD/md.jl")
+
+
 
 
 
