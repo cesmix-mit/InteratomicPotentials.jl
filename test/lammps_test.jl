@@ -9,10 +9,9 @@ import Potentials
 using LinearAlgebra: svdvals
 file_path = "DATA"
 
-c = Potentials.Configuration(file_path; atom_names = [:Ga, :N], 
-                    rcutoff = 0.5, neighbor_weight = [1.0, 0.5])
+c = Potentials.load_lammps_DATA(file_path; atom_names = [:Ga, :N], radii = [0.5, 0.5], weights = [1.0, 0.5], boundaries = ["p", "p", "p"], units = "metal" )
 
-snap = Potentials.SNAP(3.5, 3, 2)
+snap = Potentials.SNAP(3.5, 4)
 println("SNAP: ", snap)
 b = Potentials.get_bispectrum(c, snap)
 db = Potentials.get_dbispectrum(c, snap)

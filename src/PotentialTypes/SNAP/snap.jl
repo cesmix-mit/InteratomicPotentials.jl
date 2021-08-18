@@ -6,10 +6,9 @@ mutable struct SNAP <: FittedPotential
     β :: Vector{Float64}
     rcutfac         :: Float64
     twojmax         :: Int
-    num_atom_types  :: Int
 end
 
-function SNAP(rcutfac::Float64, twojmax::Int, num_atom_types::Int)
+function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration)
     J = twojmax 
     if J % 2 == 0
         m = J/2 + 1
@@ -18,9 +17,9 @@ function SNAP(rcutfac::Float64, twojmax::Int, num_atom_types::Int)
         m = (J+1)/2
         num_coeffs = Int( m * (m+1) * (m+2) / 3 )
     else
-        AssertionError("twojmax must be an integer multiple of the number of atom types!")
+        AssertionError("twojmax must be an integer!")
     end 
-    return SNAP(ones(num_atom_types*num_coeffs+1), rcutfac, twojmax, num_atom_types)
+    return SNAP( zeros(c.num_atom_types * num_coeffs + 1) , rcutfac, twojmax)
 end
 
 function get_trainable_params(snap::SNAP)
@@ -63,4 +62,5 @@ end
 include("bispectrum.jl")
 include("energy.jl")
 include("force.jl")
-include("virial")
+include("virial.jl")
+include("gradients.jl")

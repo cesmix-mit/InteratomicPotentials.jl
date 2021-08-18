@@ -32,4 +32,19 @@ function force(r:: Position, p::Coulomb)
     return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* [r.x, r.y, r.z] ./ d
 end
 
+##############################   Gradients  ###################################
+
+function grad_potential_energy(r::Position, p::Coulomb)
+    println("The Coulomb potential has no trainable parameters")
+    return (dpdnull = 0.0)
+end
+function grad_force(r:: Position, p::Coulomb)
+    println("The Coulomb potential has no trainable parameters")
+    return (dfdnull =  0 .* [r.x, r.y, r.z] ./ d )
+end
+
+function grad_virial(r::Position, p::Coulomb)
+    println("The Coulomb potential has no trainable parameters")
+    return (dvdnull =  0 .* [r.x, r.y, r.z] ./ d )
+end
 

@@ -120,7 +120,7 @@ function Configuration()
     Angles,
     Dihedrals,
     Impropers)
-
+end
 
 
 function get_interparticle_distance(c::Configuration)

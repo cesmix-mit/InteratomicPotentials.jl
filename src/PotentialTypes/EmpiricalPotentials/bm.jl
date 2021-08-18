@@ -32,4 +32,25 @@ function force(r::Position, p::BornMayer)
     return p.A /p.ρ * exp(-d / p.ρ ) .* [r.x, r.y, r.z] ./ d
 end
 
+##############################   Gradients  ###################################
+
+function grad_potential_energy(r::Position, p::BornMayer)
+    d = norm(r)
+    return (dpdA = exp(-d / p.ρ),
+            dpdρ = p.A * d * exp(-d/p.ρ) / p.ρ^2 )
+end
+
+function grad_force(r::Position, p::BornMayer)
+    d = norm(r)
+    return (dfdA = 1.0 /p.ρ * exp(-d / p.ρ ) .* [r.x, r.y, r.z] ./ d, 
+            dfdρ = p.A / p.ρ^3 * exp(-d / p.ρ )*(d - p.ρ)  .* [r.x, r.y, r.z] ./ d)
+end
+
+function grad_virial(r::Position, p::BornMayer)
+    df = grad_force(r, p)
+    dfdA = df[:dfdA]
+    dfdrho = df[:dfdρ]
+    return (dvdA = dfdA[1]*r.x + dfdA[2]*r.y + dfdA[3]*r.z, 
+            dvdρ = dfdrho[1]*r.x + dfdrho[2]*r.y + dfdrho[3]*r.z)
+end
 

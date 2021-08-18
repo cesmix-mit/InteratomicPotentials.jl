@@ -15,36 +15,66 @@
 #       get_snap is instrumental in the methods that calculate potential_energy, force, virial for the snap potential.
 ################################################################################
 
-function get_bispectrum(c::Configuration, snap::SNAP)
-    read_data_str = "read_data " * c.file_path
-    rcut_factor = snap.r_cutoff_factor 
-    twojmax = snap.twojmax
-    num_coeffs =Int( ( length(snap.β) - 1 ) / c.num_atom_types )
-    rcut_string = "" 
-    neighbor_weight_string = ""
-    for j = 1:c.num_atom_types
-        rcut_string *= string(c.r_cutoffs[j]) 
-        rcut_string *= " "
-        neighbor_weight_string *= string(c.neighbor_weights[j])
-        neighbor_weight_string *= " "
+function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
+    J = snap.twojmax
+    if J % 2 == 0
+        m = J/2 + 1
+        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
+    elseif J % 2 == 1
+        m = (J+1)/2
+        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
+    else
+        AssertionError("twojmax must be an integer multiple of the number of atom types!")
     end
-
+    
+    radii_string = "" 
+    weight_string = ""
+    for j = 1:c.num_atom_types
+        radii_string *= string(c.radii[j]) 
+        radii_string *= " "
+        weight_string *= string(c.weights[j])
+        weight_string *= " "
+    end
+    
     A = LMP(["-screen", "none"]) do lmp
         bispectrum = Array{Float64}(undef, num_coeffs, c.num_atoms)
-        for j = 1
+        for i = 1
+            # Initialize
             command(lmp, "log none")
-            command(lmp, "units metal")
-            command(lmp, "boundary p p p")
+            command(lmp, "units " * c.units)
+            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
-            command(lmp, read_data_str)
-            command(lmp, "pair_style zero $rcut_factor")
+
+            # Setup box
+            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "create_box $(c.num_atom_types) mybox")
+
+            # Create atoms
+            for j = 1:c.num_atoms
+                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            end
+
+            if c.units == "lj"
+                command(lmp, "mass 1 1.0")
+            else
+                for j = 1:c.num_atom_types
+                    command(lmp, "mass $j $(c.Masses[j])")
+                end
+            end
+
+            # Setup Forcefield
+            
+            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute b all sna/atom $rcut_factor 0.99363 $twojmax " * rcut_string * neighbor_weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute b all sna/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
             command(lmp, string_command)
-            command(lmp, "fix lo enforce2d")
+            if dim == 2
+                command(lmp, "fix lo all enforce2d")
+            end
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")
 
@@ -60,95 +90,159 @@ function get_bispectrum(c::Configuration, snap::SNAP)
 
 end
 
-function get_dbispectrum(c::Configuration, snap::SNAP)
-    read_data_str = "read_data " * c.file_path
-    rcut_factor = snap.r_cutoff_factor 
-    twojmax = snap.twojmax
-    num_coeffs = ( length(snap.β) - 1 ) * 3 
-    rcut_string = "" 
-    neighbor_weight_string = ""
-    for j = 1:c.num_atom_types
-        rcut_string *= string(c.r_cutoffs[j]) 
-        rcut_string *= " "
-        neighbor_weight_string *= string(c.neighbor_weights[j])
-        neighbor_weight_string *= " "
+function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
+    J = snap.twojmax
+    if J % 2 == 0
+        m = J/2 + 1
+        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
+    elseif J % 2 == 1
+        m = (J+1)/2
+        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
+    else
+        AssertionError("twojmax must be an integer multiple of the number of atom types!")
     end
-
+    
+    radii_string = "" 
+    weight_string = ""
+    for j = 1:c.num_atom_types
+        radii_string *= string(c.radii[j]) 
+        radii_string *= " "
+        weight_string *= string(c.weights[j])
+        weight_string *= " "
+    end
+    
     A = LMP(["-screen", "none"]) do lmp
-        dbispectrum = Array{Float64}(undef, num_coeffs, c.num_atoms)
-        for j = 1
+        bispectrum = Array{Float64}(undef, 3*c.num_atom_types*num_coeffs, c.num_atoms)
+        for i = 1
+            # Initialize
             command(lmp, "log none")
-            command(lmp, "units metal")
-            command(lmp, "boundary p p p")
+            command(lmp, "units " * c.units)
+            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
-            command(lmp, read_data_str)
-            command(lmp, "pair_style zero $rcut_factor")
+
+            # Setup box
+            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "create_box $(c.num_atom_types) mybox")
+
+            # Create atoms
+            for j = 1:c.num_atoms
+                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            end
+
+            if c.units == "lj"
+                command(lmp, "mass 1 1.0")
+            else
+                for j = 1:c.num_atom_types
+                    command(lmp, "mass $j $(c.Masses[j])")
+                end
+            end
+
+            # Setup Forcefield
+            
+            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute db all snad/atom $rcut_factor 0.99363 $twojmax " * rcut_string * neighbor_weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute db all snad/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
             command(lmp, string_command)
+            if dim == 2
+                command(lmp, "fix lo all enforce2d")
+            end
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")
 
             ## Extract bispectrum
             bs = extract_compute(lmp, "db",  LAMMPS.API.LMP_STYLE_ATOM,
                                             LAMMPS.API.LMP_TYPE_ARRAY)
-            dbispectrum[:, :] = bs
+            bispectrum[:, :] = bs
             command(lmp, "clear")
         end
-        return dbispectrum
+        return bispectrum
     end
     return A
+
 end
 
-function get_vbispectrum(c::Configuration, snap::SNAP)
-    read_data_str = "read_data " * c.file_path
-    rcut_factor = snap.r_cutoff_factor 
-    twojmax = snap.twojmax
-    num_coeffs = (length(snap.β) - 1) * 6 
-    rcut_string = "" 
-    neighbor_weight_string = ""
-    for j = 1:c.num_atom_types
-        rcut_string *= string(c.r_cutoffs[j]) 
-        rcut_string *= " "
-        neighbor_weight_string *= string(c.neighbor_weights[j])
-        neighbor_weight_string *= " "
+function get_vbispectrum(c::Configuration, snap::SNAP; dim = 3)
+    J = snap.twojmax
+    if J % 2 == 0
+        m = J/2 + 1
+        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
+    elseif J % 2 == 1
+        m = (J+1)/2
+        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
+    else
+        AssertionError("twojmax must be an integer multiple of the number of atom types!")
     end
-
+    
+    radii_string = "" 
+    weight_string = ""
+    for j = 1:c.num_atom_types
+        radii_string *= string(c.radii[j]) 
+        radii_string *= " "
+        weight_string *= string(c.weights[j])
+        weight_string *= " "
+    end
+    
     A = LMP(["-screen", "none"]) do lmp
-        vbispectrum = Array{Float64}(undef, num_coeffs, c.num_atoms)
-        for j = 1
+        bispectrum = Array{Float64}(undef, 6*c.num_atom_types*num_coeffs, c.num_atoms)
+        for i = 1
+            # Initialize
             command(lmp, "log none")
-            command(lmp, "units metal")
-            command(lmp, "boundary p p p")
+            command(lmp, "units " * c.units)
+            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
-            command(lmp, read_data_str)
-            command(lmp, "pair_style zero $rcut_factor")
+
+            # Setup box
+            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "create_box $(c.num_atom_types) mybox")
+
+            # Create atoms
+            for j = 1:c.num_atoms
+                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            end
+
+            if c.units == "lj"
+                command(lmp, "mass 1 1.0")
+            else
+                for j = 1:c.num_atom_types
+                    command(lmp, "mass $j $(c.Masses[j])")
+                end
+            end
+
+            # Setup Forcefield
+            
+            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute vb all snav/atom $rcut_factor 0.99363 $twojmax " * rcut_string * neighbor_weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute vb all snav/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
             command(lmp, string_command)
+            if dim == 2
+                command(lmp, "fix lo all enforce2d")
+            end
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")
 
             ## Extract bispectrum
             bs = extract_compute(lmp, "vb",  LAMMPS.API.LMP_STYLE_ATOM,
                                             LAMMPS.API.LMP_TYPE_ARRAY)
-            vbispectrum[:, :] = bs
+            bispectrum[:, :] = bs
             command(lmp, "clear")
         end
-        return vbispectrum
+        return bispectrum
     end
     return A
+
 end
 
 
-function get_snap(c::Configuration, snap::SNAP)
-    
+
+function get_snap(c::Configuration, snap::SNAP; dim = 3)
     J = snap.twojmax
     if J % 2 == 0
         m = J/2 + 1
@@ -193,7 +287,7 @@ function get_snap(c::Configuration, snap::SNAP)
                 command(lmp, "mass 1 1.0")
             else
                 for j = 1:c.num_atom_types
-                    command(lmp, "mass $j c.Masses[j]")
+                    command(lmp, "mass $j $(c.Masses[j])")
                 end
             end
             # command(lmp, read_data_str)
@@ -206,6 +300,9 @@ function get_snap(c::Configuration, snap::SNAP)
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute snap all snap $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
             command(lmp, string_command)
+            if dim == 2
+                command(lmp, "fix lo all enforce2d")
+            end
             command(lmp, "thermo_style custom pe")
             command(lmp, "run 0")
 
@@ -222,14 +319,14 @@ function get_snap(c::Configuration, snap::SNAP)
     return copy(transpose(A))
 end
 
-function get_snap(r::Vector{Configuration}, p)
+function get_snap(r::Vector{Configuration}, p; dim = 3)
     n = length(r)
     l = length(p.β)
     Aenergy = Array{Float64}(undef, 0, l)
     Aforce = Array{Float64}(undef, 0, l)
     Astress = Array{Float64}(undef, 0, l)
     for j = 1:n
-       A = get_snap(r[j], p)
+       A = get_snap(r[j], p; dim = dim)
        Aenergy = vcat(Aenergy, reshape(A[1, :], 1, l))
        Aforce = vcat(Aforce, A[2:end-6, :])
        Astress = vcat(Astress, A[end-5:end, :])

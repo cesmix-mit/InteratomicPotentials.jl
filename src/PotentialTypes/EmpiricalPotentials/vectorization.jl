@@ -112,3 +112,45 @@ function virial_stress(r::Vector{Configuration}, p::EmpiricalPotential)
     end
     return v
 end
+
+############################## Gradients ################################
+function grad_potential_energy(r::Vector{Position}, p::EmpiricalPotential)
+    n = length(r)
+    pe = 0. * grad_potential_energy(r[1] - r[2], p)
+    for i = 1:(n-1)
+        for j = (i+1):n
+            rtemp = r[i] - r[j]
+            pe +=  grad_potential_energy(rtemp, p)
+        end
+    end
+    return pe
+end
+
+
+
+function grad_force(r::Vector{Position}, p::EmpiricalPotential)
+    n = length(r)
+    f = [0. * grad_force(r[1] - r[2], p) for j = 1:n]
+    for i = 1:(n-1)
+        for j = (i+1):n
+            rtemp = r[i] - r[j]
+            f[i] +=  grad_force(rtemp, p) 
+            f[j] -= f[i]
+        end
+    end
+    return f
+end
+
+
+
+function grad_virial(r::Vector{Position}, p::EmpiricalPotential)
+    n = length(r)
+    v = 0. * grad_virial(r[1] - r[2], p)
+    for i = 1:(n-1)
+        for j = (i+1):n
+            rtemp = r[i] - r[j]
+            v +=  grad_virial(rtemp, p)
+        end
+    end
+    return v
+end
