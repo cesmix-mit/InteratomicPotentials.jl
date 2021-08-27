@@ -40,7 +40,7 @@ function create_snap_files(c::Configuration, snap::SNAP, file)
         write(f, "#UNITS: $(c.units)\n")
         write(f, "#LAMMPS SNAP COEFFICIENTS\n")
         write(f, "$(c.num_atom_types) $(length(snap.β))\n")
-        for i = 1:snap.num_atom_types
+        for i = 1:c.num_atom_types
             write(f, "$(c.atom_names[i]) $(c.radii[i]) $(c.weights[i])\n")
         end
         write(f, "$(snap.β[end])\n")

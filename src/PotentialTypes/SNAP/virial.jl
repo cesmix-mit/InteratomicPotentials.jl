@@ -4,7 +4,7 @@
 
 function virial(c:: Configuration, p::SNAP)
     A = get_snap(c, p)
-    virial = A[end-5:end, :] * p.β
+    virial = A[end-5:end, 1:(end-1)] * p.β[1:(end-1)]
     return sum(virial[1:3])
 end
 
@@ -19,7 +19,7 @@ end
 
 function virial_stress(c:: Configuration, p::SNAP)
     A = get_snap(c, p)
-    virial = A[end-5:end, :] * p.β
+    virial = A[end-5:end, 1:(end-1)] * p.β[1:(end-1)]
     return virial
 end
 

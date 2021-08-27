@@ -65,12 +65,13 @@ function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
             end
 
             # Setup Forcefield
-            
-            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
+            cutoff = snap.rcutfac * maximum(c.radii)
+            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute b all sna/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute b all sna/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string
             command(lmp, string_command)
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
@@ -140,12 +141,13 @@ function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
             end
 
             # Setup Forcefield
-            
-            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
+            cutoff = snap.rcutfac * maximum(c.radii)
+            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute db all snad/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute db all snad/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
             command(lmp, string_command)
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
@@ -215,12 +217,13 @@ function get_vbispectrum(c::Configuration, snap::SNAP; dim = 3)
             end
 
             # Setup Forcefield
-            
-            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
+            cutoff = snap.rcutfac * maximum(c.radii)
+            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
-            string_command = "compute vb all snav/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string * "rmin0 0.0 bzeroflag 0 quadraticflag 0 switchflag 1"
+            string_command = "compute vb all snav/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
             command(lmp, string_command)
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
@@ -242,7 +245,7 @@ end
 
 
 
-function get_snap(c::Configuration, snap::SNAP; dim = 3)
+function get_snap(c::Configuration, snap::SNAP; dim = 3, reference = true)
     J = snap.twojmax
     if J % 2 == 0
         m = J/2 + 1
@@ -293,9 +296,16 @@ function get_snap(c::Configuration, snap::SNAP; dim = 3)
             # command(lmp, read_data_str)
 
             # Setup Forcefield
-            
-            command(lmp, "pair_style zero $(2*snap.rcutfac*maximum(c.radii))")
-            command(lmp, "pair_coeff * *")
+            cutoff = snap.rcutfac * maximum(c.radii)
+            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            if reference
+                command(lmp, "pair_style hybrid/overlay zero $max_bounds zbl 2.0 2.5")
+                command(lmp, "pair_coeff * * zero")
+                command(lmp, "pair_coeff * * zbl 1 1")
+            else
+                command(lmp, "pair_style zero $max_bounds")
+                command(lmp, "pair_coeff * *")
+            end
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute snap all snap $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
@@ -319,14 +329,14 @@ function get_snap(c::Configuration, snap::SNAP; dim = 3)
     return copy(transpose(A))
 end
 
-function get_snap(r::Vector{Configuration}, p; dim = 3)
+function get_snap(r::Vector{Configuration}, p; dim = 3, reference = true)
     n = length(r)
     l = length(p.β)
     Aenergy = Array{Float64}(undef, 0, l)
     Aforce = Array{Float64}(undef, 0, l)
     Astress = Array{Float64}(undef, 0, l)
     for j = 1:n
-       A = get_snap(r[j], p; dim = dim)
+       A = get_snap(r[j], p; dim = dim, reference = reference)
        Aenergy = vcat(Aenergy, reshape(A[1, :], 1, l))
        Aforce = vcat(Aforce, A[2:end-6, :])
        Astress = vcat(Astress, A[end-5:end, :])

@@ -39,7 +39,8 @@ function get_msd(file::String, dim::Int)
         t_msd[j] = parse(Float64, v[1])
         msd[j] = parse(Float64, v[2])
     end
-    diffusivity = sum(msd[end-100:end] ./ t_msd[end-100:end]) / 100.0
+    check_n = Int( n*0.9 )
+    diffusivity = sum(msd[check_n:end] ./ t_msd[check_n:end]) / (n-check_n)
     if dim == 2
         diffusivity *= 0.25
     else
@@ -53,7 +54,7 @@ function get_positions(c0::Configuration, path::String, T)
     r = Vector{Configuration}(undef, num_configs)
     for (i,t) in enumerate(T)
         file = "DATA.$t"
-        c_temp = Potentials.Configuration(path*file; atom_names = c0.atom_names, 
+        c_temp = Potentials.load_lammps_DATA(path*file; atom_names = c0.atom_names, 
                         radii = c0.radii, weights = c0.weights)
         r[i] = c_temp
     end
@@ -192,12 +193,18 @@ function run_md(c0::Configuration, snap::SNAP, Tend::Int, save_dir::String; dim 
             command(lmp, "velocity all create $(Temp) $seed mom yes rot yes dist gaussian")
 
             # Setup Forcefield
-            command(lmp, "pair_style hybrid/overlay zero $(2*snap.rcutfac*maximum(c0.radii)) snap")
+            
+            cutoff = snap.rcutfac * maximum(c0.radii)
+            max_bounds = max(2*cutoff, min( (c0.x_bounds[2] - c0.x_bounds[1]), (c0.y_bounds[2] - c0.y_bounds[1]), (c0.z_bounds[2] - c0.z_bounds[1]) ) )
+            # command(lmp, "pair_style hybrid/overlay zero $max_bounds snap")
+            # command(lmp, "pair_coeff * * zero")
+            command(lmp, "pair_style hybrid/overlay zero $max_bounds zbl 2.0 2.5 snap")
             command(lmp, "pair_coeff * * zero")
+            command(lmp, "pair_coeff * * zbl 1 1")
             snap_coeff_path = save_dir*"tmp.snapcoeff"
             snap_param_path = save_dir*"tmp.snapparam"
             command(lmp, "pair_coeff * * snap $(snap_coeff_path) $(snap_param_path) $(c0.atom_names[1])")
-            command(lmp, "comm_modify cutoff 3.0")
+            command(lmp, "comm_modify cutoff 4.0")
             # Apply fixes
             # command(lmp, "fix l0 all langevin $Temp $Temp 0.001")
             if dim == 2

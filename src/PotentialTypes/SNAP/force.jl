@@ -3,7 +3,7 @@
 #########################################################################
 function force(c::Configuration, p::SNAP)
     A = get_snap(c, p)
-    force = A[2:end-6, :] * p.β
+    force = A[2:end-6, 1:(end-1)] * p.β[1:(end-1)]
     n = length(force)
     num_tuples = Int(n/3)
     force = [[force[3*(j-1)+k] for k = 1:3] for j = 1:num_tuples]
