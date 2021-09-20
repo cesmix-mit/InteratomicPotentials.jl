@@ -23,8 +23,6 @@ import Base.copy
 import Base.vec
 
 include("param.jl")
-include("position.jl")
-include("config.jl")
 
 
 

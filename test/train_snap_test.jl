@@ -25,12 +25,12 @@ radii = 1.5
 println("Radii $radii")
     for (i, index) = enumerate(train_i)
         file_path = "DATA/$index/DATA"
-        r_train[i] = Potentials.load_lammps_DATA(file_path; atom_names = [:Ga, :N], radii = [radii, radii], weights = [1.0, 0.5], boundaries = ["p", "p", "p"], units = "metal" )
+        r_train[i] = Potentials.load_lammps(file_path; atom_names = [:Ga, :N], radii = [radii, radii], weights = [1.0, 0.5], boundary_type = ["p", "p", "p"], units = "metal" )
     end
 
     for (i, index) = enumerate(test_i)
         file_path = "DATA/$index/DATA"
-        r_test[i] = Potentials.load_lammps_DATA(file_path; atom_names = [:Ga, :N], radii = [radii, radii], weights = [1.0, 0.5], boundaries = ["p", "p", "p"], units = "metal" )
+        r_test[i] = Potentials.load_lammps(file_path; atom_names = [:Ga, :N], radii = [radii, radii], weights = [1.0, 0.5], boundary_type = ["p", "p", "p"], units = "metal" )
     end
 
 # Set up true potential

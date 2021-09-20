@@ -21,30 +21,30 @@ end
 
 ############################# Energies ##########################################
 
-function potential_energy(r::Position, p::Coulomb)
+function potential_energy(r::Vector{<:Real}, p::Coulomb)
     return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * norm(r))
 end
 
 ############################### Forces ##########################################
 
-function force(r:: Position, p::Coulomb)
+function force(r::Vector{<:Real}, p::Coulomb)
     d = norm(r)
     return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* [r.x, r.y, r.z] ./ d
 end
 
 ##############################   Gradients  ###################################
 
-function grad_potential_energy(r::Position, p::Coulomb)
+function grad_potential_energy(r::Vector{<:Real}, p::Coulomb)
     println("The Coulomb potential has no trainable parameters")
     return (dpdnull = 0.0)
 end
-function grad_force(r:: Position, p::Coulomb)
+function grad_force(r:: Vector{<:Real}, p::Coulomb)
     println("The Coulomb potential has no trainable parameters")
-    return (dfdnull =  0 .* [r.x, r.y, r.z] ./ d )
+    return (dfdnull =  0 .* r ./ d )
 end
 
-function grad_virial(r::Position, p::Coulomb)
+function grad_virial(r::Vector{<:Real}, p::Coulomb)
     println("The Coulomb potential has no trainable parameters")
-    return (dvdnull =  0 .* [r.x, r.y, r.z] ./ d )
+    return (dvdnull =  0 .* r ./ d )
 end
 

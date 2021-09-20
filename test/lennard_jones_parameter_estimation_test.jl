@@ -17,7 +17,8 @@ using Statistics: mean
 println("Beginning test of correctness of LJ implementation.")
 # Set up Atoms (using a specific configuration)
 N = 38
-r = Vector{Potentials.Position}(undef, N)
+r = Vector{Potentials.Atom}(undef, N)
+mass = 38.0
 r0 = [0.163946667699999993 0.319538517000000022 1.71226674359999986;
 1.18570812759999988 -1.12890812809999996 -0.616849616600000039;
 1.47183871269999988 -0.0530362826999999995 0.944308599800000037;
@@ -57,7 +58,7 @@ r0 = [0.163946667699999993 0.319538517000000022 1.71226674359999986;
 0.405362064999999994 0.0660416075000000019 0.658322833699999999;
 -0.124574169299999996 -0.750628853799999995 0.15200806280000001]
 for j = 1:N
-    r[j] = Potentials.Position(r0[j, 1], r0[j, 2], r0[j, 3])
+    r[j] = Potentials.Atom(mass, r0[j, :], zeros(3), :Xe)
 end
 
 

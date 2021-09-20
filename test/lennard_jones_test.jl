@@ -1,11 +1,13 @@
 import Potentials
 
 N = 3
-r = Vector{Potentials.Position}(undef, N)
+r = Vector{Potentials.Atom}(undef, N)
+mass = 38.0
 
-r[1] = Potentials.Position(0.0, 1.0, 0.0)
-r[2] = Potentials.Position(-1.0, 0.0, 0.0)
-r[3] = Potentials.Position(1.0, 0.0, 0.0)
+r[1] = Potentials.Atom(mass, [0.0, 1.0, 0.0], zeros(3), :Xe)
+r[2] = Potentials.Atom(mass, [-1.0, 0.0, 0.0], zeros(3), :Xe)
+r[3] = Potentials.Atom(mass, [1.0, 0.0, 0.0], zeros(3), :Xe)
+
 ϵ = 1.0
 σ = 0.5
 lj = Potentials.LennardJones(ϵ, σ)

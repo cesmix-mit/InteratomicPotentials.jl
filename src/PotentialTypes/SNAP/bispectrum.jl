@@ -37,36 +37,37 @@ function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
     end
     
     A = LMP(["-screen", "none"]) do lmp
-        bispectrum = Array{Float64}(undef, num_coeffs, c.num_atoms)
+        bispectrum = Array{Float64}(undef, num_coeffs, length(c.Atoms))
         for i = 1
             # Initialize
             command(lmp, "log none")
             command(lmp, "units " * c.units)
-            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
+            command(lmp, "boundary $(c.domain.bound_type[1]) $(c.domain.bound_type[2]) $(c.domain.bound_type[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
 
             # Setup box
-            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "region mybox block $(c.domain.bounds[1][1]) $(c.domain.bounds[1][2]) $(c.domain.bounds[2][1]) $(c.domain.bounds[2][2]) $(c.domain.bounds[3][1]) $(c.domain.bounds[3][2])")
             command(lmp, "create_box $(c.num_atom_types) mybox")
 
             # Create atoms
-            for j = 1:c.num_atoms
-                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
-                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            println(c.atom_names)
+            for j = 1:length(c.Atoms)
+                atom_id = findall(c.atom_names .== c.Atoms[j].Type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Atoms[j].Position[1]) $(c.Atoms[j].Position[2]) $(c.Atoms[j].Position[3])")
             end
 
             if c.units == "lj"
                 command(lmp, "mass 1 1.0")
             else
                 for j = 1:c.num_atom_types
-                    command(lmp, "mass $j $(c.Masses[j])")
+                    command(lmp, "mass $j $(c.masses[j])")
                 end
             end
 
             # Setup Forcefield
             cutoff = snap.rcutfac * maximum(c.radii)
-            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            max_bounds = max(2*cutoff, min( (c.domain.bounds[1][2] - c.domain.bounds[1][1]), (c.domain.bounds[2][2] - c.domain.bounds[2][1]), (c.domain.bounds[3][2] - c.domain.bounds[3][1]) ) )
             command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
@@ -113,36 +114,36 @@ function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
     end
     
     A = LMP(["-screen", "none"]) do lmp
-        bispectrum = Array{Float64}(undef, 3*c.num_atom_types*num_coeffs, c.num_atoms)
+        bispectrum = Array{Float64}(undef, 3*c.num_atom_types*num_coeffs, length(c.Atoms))
         for i = 1
             # Initialize
             command(lmp, "log none")
             command(lmp, "units " * c.units)
-            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
+            command(lmp, "boundary $(c.domain.bound_type[1]) $(c.domain.bound_type[2]) $(c.domain.bound_type[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
 
             # Setup box
-            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "region mybox block $(c.domain.bounds[1][1]) $(c.domain.bounds[1][2]) $(c.domain.bounds[2][1]) $(c.domain.bounds[2][2]) $(c.domain.bounds[3][1]) $(c.domain.bounds[3][2])")
             command(lmp, "create_box $(c.num_atom_types) mybox")
 
             # Create atoms
-            for j = 1:c.num_atoms
-                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
-                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            for j = 1:length(c.Atoms)
+                atom_id = findall(c.atom_names .== c.Atoms[j].Type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Atoms[j].Position[1]) $(c.Atoms[j].Position[2]) $(c.Atoms[j].Position[3])")
             end
 
             if c.units == "lj"
                 command(lmp, "mass 1 1.0")
             else
                 for j = 1:c.num_atom_types
-                    command(lmp, "mass $j $(c.Masses[j])")
+                    command(lmp, "mass $j $(c.masses[j])")
                 end
             end
 
             # Setup Forcefield
             cutoff = snap.rcutfac * maximum(c.radii)
-            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            max_bounds = max(2*cutoff, min( (c.domain.bounds[1][2] - c.domain.bounds[1][1]), (c.domain.bounds[2][2] - c.domain.bounds[2][1]), (c.domain.bounds[3][2] - c.domain.bounds[3][1]) ) )
             command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
@@ -189,36 +190,36 @@ function get_vbispectrum(c::Configuration, snap::SNAP; dim = 3)
     end
     
     A = LMP(["-screen", "none"]) do lmp
-        bispectrum = Array{Float64}(undef, 6*c.num_atom_types*num_coeffs, c.num_atoms)
+        bispectrum = Array{Float64}(undef, 6*c.num_atom_types*num_coeffs, length(c.Atoms))
         for i = 1
             # Initialize
             command(lmp, "log none")
             command(lmp, "units " * c.units)
-            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
+            command(lmp, "boundary $(c.domain.bound_type[1]) $(c.domain.bound_type[2]) $(c.domain.bound_type[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
 
             # Setup box
-            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "region mybox block $(c.domain.bounds[1][1]) $(c.domain.bounds[1][2]) $(c.domain.bounds[2][1]) $(c.domain.bounds[2][2]) $(c.domain.bounds[3][1]) $(c.domain.bounds[3][2])")
             command(lmp, "create_box $(c.num_atom_types) mybox")
 
             # Create atoms
-            for j = 1:c.num_atoms
-                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
-                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            for j = 1:length(c.Atoms)
+                atom_id = findall(c.atom_names .== c.Atoms[j].Type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Atoms[j].Position[1]) $(c.Atoms[j].Position[2]) $(c.Atoms[j].Position[3])")
             end
 
             if c.units == "lj"
                 command(lmp, "mass 1 1.0")
             else
                 for j = 1:c.num_atom_types
-                    command(lmp, "mass $j $(c.Masses[j])")
+                    command(lmp, "mass $j $(c.masses[j])")
                 end
             end
 
             # Setup Forcefield
             cutoff = snap.rcutfac * maximum(c.radii)
-            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            max_bounds = max(2*cutoff, min( (c.domain.bounds[1][2] - c.domain.bounds[1][1]), (c.domain.bounds[2][2] - c.domain.bounds[2][1]), (c.domain.bounds[3][2] - c.domain.bounds[3][1]) ) )
             command(lmp, "pair_style zero $max_bounds")
             command(lmp, "pair_coeff * *")
             command(lmp, "compute PE all pe")
@@ -247,15 +248,7 @@ end
 
 function get_snap(c::Configuration, snap::SNAP; dim = 3, reference = true)
     J = snap.twojmax
-    if J % 2 == 0
-        m = J/2 + 1
-        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
-    elseif J % 2 == 1
-        m = (J+1)/2
-        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
-    else
-        AssertionError("twojmax must be an integer multiple of the number of atom types!")
-    end
+    num_coeffs = length(snap.β)
     
     radii_string = "" 
     weight_string = ""
@@ -267,37 +260,36 @@ function get_snap(c::Configuration, snap::SNAP; dim = 3, reference = true)
     end
     
     A = LMP(["-screen", "none"]) do lmp
-        bispectrum = Array{Float64}(undef, c.num_atom_types*num_coeffs + 1, 1+3*c.num_atoms+6)
+        bispectrum = Array{Float64}(undef, num_coeffs, 1+3*length(c.Atoms)+6)
         for i = 1
             # Initialize
             command(lmp, "log none")
             command(lmp, "units " * c.units)
-            command(lmp, "boundary $(c.boundaries[1]) $(c.boundaries[2]) $(c.boundaries[3])")
+            command(lmp, "boundary $(c.domain.bound_type[1]) $(c.domain.bound_type[2]) $(c.domain.bound_type[3])")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
 
             # Setup box
-            command(lmp, "region mybox block $(c.x_bounds[1]) $(c.x_bounds[2]) $(c.y_bounds[1]) $(c.y_bounds[2]) $(c.z_bounds[1]) $(c.z_bounds[2])")
+            command(lmp, "region mybox block $(c.domain.bounds[1][1]) $(c.domain.bounds[1][2]) $(c.domain.bounds[2][1]) $(c.domain.bounds[2][2]) $(c.domain.bounds[3][1]) $(c.domain.bounds[3][2])")
             command(lmp, "create_box $(c.num_atom_types) mybox")
 
             # Create atoms
-            for j = 1:c.num_atoms
-                atom_id = findall(c.atom_names .== c.Positions[j].type)[1]
-                command(lmp, "create_atoms $atom_id single $(c.Positions[j].x) $(c.Positions[j].y) $(c.Positions[j].z)")
+            for j = 1:length(c.Atoms)
+                atom_id = findall(c.atom_names .== c.Atoms[j].Type)[1]
+                command(lmp, "create_atoms $atom_id single $(c.Atoms[j].Position[1]) $(c.Atoms[j].Position[2]) $(c.Atoms[j].Position[3])")
             end
 
             if c.units == "lj"
                 command(lmp, "mass 1 1.0")
             else
                 for j = 1:c.num_atom_types
-                    command(lmp, "mass $j $(c.Masses[j])")
+                    command(lmp, "mass $j $(c.masses[j])")
                 end
             end
-            # command(lmp, read_data_str)
 
             # Setup Forcefield
             cutoff = snap.rcutfac * maximum(c.radii)
-            max_bounds = max(2*cutoff, min( (c.x_bounds[2] - c.x_bounds[1]), (c.y_bounds[2] - c.y_bounds[1]), (c.z_bounds[2] - c.z_bounds[1]) ) )
+            max_bounds = max(2*cutoff, min( (c.domain.bounds[1][2] - c.domain.bounds[1][1]), (c.domain.bounds[2][2] - c.domain.bounds[2][1]), (c.domain.bounds[3][2] - c.domain.bounds[3][1]) ) )
             if reference
                 command(lmp, "pair_style hybrid/overlay zero $max_bounds zbl 2.0 2.5")
                 command(lmp, "pair_coeff * * zero")
@@ -320,7 +312,7 @@ function get_snap(c::Configuration, snap::SNAP; dim = 3, reference = true)
             bs = extract_compute(lmp, "snap",  LAMMPS.API.LMP_STYLE_GLOBAL,
                                             LAMMPS.API.LMP_TYPE_ARRAY)
             bispectrum[:, :] = bs
-            bispectrum[end, 1] = c.num_atoms
+            bispectrum[end, 1] = length(c.Atoms)
             command(lmp, "clear")
         end
         return bispectrum

@@ -7,11 +7,10 @@
 println("Beginning test of LAMMPS.jl implementation.")
 import Potentials
 using LinearAlgebra: svdvals
-file_path = "DATA"
+file_path = "DATA/1/DATA"
 
-c = Potentials.load_lammps_DATA(file_path; atom_names = [:Ga, :N], radii = [0.5, 0.5], weights = [1.0, 0.5], boundaries = ["p", "p", "p"], units = "metal" )
-
-snap = Potentials.SNAP(3.5, 4)
+c = Potentials.load_lammps(file_path; atom_names = [:Ga, :N], radii = [0.5, 0.5], weights = [1.0, 0.5], boundary_type = ["p", "p", "p"], units = "metal" )
+snap = Potentials.SNAP(3.5, 4, c)
 println("SNAP: ", snap)
 b = Potentials.get_bispectrum(c, snap)
 db = Potentials.get_dbispectrum(c, snap)
