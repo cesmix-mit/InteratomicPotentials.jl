@@ -1,11 +1,11 @@
 #########################################################################
 ##############################   GaN  ###################################
 #########################################################################
-function potential_energy(r::Atom, p::GaN, type1::Symbol, type2::Symbol)
+function potential_energy(r::Atom, p::GaN, Type1::Symbol, Type2::Symbol)
     
-    if (type1 == :Ga) && (type2 == :Ga) # Ga-Ga interaction
+    if (Type1 == :Ga) && (Type2 == :Ga) # Ga-Ga interaction
         return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.lj_Ga_Ga)
-    elseif (type1 == :N) && (type2 == :N) # N-N interaction
+    elseif (Type1 == :N) && (Type2 == :N) # N-N interaction
         return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.lj_N_N)
     else 
         return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.bm_Ga_N)
@@ -20,7 +20,7 @@ function potential_energy(r::Vector{Atom}, p::MixedPotential)
         for j = (i+1):n
             rj = r[j].Position
             rtemp = ri - rj
-            pe +=  potential_energy(rtemp, p, r[i].type, r[j].type)
+            pe +=  potential_energy(rtemp, p, r[i].Type, r[j].Type)
         end
     end
     return pe

@@ -1,8 +1,8 @@
 #####################################################################
 ####################### Mixed Potentials (GaN) ######################
 #####################################################################
-function virial(r::Atom, p::GaN, type1::Symbol, type2::Symbol)
-    f = force(r, p, type1, type2)
+function virial(r::Atom, p::GaN, Type1::Symbol, Type2::Symbol)
+    f = force(r, p, Type1, Type2)
     return f[1] * r.Position[1] + f[2] * r.Position[2] + f[3] * r.Position[3]
 end
 
@@ -15,7 +15,7 @@ function virial(r::Vector{Atom}, p::MixedPotential)
         for j = (i+1):n
             rj = r[j].Position
             rtemp = ri - rj
-            v +=  virial(rtemp, p, r[i].type, r[j].type)
+            v +=  virial(rtemp, p, r[i].Type, r[j].Type)
         end
     end
     return v
@@ -34,8 +34,8 @@ function virial(r::Vector{Configuration}, p::MixedPotential)
     return v
 end
 
-function virial_stress(r::Atom, p::GaN, type1::Symbol, type2::Symbol)
-    f = force(r, p, type1, type2)
+function virial_stress(r::Atom, p::GaN, Type1::Symbol, Type2::Symbol)
+    f = force(r, p, Type1, Type2)
     vi = r.Position * f'
     return [vi[1, 1], vi[2, 2], vi[3, 3], vi[2, 3], vi[1, 3], vi[1,2]]
 end
@@ -48,7 +48,7 @@ function virial_stress(r::Vector{Atom}, p::MixedPotential)
         for j = (i+1):n
             rj = r[j].Position
             rtemp = ri - rj
-            v +=  virial_stress(rtemp, p, r[i].type, r[j].type)
+            v +=  virial_stress(rtemp, p, r[i].Type, r[j].Type)
         end
     end
     return v
