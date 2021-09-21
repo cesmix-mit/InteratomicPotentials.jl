@@ -29,7 +29,7 @@ end
 
 function force(r::Vector{<:Real}, p::Coulomb)
     d = norm(r)
-    return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* [r.x, r.y, r.z] ./ d
+    return p.q_1 * p.q_2 / (4.0 * π * p.ϵ0 * d^2) .* r ./ d
 end
 
 ##############################   Gradients  ###################################

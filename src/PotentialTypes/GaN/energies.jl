@@ -1,14 +1,14 @@
 #########################################################################
 ##############################   GaN  ###################################
 #########################################################################
-function potential_energy(r::Atom, p::GaN, Type1::Symbol, Type2::Symbol)
+function potential_energy(r::Vector{<:Real}, p::GaN, Type1::Symbol, Type2::Symbol)
     
     if (Type1 == :Ga) && (Type2 == :Ga) # Ga-Ga interaction
-        return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.lj_Ga_Ga)
+        return potential_energy(r, p.c) + potential_energy(r, p.lj_Ga_Ga)
     elseif (Type1 == :N) && (Type2 == :N) # N-N interaction
-        return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.lj_N_N)
+        return potential_energy(r, p.c) + potential_energy(r, p.lj_N_N)
     else 
-        return potential_energy(r.Position, p.c) + potential_energy(r.Position, p.bm_Ga_N)
+        return potential_energy(r, p.c) + potential_energy(r, p.bm_Ga_N)
     end
 end
 

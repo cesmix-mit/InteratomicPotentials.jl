@@ -29,7 +29,7 @@ end
 
 function force(r::Vector{<:Real}, p::BornMayer)
     d = norm(r) 
-    return p.A /p.ρ * exp(-d / p.ρ ) .* [r.x, r.y, r.z] ./ d
+    return p.A /p.ρ * exp(-d / p.ρ ) .* r ./ d
 end
 
 ##############################   Gradients  ###################################
