@@ -33,7 +33,7 @@
 #
 #
 ################################################################################
-module Potentials
+module InteratomicPotentials
 
 using Base: Float64
 using LAMMPS
