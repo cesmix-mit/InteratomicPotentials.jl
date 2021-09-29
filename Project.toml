@@ -4,6 +4,7 @@ authors = ["Dallas Foster <fostdall@mit.edu>"]
 version = "0.1.0"
 
 [deps]
+ExtXYZ = "352459e4-ddd7-4360-8937-99dcb397b478"
 GalacticOptim = "a75be94c-b780-496d-a8a9-0878b188d577"
 Hyperopt = "93e5fe13-2215-51db-baaf-2e9a34fb2712"
 LAMMPS = "ee2e13b9-eee9-4449-aafa-cfa6a2dbe14d"
