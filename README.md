@@ -1,4 +1,4 @@
-# [WIP] Potentials.jl
+# [WIP] InteratomicPotentials.jl
 This module implements methods (energies, forces, and virial tensors) for a variety of interatomic potentials, including the SNAP Potential (Thompson et al. 2014). 
 
 Project goals:
