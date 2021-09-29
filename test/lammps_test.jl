@@ -5,7 +5,7 @@
 #
 ################################################################################
 println("Beginning test of LAMMPS.jl implementation.")
-import Potentials
+import InteratomicPotentials as Potentials
 using LinearAlgebra: svdvals
 file_path = "DATA/1/DATA"
 

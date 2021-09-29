@@ -16,16 +16,7 @@
 ################################################################################
 
 function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
-    J = snap.twojmax
-    if J % 2 == 0
-        m = J/2 + 1
-        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
-    elseif J % 2 == 1
-        m = (J+1)/2
-        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
-    else
-        AssertionError("twojmax must be an integer multiple of the number of atom types!")
-    end
+    num_coeffs = get_num_coeffs(snap.twojmax)
     
     radii_string = "" 
     weight_string = ""
@@ -73,7 +64,27 @@ function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute b all sna/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string
-            command(lmp, string_command)
+            
+            args_command = "" 
+            fields = fieldnames(typeof(snap.keywords))
+            for f in fields
+                name = string(f)
+                value = getfield(snap.keywords, f)
+                if value == 0
+                    continue
+                else
+                    value = string(value)
+                    if (name == "chemflag")
+                        value = string(c.num_atom_types) * " "
+                        for j = 0:(c.num_atom_types-1)
+                            value *= string(j) * " "
+                        end
+                    end
+                    args_command *= name * " " * value * " "
+                end
+            end       
+            string_command *= args_command
+            command(lmp, strip(string_command))
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
             end
@@ -93,16 +104,7 @@ function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
 end
 
 function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
-    J = snap.twojmax
-    if J % 2 == 0
-        m = J/2 + 1
-        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
-    elseif J % 2 == 1
-        m = (J+1)/2
-        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
-    else
-        AssertionError("twojmax must be an integer multiple of the number of atom types!")
-    end
+    num_coeffs = get_num_coeffs(snap.twojmax)
     
     radii_string = "" 
     weight_string = ""
@@ -149,7 +151,26 @@ function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute db all snad/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
-            command(lmp, string_command)
+            args_command = "" 
+            fields = fieldnames(typeof(snap.keywords))
+            for f in fields
+                name = string(f)
+                value = getfield(snap.keywords, f)
+                if value == 0
+                    continue
+                else
+                    value = string(value)
+                    if (name == "chemflag")
+                        value = string(c.num_atom_types) * " "
+                        for j = 0:(c.num_atom_types-1)
+                            value *= string(j) * " "
+                        end
+                    end
+                    args_command *= name * " " * value * " "
+                end
+            end       
+            string_command *= args_command
+            command(lmp, strip(string_command))
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
             end
@@ -169,16 +190,7 @@ function get_dbispectrum(c::Configuration, snap::SNAP; dim = 3)
 end
 
 function get_vbispectrum(c::Configuration, snap::SNAP; dim = 3)
-    J = snap.twojmax
-    if J % 2 == 0
-        m = J/2 + 1
-        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
-    elseif J % 2 == 1
-        m = (J+1)/2
-        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
-    else
-        AssertionError("twojmax must be an integer multiple of the number of atom types!")
-    end
+    num_coeffs = get_num_coeffs(snap.twojmax)
     
     radii_string = "" 
     weight_string = ""
@@ -225,7 +237,26 @@ function get_vbispectrum(c::Configuration, snap::SNAP; dim = 3)
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute vb all snav/atom $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
-            command(lmp, string_command)
+            args_command = "" 
+            fields = fieldnames(typeof(snap.keywords))
+            for f in fields
+                name = string(f)
+                value = getfield(snap.keywords, f)
+                if value == 0
+                    continue
+                else
+                    value = string(value)
+                    if (name == "chemflag")
+                        value = string(c.num_atom_types) * " "
+                        for j = 0:(c.num_atom_types-1)
+                            value *= string(j) * " "
+                        end
+                    end
+                    args_command *= name * " " * value * " "
+                end
+            end       
+            string_command *= args_command
+            command(lmp, strip(string_command))
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
             end
@@ -301,7 +332,26 @@ function get_snap(c::Configuration, snap::SNAP; dim = 3, reference = true)
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             string_command = "compute snap all snap $(snap.rcutfac) 0.99363 $(snap.twojmax) " * radii_string * weight_string 
-            command(lmp, string_command)
+            args_command = "" 
+            fields = fieldnames(typeof(snap.keywords))
+            for f in fields
+                name = string(f)
+                value = getfield(snap.keywords, f)
+                if value == 0
+                    continue
+                else
+                    value = string(value)
+                    if (name == "chemflag")
+                        value = string(c.num_atom_types) * " "
+                        for j = 0:(c.num_atom_types-1)
+                            value *= string(j) * " "
+                        end
+                    end
+                    args_command *= name * " " * value * " "
+                end
+            end       
+            string_command *= args_command
+            command(lmp, strip(string_command))
             if dim == 2
                 command(lmp, "fix lo all enforce2d")
             end

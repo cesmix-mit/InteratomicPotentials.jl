@@ -2,13 +2,22 @@
 ##############################  SNAP  ###################################
 #########################################################################
 
+mutable struct SNAPkeywords
+    switchflag      :: Int 
+    bzeroflag       :: Int 
+    quadraticflag   :: Int
+    chemflag        :: Int 
+    bnormflag       :: Int
+end
+
 mutable struct SNAP <: FittedPotential
     β :: Vector{Float64}
     rcutfac         :: Float64
     twojmax         :: Int
+    keywords        :: SNAPkeywords
 end
 
-function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration)
+function get_num_coeffs(twojmax :: Int)
     J = twojmax 
     if J % 2 == 0
         m = J/2 + 1
@@ -19,8 +28,32 @@ function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration)
     else
         AssertionError("twojmax must be an integer!")
     end 
-    return SNAP( zeros(c.num_atom_types * num_coeffs + 1) , rcutfac, twojmax)
+    return num_coeffs
 end
+
+
+function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration)
+    keywords = SNAPkeywords(0, 0, 0, 0, 0)
+    num_coeffs = get_num_coeffs(twojmax)
+
+    return SNAP( zeros(c.num_atom_types * num_coeffs + 1) , rcutfac, twojmax, keywords)
+end
+
+function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration, keywords::SNAPkeywords)
+    num_coeffs = get_num_coeffs(twojmax)
+    if keywords.quadraticflag == 1
+        num_coeffs += num_coeffs * (num_coeffs+1) / 2
+    end
+    if keywords.chemflag == 1
+        num_coeffs = num_coeffs * (c.num_atom_types^3)
+        keywords.bnormflag = 1
+    else
+        num_coeffs = num_coeffs * c.num_atom_types
+    end
+
+    return SNAP( zeros(num_coeffs + 1) , rcutfac, twojmax, keywords)
+end
+
 
 function get_trainable_params(snap::SNAP)
     return (β = snap.β, )

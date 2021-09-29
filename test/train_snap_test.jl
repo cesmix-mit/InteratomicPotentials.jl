@@ -8,7 +8,7 @@
 ################################################################################
 println("Beginning test of GaN and SNAP implementation.")
 
-import Potentials
+import InteratomicPotentials as Potentials
 using LinearAlgebra
 using GalacticOptim, Optim
 using Random
@@ -103,16 +103,18 @@ function cost(rcutoff, radii)
 end
 
 
-ho = @hyperopt for i = 100, 
-    radii = 0.75:0.01:2.25,
-    rcut = (1.0):0.01:2.0
-    println(i, "\t", radii, "\t", rcut, "   \t")
-    @show cost(rcut, radii)
-end
+# ho = @hyperopt for i = 100, 
+#     radii = 0.75:0.01:2.25,
+#     rcut = (1.0):0.01:2.0
+#     println(i, "\t", radii, "\t", rcut, "   \t")
+#     @show cost(rcut, radii)
+# end
 
-best_params, min_f = ho.minimizer, ho.minimum
-println(best_params, "\t", min_f)
+# best_params, min_f = ho.minimizer, ho.minimum
+# println(best_params, "\t", min_f)
 
-cost(best_params[2], best_params[1])
+# cost(best_params[2], best_params[1])
+
+cost(1.5, 1.5)
 
 println("End of test.")

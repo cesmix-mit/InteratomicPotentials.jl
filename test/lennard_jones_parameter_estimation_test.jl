@@ -11,7 +11,7 @@
 #     properly implemented.
 #
 ################################################################################
-import Potentials
+import InteratomicPotentials as Potentials
 using GalacticOptim, Optim
 using Statistics: mean
 println("Beginning test of correctness of LJ implementation.")
