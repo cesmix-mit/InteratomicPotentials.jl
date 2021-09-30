@@ -58,7 +58,7 @@ function force(r::Vector{Atom}, p::EmpiricalPotential)
 end
 
 function force(c::Configuration, p::EmpiricalPotential)
-    return force(c.Atoms, p; rcut = maximum(c.radii))
+    return force(c.Atoms, p)
 end
 
 function force(r::Vector{Configuration}, p::EmpiricalPotential)
