@@ -63,7 +63,7 @@ end
 
 function force(r::Vector{Configuration}, p::EmpiricalPotential)
     n = length(r)
-    f = [[Vector{Real}(undef, 3) for j = 1:r[i].num_atoms] for i = 1:n]
+    f = [[Vector{Real}(undef, 3) for j = 1:length(r[i].Atoms)] for i = 1:n]
     for i = 1:n
         f[i] = force(r[i], p)
     end
