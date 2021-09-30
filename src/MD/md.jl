@@ -111,7 +111,7 @@ function run_md(c0::Configuration, lj::LennardJones, Tend::Int, save_dir::String
             command(lmp, "create_box $(c0.num_atom_types) mybox")
 
             # Create atoms
-            for j = 1:length(c.Atoms)
+            for j = 1:length(c0.Atoms)
                 atom_id = findall(c0.atom_names .== c0.Atoms[j].Type)[1]
                 command(lmp, "create_atoms $atom_id single $(c0.Atoms[j].Position[1]) $(c0.Atoms[j].Position[2]) $(c0.Atoms[j].Position[3])")
             end
@@ -180,12 +180,12 @@ function run_md(c0::Configuration, snap::SNAP, Tend::Int, save_dir::String; dim 
             end
 
             # Setup box
-            command(lmp, "region mybox block $(c0.domain.bounds[1][1]) $(c0.domain.bounds[1][2]) $(c0.domain.bounds[2][1]) $(c.domain.bounds[2][2]) $(c.domain.bounds[3][1]) $(c.domain.bounds[3][2])")
+            command(lmp, "region mybox block $(c0.domain.bounds[1][1]) $(c0.domain.bounds[1][2]) $(c0.domain.bounds[2][1]) $(c0.domain.bounds[2][2]) $(c0.domain.bounds[3][1]) $(c0.domain.bounds[3][2])")
             command(lmp, "create_box $(c0.num_atom_types) mybox")
 
 
             # Create atoms
-            for j = 1:length(c.Atoms)
+            for j = 1:length(c0.Atoms)
                 atom_id = findall(c0.atom_names .== c0.Atoms[j].Type)[1]
                 command(lmp, "create_atoms $atom_id single $(c0.Atoms[j].Position[1]) $(c0.Atoms[j].Position[2]) $(c0.Atoms[j].Position[3])")
             end
@@ -196,7 +196,7 @@ function run_md(c0::Configuration, snap::SNAP, Tend::Int, save_dir::String; dim 
             # Setup Forcefield
             
             cutoff = snap.rcutfac * maximum(c0.radii)
-            max_bounds = max(2*cutoff, min( (c.domain.bounds[1][2] - c.domain.bounds[1][1]), (c.domain.bounds[2][2] - c.domain.bounds[2][1]), (c.domain.bounds[3][2] - c.domain.bounds[3][1]) ) )
+            max_bounds = max(2*cutoff, min( (c0.domain.bounds[1][2] - c0.domain.bounds[1][1]), (c0.domain.bounds[2][2] - c0.domain.bounds[2][1]), (c0.domain.bounds[3][2] - c0.domain.bounds[3][1]) ) )
             # command(lmp, "pair_style hybrid/overlay zero $max_bounds snap")
             # command(lmp, "pair_coeff * * zero")
             command(lmp, "pair_style hybrid/overlay zero $max_bounds zbl 2.0 2.5 snap")
