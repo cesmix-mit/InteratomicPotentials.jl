@@ -54,8 +54,8 @@ function get_positions(c0::Configuration, path::String, T)
     r = Vector{Configuration}(undef, num_configs)
     for (i,t) in enumerate(T)
         file = "DATA.$t"
-        c_temp = load_lammps_DATA(path*file; atom_names = c0.atom_names, 
-                        radii = c0.radii, weights = c0.weights)
+        c_temp = load_lammps(path*file; atom_names = c0.atom_names, 
+                        radii = c0.radii, weights = c0.weights, boundary_type = c0.domain.bound_type)
         r[i] = c_temp
     end
 
