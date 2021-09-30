@@ -68,7 +68,7 @@ function load_lammps(file_path :: String; atom_names = nothing, radii = [3.5], w
     # Prep for Velocities
     ind_velocities = findall(occursin.("Velocities", lines))
     if ~isempty(ind_velocities)
-        line_num_velocity = ind_velocity[1] + 1
+        line_num_velocity = ind_velocities[1] + 1
     end
     
     # Iterate through each atom
