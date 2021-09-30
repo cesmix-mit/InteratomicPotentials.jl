@@ -54,7 +54,7 @@ function get_positions(c0::Configuration, path::String, T)
     r = Vector{Configuration}(undef, num_configs)
     for (i,t) in enumerate(T)
         file = "DATA.$t"
-        c_temp = Potentials.load_lammps_DATA(path*file; atom_names = c0.atom_names, 
+        c_temp = load_lammps_DATA(path*file; atom_names = c0.atom_names, 
                         radii = c0.radii, weights = c0.weights)
         r[i] = c_temp
     end
