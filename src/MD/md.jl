@@ -169,7 +169,7 @@ function run_md(c0::Configuration, snap::SNAP, Tend::Int, save_dir::String; dim 
     d = LMP(["-screen", "none"]) do lmp
         for i = 1
             command(lmp, "log none")
-            command(lmp, "units c0.units")
+            command(lmp, "units" * " " * c0.units)
             command(lmp, "dimension $dim")
             command(lmp, "atom_style atomic")
             command(lmp, "atom_modify map array")
