@@ -78,8 +78,8 @@ function load_lammps(file_path :: String; atom_names = nothing, radii = [3.5], w
         
         ind_velocities = findall(occursin.("Velocities", lines))
         if ~isempty(ind_velocities)
-            info = split(lines[line_num_velocity+i])
-            velocity = [parse(Float64, info[3]), parse(Float64, info[4]), parse(Float64, info[5])]
+            info_vel = split(lines[line_num_velocity+i])
+            velocity = [parse(Float64, info_vel[2]), parse(Float64, info_vel[3]), parse(Float64, info_vel[4])]
         else
             velocity = zeros(3)
         end
