@@ -1,4 +1,5 @@
 using InteratomicPotentials 
+import InteratomicPotentials as Potentials
 
 N = 3
 r = Vector{Potentials.Atom}(undef, N)
