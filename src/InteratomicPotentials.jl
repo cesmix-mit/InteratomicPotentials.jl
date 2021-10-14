@@ -38,7 +38,6 @@ module InteratomicPotentials
 using Base: Float64
 using LAMMPS
 using LinearAlgebra
-using Plots
 using ExtXYZ
 
 include("Utilities/utils.jl")

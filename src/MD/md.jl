@@ -62,35 +62,35 @@ function get_positions(c0::Configuration, path::String, T)
     return r
 end
 
-function animate_atoms(r::Vector{Configuration}, T, path::String; dim = 2, fps = 60)
-    c0 = r[1]
-    n = length(r)
-    if dim == 3
-        anim = @animate for i = 1:n
-            pos = hcat(vec(r[i].Positions)...)
-            scatter(pos[1, :], pos[2, :], pos[3, :], xaxis = ("x", (c0.x_bounds[1], c0.x_bounds[2]), -c0.x_bounds[1]:0.5:c0.x_bounds[2]), 
-                            yaxis = ("y", (c0.y_bounds[1], c0.y_bounds[2]), -c0.y_bounds[1]:0.5:c0.y_bounds[2]), 
-                            zaxis = ("z", (c0.z_bounds[1], c0.z_bounds[2]), -c0.z_bounds[1]:0.5:c0.z_bounds[2]), 
-                            markersize = 20, 
-                            c=colormap("Blues", c0.num_atoms), 
-                            legend = false,
-                            title = string("τ = ", floor(T[i]) ))
-        end
+# function animate_atoms(r::Vector{Configuration}, T, path::String; dim = 2, fps = 60)
+#     c0 = r[1]
+#     n = length(r)
+#     if dim == 3
+#         anim = @animate for i = 1:n
+#             pos = hcat(vec(r[i].Positions)...)
+#             scatter(pos[1, :], pos[2, :], pos[3, :], xaxis = ("x", (c0.x_bounds[1], c0.x_bounds[2]), -c0.x_bounds[1]:0.5:c0.x_bounds[2]), 
+#                             yaxis = ("y", (c0.y_bounds[1], c0.y_bounds[2]), -c0.y_bounds[1]:0.5:c0.y_bounds[2]), 
+#                             zaxis = ("z", (c0.z_bounds[1], c0.z_bounds[2]), -c0.z_bounds[1]:0.5:c0.z_bounds[2]), 
+#                             markersize = 20, 
+#                             c=colormap("Blues", c0.num_atoms), 
+#                             legend = false,
+#                             title = string("τ = ", floor(T[i]) ))
+#         end
     
-    elseif dim==2
-        anim = @animate for i = 1:n
-            pos = hcat(vec(r[i].Positions)...)
-            scatter(pos[1, :], pos[2, :], xaxis = ("x", (c0.x_bounds[1], c0.x_bounds[2]), -c0.x_bounds[1]:0.5:c0.x_bounds[2]), 
-                            yaxis = ("y", (c0.y_bounds[1], c0.y_bounds[2]), -c0.y_bounds[1]:0.5:c0.y_bounds[2]), 
-                            c=colormap("Blues", c0.num_atoms),
-                            legend = false, 
-                            title = string("τ = ", floor(T[i]) ) )
+#     elseif dim==2
+#         anim = @animate for i = 1:n
+#             pos = hcat(vec(r[i].Positions)...)
+#             scatter(pos[1, :], pos[2, :], xaxis = ("x", (c0.x_bounds[1], c0.x_bounds[2]), -c0.x_bounds[1]:0.5:c0.x_bounds[2]), 
+#                             yaxis = ("y", (c0.y_bounds[1], c0.y_bounds[2]), -c0.y_bounds[1]:0.5:c0.y_bounds[2]), 
+#                             c=colormap("Blues", c0.num_atoms),
+#                             legend = false, 
+#                             title = string("τ = ", floor(T[i]) ) )
             
-        end
-    end
+#         end
+#     end
     
-    gif(anim, path*"movie.gif", fps = fps)
-end
+#     gif(anim, path*"movie.gif", fps = fps)
+# end
 
 function run_md(c0::Configuration, lj::LennardJones, Tend::Int, save_dir::String; dim = 3, seed = 1, Temp = 0.5, dt = 0.005, dT = 10)
     d = LMP(["-screen", "none"]) do lmp
