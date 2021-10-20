@@ -35,7 +35,7 @@ function load_lammps(file_path :: String; atom_names = nothing, radii = [3.5], w
     y_bounds            = [parse(Float64, ybounds_vec[1]), parse(Float64, ybounds_vec[2])]
     z_bounds            = [parse(Float64, zbounds_vec[1]), parse(Float64, zbounds_vec[2])]
 
-    domain = Domain( [x_bounds, y_bounds, z_bounds], boundary_type )
+    domain = Domain( SVector([x_bounds, y_bounds, z_bounds]), SVector(boundary_type) )
 
     if length(radii) == num_atom_types
         radii = radii
@@ -74,14 +74,14 @@ function load_lammps(file_path :: String; atom_names = nothing, radii = [3.5], w
     # Iterate through each atom
     for i = 1:num_atoms
         info = split(lines[line_num_atoms+i])
-        position = [parse(Float64, info[3]), parse(Float64, info[4]), parse(Float64, info[5])]
+        position = SA_F64[parse(Float64, info[3]), parse(Float64, info[4]), parse(Float64, info[5])]
         
         ind_velocities = findall(occursin.("Velocities", lines))
         if ~isempty(ind_velocities)
             info_vel = split(lines[line_num_velocity+i])
-            velocity = [parse(Float64, info_vel[2]), parse(Float64, info_vel[3]), parse(Float64, info_vel[4])]
+            velocity = SA_F64[parse(Float64, info_vel[2]), parse(Float64, info_vel[3]), parse(Float64, info_vel[4])]
         else
-            velocity = zeros(3)
+            velocity = SVector(zeros(3))
         end
         Atoms[parse(Int, info[1])] = Atom(masses[parse(Int, info[2])], 
                                           position, 
@@ -90,12 +90,13 @@ function load_lammps(file_path :: String; atom_names = nothing, radii = [3.5], w
                                 )
     end
 
-    c = Configuration(Atoms, num_atom_types, 
-                    Angles, num_angle_types,
-                    Bonds, num_bond_types, 
-                    Impropers, num_improper_types, 
-                    Dihedrals, num_dihedral_types,
-                    atom_names, masses, radii, weights,
+    c = Configuration(SVector(Atoms), num_atom_types, 
+                    SVector(Angles), num_angle_types,
+                    SVector(Bonds), num_bond_types, 
+                    SVector(Impropers), num_improper_types, 
+                    SVector(Dihedrals), num_dihedral_types,
+                    SVector(atom_names), SVector(masses),
+                    SVector(radii), SVector(weights),
                     domain, units)
 
     return c

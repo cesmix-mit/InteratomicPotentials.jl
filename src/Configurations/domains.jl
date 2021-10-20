@@ -1,4 +1,4 @@
-mutable struct Domain
-    bounds      :: Vector
-    bound_type  :: Vector
+struct Domain
+    bounds      :: SVector
+    bound_type  :: SVector
 end

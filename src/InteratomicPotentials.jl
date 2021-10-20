@@ -36,22 +36,26 @@
 module InteratomicPotentials
 
 using Base: Float64
+using StaticArrays
 using LAMMPS
 using LinearAlgebra
 using ExtXYZ
-
-include("Utilities/utils.jl")
-include("Configurations/config.jl")
-include("IO/io.jl")
+using AtomsBase
+using Unitful
+using UnitfulAtomic
+# include("Utilities/utils.jl")
+# include("Configurations/config.jl")
+# include("IO/io.jl")
 include("PotentialTypes/types.jl")
-include("MD/md.jl")
+# include("MD/md.jl")
 
 export potential_energy, force, virial, virial_stress
 export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
-export LennardJones, BornMayer, Coulomb, GaN, MixedPotential
-export EmpiricalPotential, SNAP, SNAPkeywords, get_bispectrum, get_dbispectrum, get_vbispectrum, get_snap
-export Atom, Angle, Bond, Configuration, Dihedral, Domain, Improper
-export load_lammps
+export EmpiricalPotential, LennardJones
+# export BornMayer, Coulomb, GaN, MixedPotential
+# export SNAP, SNAPkeywords, get_bispectrum, get_dbispectrum, get_vbispectrum, get_snap
+# export Atom, Angle, Bond, Configuration, Dihedral, Domain, Improper
+# export load_lammps
 
 
 

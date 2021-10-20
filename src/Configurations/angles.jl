@@ -1,3 +1,3 @@
-mutable struct Angle
+struct Angle
 
 end

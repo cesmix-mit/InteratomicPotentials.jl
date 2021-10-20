@@ -1,3 +1,3 @@
-mutable struct Dihedral
+struct Dihedral
 
 end
