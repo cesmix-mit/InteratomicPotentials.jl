@@ -1,7 +1,7 @@
 # # Visualizing configurations with Makie.jl
 import InteratomicPotentials as Potentials
 
-# # Let's load as test data a `GaN` configuration
+# Let's load as test data a `GaN` configuration
 file_path = joinpath(dirname(pathof(Potentials)), "..", "test", "DATA", "1", "DATA")
 radii = 1.5
 configuration = Potentials.load_lammps(
