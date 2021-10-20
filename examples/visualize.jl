@@ -41,3 +41,31 @@ fig = Figure()
 axes = Axis3(fig[1,1], aspect=:data)
 plot!(axes, configuration)
 fig
+
+# Makie allows us to quickly create recordings
+
+function load_configuration(i)
+    file_path = joinpath(dirname(pathof(Potentials)), "..", "test", "DATA", string(i), "DATA")
+    radii = 1.5
+    return Potentials.load_lammps(
+        file_path;
+        atom_names = [:Ga, :N],
+        radii = [radii, radii],
+        weights = [1.0, 0.5],
+        boundary_type = ["p", "p", "p"],
+        units = "metal"
+    )
+end
+
+# Create a idx `Node`
+
+idx = Node(1)
+configuration = @lift load_configuration($idx)
+
+fig = Figure()
+axes = Axis3(fig[1,1], aspect=:data)
+plot!(axes, configuration)
+
+record(fig, "GaN.mp4", 1:61, framerate=1) do frame
+    idx[] = frame
+end
