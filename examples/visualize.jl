@@ -40,3 +40,4 @@ using GLMakie
 fig = Figure()
 axes = Axis3(fig[1,1], aspect=:data)
 plot!(axes, configuration)
+fig
