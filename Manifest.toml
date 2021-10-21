@@ -9,8 +9,6 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 [[AtomsBase]]
 deps = ["PeriodicTable", "StaticArrays", "Unitful", "UnitfulAtomic"]
 git-tree-sha1 = "da633e8192d7dce836272398994357872d508cdc"
-repo-rev = "master"
-repo-url = "https://github.com/JuliaMolSim/AtomsBase.jl"
 uuid = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
 version = "0.1.0"
 
