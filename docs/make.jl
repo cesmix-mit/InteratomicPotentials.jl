@@ -17,6 +17,7 @@ const EXAMPLES_DIR = joinpath(@__DIR__, "..", "examples")
 const OUTPUT_DIR   = joinpath(@__DIR__, "src/generated")
 
 examples = Pair{String, String}[
+    "Visualize with Makie" => "visualize"
 ]
 
 for (_, name) in examples
