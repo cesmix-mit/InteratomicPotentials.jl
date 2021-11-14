@@ -1,0 +1,44 @@
+name: Documentation
+on:
+  push:
+    branches:
+      - main
+    tags: "*"
+jobs:
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: "1.6"
+      - name: add CESMIX registry
+        run: |
+          julia -e '
+            using Pkg
+            Pkg.Registry.add("General")
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/cesmix-mit/CESMIX.git"))
+          '
+        shell: bash
+      - name: instantiate docs
+        run: |
+          julia --project=docs -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+          '
+      - name: run doctests
+        run: |
+          julia --project=docs -e '
+            using Documenter: DocMeta, doctest
+            using InteratomicPotentials
+            DocMeta.setdocmeta!(InteratomicPotentials, :DocTestSetup, :(using InteratomicPotentials); recursive=true)
+            doctest(InteratomicPotentials)
+          '
+      - name: generate docs
+        run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs docs/make.jl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
