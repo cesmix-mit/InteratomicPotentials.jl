@@ -3,7 +3,8 @@
 *.jl.mem
 
 # generated docs
-docs/build
+docs/build/
+docs/src/generated/
 
 Manifest.toml
 
