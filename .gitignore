@@ -1,5 +1,11 @@
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
-deps/deps.jl
+
+# generated docs
+docs/build
+
 Manifest.toml
+
+# LAMMPS artifacts
+log.lammps
