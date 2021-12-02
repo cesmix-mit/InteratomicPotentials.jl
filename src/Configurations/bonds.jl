@@ -1,3 +1,3 @@
-struct Bond
+mutable struct Bond
 
 end

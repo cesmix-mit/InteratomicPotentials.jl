@@ -2,6 +2,7 @@ using Test
 
 @time begin
 @testset "Potentials.jl" begin
-    include("lj_test.jl")
+    include("lennard_jones_test.jl")
+    # include("lammps_test.jl")
 end
 end

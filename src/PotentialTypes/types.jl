@@ -11,14 +11,14 @@ abstract type MixedPotential <:ArbitraryPotential end
 
 ############################### Empirical Potentials ################################################
 include("EmpiricalPotentials/lj.jl")
-# include("EmpiricalPotentials/bm.jl")
-# include("EmpiricalPotentials/coulomb.jl")
+include("EmpiricalPotentials/bm.jl")
+include("EmpiricalPotentials/coulomb.jl")
 include("EmpiricalPotentials/virials.jl")
 include("EmpiricalPotentials/vectorization.jl")
 
 ################################ SNAP ##############################################################
-# include("SNAP/snap.jl")
+include("SNAP/snap.jl")
 
 ################################ GaN ###############################################################
-# include("GaN/gan.jl")
+include("GaN/gan.jl")
 

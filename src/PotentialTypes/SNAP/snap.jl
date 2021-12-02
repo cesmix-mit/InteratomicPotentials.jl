@@ -3,7 +3,6 @@
 #########################################################################
 
 mutable struct SNAPkeywords
-    n_elements      :: Int
     switchflag      :: Int 
     bzeroflag       :: Int 
     quadraticflag   :: Int

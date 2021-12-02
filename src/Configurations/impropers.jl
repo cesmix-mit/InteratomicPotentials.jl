@@ -1,3 +1,3 @@
-struct Improper
+mutable struct Improper
 
 end

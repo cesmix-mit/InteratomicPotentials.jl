@@ -1,18 +1,14 @@
 name = "InteratomicPotentials"
 uuid = "a9efe35a-c65d-452d-b8a8-82646cd5cb04"
 authors = ["Dallas Foster <fostdall@mit.edu>"]
-version = "0.1.5"
+version = "0.1.2"
 
 [deps]
-AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
 ExtXYZ = "352459e4-ddd7-4360-8937-99dcb397b478"
 LAMMPS = "ee2e13b9-eee9-4449-aafa-cfa6a2dbe14d"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
 
 [compat]
 ExtXYZ = "0.1"
