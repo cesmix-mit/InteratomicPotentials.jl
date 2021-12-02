@@ -40,13 +40,17 @@ using LAMMPS
 using LinearAlgebra
 using ExtXYZ
 
+using Unitful 
+using StaticArrays
+using AtomsBase
+
 include("Utilities/utils.jl")
 include("Configurations/config.jl")
 include("IO/io.jl")
 include("PotentialTypes/types.jl")
 include("MD/md.jl")
 
-export potential_energy, force, virial, virial_stress
+export potential_energy, force, forces, virial, virial_stress
 export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
 export LennardJones, BornMayer, Coulomb, GaN, MixedPotential
 export EmpiricalPotential, SNAP, SNAPkeywords, get_bispectrum, get_dbispectrum, get_vbispectrum, get_snap

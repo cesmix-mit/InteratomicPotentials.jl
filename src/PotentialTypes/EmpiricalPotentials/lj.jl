@@ -1,8 +1,15 @@
 ############################## Lennard Jones ###################################
+#mutable struct LennardJones <: EmpiricalPotential
+#    ϵ::Real
+#    σ::Real
+#end
+
+# TODO: Unitful.Energy, Unitful.Length
 mutable struct LennardJones <: EmpiricalPotential
-    ϵ::Real
-    σ::Real
+    ϵ::Unitful.Energy
+    σ::Unitful.Length
 end
+
 
 function LennardJones()
     #ToDO
