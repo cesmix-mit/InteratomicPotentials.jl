@@ -115,10 +115,18 @@ end
 
 # TODO: New functions needed in "gen_test_data"
 
-function potential_energy(s::AbstractSystem, p::ArbitraryPotential)
-    N = size(s)[1]
-    return sum([potential_energy(position(getindex(s,i)) - position(getindex(s,j)), p)
-                for i in 1:N for j in i+1:N])
+function potential_energy(c::AbstractSystem, p::ArbitraryPotential)
+    N = size(c)[1]
+    s = typeof(potential_energy(position(getindex(c,1)), p))(0.0)
+    for i in 1:N
+        for j in i+1:N
+            r = position(getindex(c,i)) - position(getindex(c,j))
+            if norm(r) <= p.cutoff
+                s += potential_energy(r, p)
+            end
+        end
+    end
+    return s
 end
 
 function forces(s::AbstractSystem, p::ArbitraryPotential)

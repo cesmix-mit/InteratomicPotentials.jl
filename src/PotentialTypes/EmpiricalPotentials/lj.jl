@@ -8,16 +8,17 @@
 mutable struct LennardJones <: EmpiricalPotential
     ϵ::Unitful.Energy
     σ::Unitful.Length
+    cutoff::Unitful.Length
 end
 
 
 function LennardJones()
     #ToDO
-    return LennardJones(1.0, 1.0)
+    return LennardJones(1.0u"J", 1.0u"nm", 1.0u"nm")
 end
 
 function get_trainable_params(lj::LennardJones)
-    p = Parameter{:ϵ, :σ}((lj.ϵ, lj.σ))
+    p = Parameter{:ϵ, :σ, :cutoff}((lj.ϵ, lj.σ, lj.cutoff))
     return p
 end
 
@@ -50,7 +51,7 @@ end
 
 function grad_force(r::Vector{<:Real}, p::LennardJones)
     d = norm(r)
-    g = (dfdϵ = 48.0 * ( (p.σ / d)^13 - 0.5*(p.σ / d)^7 ) .* r ./ d, 
+    g = (dfdϵ = 48.0 * ( (p.σ / d)^13 - 0.5*(p.σ / d)^7 ) .* r ./ d,
     dfdσ = 144.0 * p.ϵ / p.σ * ( 4.0*p.σ^12 / d^13 - p.σ^6 / d^7 ) .* r ./ d )
     return g 
 end
