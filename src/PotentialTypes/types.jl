@@ -129,9 +129,21 @@ function potential_energy(c::AbstractSystem, p::ArbitraryPotential)
     return s
 end
 
-function forces(s::AbstractSystem, p::ArbitraryPotential)
-    N = size(s)[1]
-    return [ SVector{D}(zeros(D) * 1.0u"N") for i in 1:N ]
+function forces(c::AbstractSystem, p::ArbitraryPotential)
+    N = size(c)[1]
+    forces = []
+    T = typeof(force(position(getindex(c,1)), p)[1]) # TODO: ugly
+    for i in 1:N
+        f_i = SVector{D}([T(0.0) for k in 1:D]) # TODO: ugly
+        for j in 1:N
+            r = position(getindex(c,i)) - position(getindex(c,j))
+            if norm(r) <= p.cutoff && norm(r) > 0.0u"nm"
+                f_i += force(r, p)
+            end
+        end
+        push!(forces, f_i)
+    end
+    return forces
 end
 
 function virial(s::AbstractSystem, p::ArbitraryPotential) 

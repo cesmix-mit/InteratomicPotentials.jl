@@ -36,7 +36,7 @@ end
 
 ############################### Forces ##########################################
 
-function force(r::Vector{<:Real}, p::LennardJones)
+function force(r::SVector, p::LennardJones)
     d = norm(r)
     return 24.0 * p.ϵ * ( 2.0 * ( p.σ / d )^12 -  ( p.σ / d)^6 ) .* r ./ d ./ d
 end
