@@ -43,6 +43,7 @@ using ExtXYZ
 using AtomsBase
 using Unitful
 using UnitfulAtomic
+using CGcoefficient
 # include("Utilities/utils.jl")
 # include("Configurations/config.jl")
 # include("IO/io.jl")

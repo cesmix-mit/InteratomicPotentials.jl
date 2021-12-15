@@ -2,6 +2,7 @@
 struct RuntimeArrays{T}
 
     # Iterparticle Arrays
+    indij       :: Vector{SVector{2, Int}}
     rij         :: Vector{SVector{3, <:T}} 
     inside      :: Vector{<:T} 
     wj          :: Vector{<:T} 
@@ -31,22 +32,24 @@ struct RuntimeArrays{T}
 end
 
 
-function initialize_runtime_arrays(a::StaticAtom, A::AbstractSystem, snap :: SNAPParams)
+function initialize_runtime_arrays(i::Int, ai::StaticAtom, A::AbstractSystem, snap :: SNAPParams)
+    ind_ij     = SVector{2, Int}[]
     rcutij     = AbstractFloat[] 
     inside  = AbstractFloat[]
     wj      = AbstractFloat[]
     rij  = SVector{3, AbstractFloat}[] 
     element = Int[]
     elements = snap.elements
-    for p_j = A.particles
-        elem_temp = findall(x->x==Symbol(p_j.element.symbol), elements)[1]
+    for (j, aj) in enumerate(A.particles)
+        elem_temp = findall(x->x==Symbol(aj.element.symbol), elements)[1]
         rcutij_temp = snap.rcut[elem_temp]
         wj_temp     = snap.weight[elem_temp]
-        rij_temp = ustrip.(a.position - p_j.position )
+        rij_temp = ustrip.(ai.position - aj.position )
         norm_ij = norm(rij_temp)
-        if (norm_ij < snap.rmin0) || (norm_ij > rcutij_temp)
+        if (norm_ij > rcutij_temp)
             continue;
         else
+            push!(ind_ij, SVector{2}([i, j]) )
             push!(element, elem_temp)
             push!(rcutij, rcutij_temp)
             push!(wj, wj_temp)
@@ -61,6 +64,7 @@ function initialize_runtime_arrays(a::StaticAtom, A::AbstractSystem, snap :: SNA
     n_doubles = n_elements * n_elements
     n_triples = n_doubles * n_elements
     return RuntimeArrays{AbstractFloat}(
+        ind_ij,                                                 # indij
         rij,                                                    # rij
         inside,                                                 # inside
         wj,                                                     # wj

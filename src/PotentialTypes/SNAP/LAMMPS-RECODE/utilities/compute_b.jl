@@ -18,8 +18,8 @@ function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
         for elem1 = 0:(n_elements-1)
             for elem2 = 0:(n_elements-1)
     
-                zptr_r = runtime_arrays.zlist_r#[idouble*snap.prebuilt_arrays.idxz_max+1:end];
-                zptr_i = runtime_arrays.zlist_i#[idouble*snap.prebuilt_arrays.idxz_max+1:end];
+                zptr_r = runtime_arrays.zlist_r[idouble*snap.prebuilt_arrays.idxz_max+1:end];
+                zptr_i = runtime_arrays.zlist_i[idouble*snap.prebuilt_arrays.idxz_max+1:end];
     
                 for elem3 = 0:(n_elements-1)
                     for jjb = 0:(snap.prebuilt_arrays.idxb_max-1)
@@ -30,21 +30,29 @@ function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
                         # print(size(snap.prebuilt_arrays.idxz_block))
                         jjz = snap.prebuilt_arrays.idxz_block[j1+1,j2+1,j+1];
                         jju = snap.prebuilt_arrays.idxu_block[j+1];
-                        sumzu = 0.0;
+                        sumzu = 0.0
                         mb = 0
-                        # println("j1 $j1, j2 $j2, j $j, jjz $jjz, jju $jju")
-                        # println("Main j sum")
-
+                        println("j1 $j1, j2 $j2, j $j, jjz $jjz, jju $jju")
+                        println("Main j sum")
+                        println("Beginning Loop: jjb $jjb, sumzu $sumzu")
                         # Strict inequality
                         while 2*mb < j
                             for ma = 0:j 
-                                sumzu += runtime_arrays.ulisttot_r[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_r[jjz+1] +
-                                        runtime_arrays.ulisttot_i[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_i[jjz+1];
-                                jjz+=1;
-                                jju+=1;
+                                # println("ulisttot_r $(runtime_arrays.ulisttot_r[elem3*snap.prebuilt_arrays.idxu_max+jju+1])")
+                                # println("ulisttot_i $(runtime_arrays.ulisttot_i[elem3*snap.prebuilt_arrays.idxu_max+jju+1])")
+                                # println("zptr_r $(zptr_r[jjz+1])")
+                                # println("zptr_i $(zptr_i[jjz+1])")
+                                println("Before sumzu $sumzu")
+                                sumzu += (runtime_arrays.ulisttot_r[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_r[jjz+1] +
+                                        runtime_arrays.ulisttot_i[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_i[jjz+1])
+                                println("After sumzu $sumzu")
+                                jjz+=1
+                                jju+=1
                             end
+                            println("While loop sumzu $sumzu")
                             mb +=1;
                         end # loop over ma, mb
+                        println("Finish odd: jjb $jjb, sumzu $sumzu")
                         # // For j even, handle middle column
                         if (j % 2 == 0) 
                             mb = floor(Int, j / 2);
@@ -57,10 +65,17 @@ function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
                                 jju+=1;
                                 ma+=1
                             end
+                            # println("ulisttot_r $(runtime_arrays.ulisttot_r[elem3*snap.prebuilt_arrays.idxu_max+jju+1])")
+                            # println("ulisttot_i $(runtime_arrays.ulisttot_i[elem3*snap.prebuilt_arrays.idxu_max+jju+1])")
+                            # println("zptr_r $(zptr_r[jjz+1])")
+                            # println("zptr_i $(zptr_i[jjz+1])")
                             sumzu += 0.5 * (runtime_arrays.ulisttot_r[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_r[jjz+1] +
                                         runtime_arrays.ulisttot_i[elem3*snap.prebuilt_arrays.idxu_max+jju+1] * zptr_i[jjz+1]);
-                            # println("sumzu $sumzu")
+                            println("Finish even: jjb $jjb, sumzu $sumzu")
+
                         end # if jeven
+                        println("jjb $jjb, sumzu $sumzu")
+
                         runtime_arrays.blist[itriple*snap.prebuilt_arrays.idxb_max+jjb+1] = 2.0 * sumzu;
                     end
                     itriple+=1;
@@ -73,10 +88,10 @@ function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
     
         if (snap.bzero_flag) 
             if (~snap.wselfall_flag) 
-                itriple = (ielem*nelements+ielem)*nelements+ielem;
-                for jjb = 0:(snap.idxb_max-1)
-                    j = idxb[jjb+1].j;
-                    runtime_arrays.blist[itriple*idxb_max+jjb+1] -= bzero[j+1];
+                itriple = (ielem-1)*( n_elements+1)*n_elements+(ielem-1);
+                for jjb = 0:(snap.prebuilt_arrays.idxb_max-1)
+                    j = snap.prebuilt_arrays.idxb[jjb+1].j;
+                    runtime_arrays.blist[itriple*snap.prebuilt_arrays.idxb_max+jjb+1] -= snap.prebuilt_arrays.bzero[j+1];
                 end # loop over JJ
             else 
                 itriple = 0;
@@ -84,8 +99,8 @@ function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
                     for elem2 = 0:(n_elements-1)
                         for elem3 = 0:(n_elements-1)
                             for jjb = 0:(snap.prebuilt_arrays.idxb_max-1)
-                                j = idxb[jjb+1].j;
-                                runtime_arrays.blist[itriple*idxb_max+jjb+1] -= bzero[j+1];
+                                j = snap.prebuilt_arrays.idxb[jjb+1].j;
+                                runtime_arrays.blist[itriple*snap.prebuilt_arrays.idxb_max+jjb+1] -= snap.prebuilt_arrays.bzero[j+1];
                             end # loop over JJ
                             itriple+=1;
                         end # loop over elem3

@@ -12,9 +12,14 @@ function compute_ui(
         z = runtime_arrays.rij[j][3]
         rsq = x*x + y*y + z*z 
         r   = sqrt(rsq) 
-
-        theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0)
-        z0 = r / tan(theta0)
+        if r > 0.0
+            theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0) 
+            # Evaluate r / tan (r * theta0) = 1 / theta0 - r^2 * theta0 / 3 - r^4 * theta0 ^3 / 45
+            z0 = r / tan(theta0)
+        else
+            theta0 = snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0)
+            z0 = 1.0 / theta0
+        end
         compute_uarray(x, y, z, z0, r, j, 
                 snap, 
                 runtime_arrays)
@@ -72,17 +77,16 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
                     rootpq *
                     (a_r * ulist_r[jjup] +
                     a_i * ulist_i[jjup]);
-                    ulist_i[jju] +=
+                ulist_i[jju] +=
                     rootpq *
                     (a_r * ulist_i[jjup] -
                     a_i * ulist_r[jjup]);
-
                 rootpq = snap.prebuilt_arrays.rootpqarray[Int(ma + 1+1), Int(j - mb+1)];
                 ulist_r[jju+1] =
                         -rootpq *
                         (b_r * ulist_r[jjup] +
                         b_i * ulist_i[jjup]);
-                    ulist_i[jju+1] =
+                ulist_i[jju+1] =
                         -rootpq *
                         (b_r * ulist_i[jjup] -
                         b_i * ulist_r[jjup]);
@@ -131,19 +135,19 @@ function add_uarraytot(r::AbstractFloat, rcut::AbstractFloat, wj::AbstractFloat,
     sfac *= wj;
     ulist_r = runtime_arrays.ulist_r_ij[jj, :];
     ulist_i = runtime_arrays.ulist_i_ij[jj, :];
-
     for j = 0:snap.twojmax 
         jju = snap.prebuilt_arrays.idxu_block[j+1];
         for mb = 0:j 
             for ma = 0:j
                 runtime_arrays.ulisttot_r[(jelem-1)*snap.prebuilt_arrays.idxu_max+jju+1] +=
-                sfac * ulist_r[jju+1];
+                        sfac * ulist_r[jju+1];
                 runtime_arrays.ulisttot_i[(jelem-1)*snap.prebuilt_arrays.idxu_max+jju+1] +=
-                sfac * ulist_i[jju+1];
+                        sfac * ulist_i[jju+1];
                 jju+=1
             end
         end
     end
+    print("ulisttot_r $(runtime_arrays.ulisttot_r)")
 end
 
 
@@ -314,7 +318,7 @@ end
 
 
 function compute_sfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
-    if ~ snap.switch_flag
+    if ~snap.switch_flag
         sfac = 1.0 
     else
         if r <= snap.rmin0
@@ -330,7 +334,7 @@ function compute_sfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
 end
 
 function compute_dsfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
-    if ~ snap.switch_flag
+    if ~snap.switch_flag
         dsfac = 1.0
     else
         if r <= snap.rmin0

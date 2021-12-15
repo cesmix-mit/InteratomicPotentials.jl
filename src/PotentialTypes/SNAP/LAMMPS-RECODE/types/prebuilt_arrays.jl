@@ -34,15 +34,32 @@ struct PrebuiltArrays{T}
     # Clebsch Gordan
     rootpqarray :: Array{T}
     cglist      :: Vector{T}
+
+    # bzero 
+    bzero       :: Vector{T}
 end
 
 
 # /* ---------------------------------------------------------------------- */
 ## Initialize
 
-function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int)
+function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::Bool, bnorm_flag::Bool)
     jdim = twojmax+1
     ncount = 0
+
+    wself = 1.0
+    bzero = zeros(jdim)
+    if (bzero_flag) 
+        www = wself*wself*wself;
+        for j = 0:twojmax 
+            if (bnorm_flag)
+                bzero[j+1] = www;
+            else
+                bzero[j+1] = www*(j+1);
+            end
+        end
+    end
+
 
     idxcg_block = zeros(Int, jdim, jdim, jdim)
     idxu_block = zeros(Int, jdim)
@@ -218,7 +235,8 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int)
     idxz,
     ncoeff,
     rootpqarray,
-    cglist)
+    cglist, 
+    bzero)
 end
 
 
@@ -242,18 +260,19 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
     
                     for m2 = 0:j2   
                         bb2 = 2 * m2 - j2;
-                        m = (aa2 + bb2 + j) / 2;
+                        m = Int( (aa2 + bb2 + j) / 2 );
         
                         if (m < 0) || (m > j) 
                             cglist[idxcg_count+1] = 0.0;
                             idxcg_count+=1;
-                            continue;
+                            continue
                         else
+                            # println("j $j")
                             sum = 0.0;
-                            min_z = maximum([0, maximum([-(j-j2+aa2)/2, -(j-j1-bb2)/2])])
-                            max_z = minimum([ (j1 + j2 - j) / 2, minimum([ (j1-aa2)/2, (j2+bb2) / 2 ])])
+                            min_z = Int(maximum([0, maximum([-(j-j2+aa2)/2, -(j-j1-bb2)/2])]))
+                            max_z = Int(minimum([ (j1 + j2 - j) / 2, minimum([ (j1-aa2)/2, (j2+bb2) / 2 ])]))
                             for z = min_z:max_z
-                                ifac = ( (z % 2)==0 ) ? -1 : 1;
+                                ifac = ( (z % 2)==0 ) ? -1.0 : 1.0;
                                 sum += ifac /
                                     (factorial(Int(z)) *
                                     factorial( Int( (j1 + j2 - j) / 2 - z) ) *
@@ -272,8 +291,14 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
                                         factorial( Int( (j  + cc2) / 2) ) *
                                         factorial( Int( (j  - cc2) / 2) )*
                                         (j + 1));
-
+                            
+                            # println("j1 $j1, j2 $j2, m1 $m1, m2 $m2, j $j, m, $m")
+                        
+                            #     println("dcg $dcg, sfaccg $sfaccg")
+                            # cg = float(CG(j1, j2, j, m1, m2, m))
+                            # println("cg $cg")
                             cglist[idxcg_count+1] = sum * dcg * sfaccg;
+                            # cglist[idxcg_count+1] = cg
                             idxcg_count+=1;
                         end
                     end
