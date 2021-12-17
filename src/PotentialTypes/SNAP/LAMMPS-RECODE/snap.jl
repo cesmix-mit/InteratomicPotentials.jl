@@ -12,9 +12,7 @@ function compute_sna(A::AbstractSystem, snap::SNAPParams)
         # These must be done with each new configuration
         compute_ui(snap, runtime_arrays)
         compute_dui(snap, runtime_arrays)
-        println("ui $(runtime_arrays.ulisttot_r)")
         compute_zi(snap, runtime_arrays)
-        println("zi $(runtime_arrays.zlist_r)")
         compute_bi(snap, runtime_arrays)
 
         for ej in runtime_arrays.element

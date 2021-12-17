@@ -12,14 +12,9 @@ function compute_ui(
         z = runtime_arrays.rij[j][3]
         rsq = x*x + y*y + z*z 
         r   = sqrt(rsq) 
-        if r > 0.0
-            theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0) 
-            # Evaluate r / tan (r * theta0) = 1 / theta0 - r^2 * theta0 / 3 - r^4 * theta0 ^3 / 45
-            z0 = r / tan(theta0)
-        else
-            theta0 = snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0)
-            z0 = 1.0 / theta0
-        end
+        theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0) 
+        z0 = r / tan(theta0)
+        println("x $x y $y z $z, theta0 $theta0 z0 $z0, r $r")
         compute_uarray(x, y, z, z0, r, j, 
                 snap, 
                 runtime_arrays)
@@ -54,42 +49,40 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     b_r = r0inv * y;
     b_i = -r0inv * x;
     # // VMK Section 4.8.2
-
-
     ulist_r = runtime_arrays.ulist_r_ij[jj, :];
     ulist_i = runtime_arrays.ulist_i_ij[jj, :];
     ulist_r[1] = 1.0;
     ulist_i[1] = 0.0;
 
     for j = 1:(snap.twojmax) 
-        jju = snap.prebuilt_arrays.idxu_block[j+1]+1;
-        jjup = snap.prebuilt_arrays.idxu_block[j]+1;
+        jju = snap.prebuilt_arrays.idxu_block[j+1];
+        jjup = snap.prebuilt_arrays.idxu_block[j];
 
         # fill in left side of matrix layer from previous layer
         mb = 0
         while 2*mb <= j
-            ulist_r[jju] = 0.0;
-            ulist_i[jju] = 0.0;
+            ulist_r[jju+1] = 0.0;
+            ulist_i[jju+1] = 0.0;
 
-            for ma = 0:j-1 
-                rootpq = snap.prebuilt_arrays.rootpqarray[Int(j - ma+1), Int(j - mb+1)];
-                ulist_r[jju] +=
+            for ma = 0:(j-1) 
+                rootpq = snap.prebuilt_arrays.rootpqarray[j - ma+1, j - mb+1];
+                ulist_r[jju+1] +=
                     rootpq *
-                    (a_r * ulist_r[jjup] +
-                    a_i * ulist_i[jjup]);
-                ulist_i[jju] +=
+                    (a_r * ulist_r[jjup+1] +
+                    a_i * ulist_i[jjup+1]);
+                ulist_i[jju+1] +=
                     rootpq *
-                    (a_r * ulist_i[jjup] -
-                    a_i * ulist_r[jjup]);
-                rootpq = snap.prebuilt_arrays.rootpqarray[Int(ma + 1+1), Int(j - mb+1)];
-                ulist_r[jju+1] =
+                    (a_r * ulist_i[jjup+1] -
+                    a_i * ulist_r[jjup+1]);
+                rootpq = snap.prebuilt_arrays.rootpqarray[ma + 1+1, j - mb+1];
+                ulist_r[jju+1+1] =
                         -rootpq *
-                        (b_r * ulist_r[jjup] +
-                        b_i * ulist_i[jjup]);
-                ulist_i[jju+1] =
+                        (b_r * ulist_r[jjup+1] +
+                        b_i * ulist_i[jjup+1]);
+                ulist_i[jju+1+1] =
                         -rootpq *
-                        (b_r * ulist_i[jjup] -
-                        b_i * ulist_r[jjup]);
+                        (b_r * ulist_i[jjup+1] -
+                        b_i * ulist_r[jjup+1]);
                 jju+=1;
                 jjup+=1;
             end
@@ -100,9 +93,8 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
 
         #  // copy left side to right side with inversion symmetry VMK 4.4(2)
         #  // u[ma-j][mb-j] = (-1)^(ma-mb)*Conj([u[ma][mb])
-
         jju = snap.prebuilt_arrays.idxu_block[j+1];
-        jjup = jju+(j+1)*(j+1) - 1;
+        jjup = jju+(j+1)*(j+1) - 1 ;
         mbpar = 1;
         mb = 0;
         while 2*mb <= j
@@ -147,7 +139,6 @@ function add_uarraytot(r::AbstractFloat, rcut::AbstractFloat, wj::AbstractFloat,
             end
         end
     end
-    print("ulisttot_r $(runtime_arrays.ulisttot_r)")
 end
 
 

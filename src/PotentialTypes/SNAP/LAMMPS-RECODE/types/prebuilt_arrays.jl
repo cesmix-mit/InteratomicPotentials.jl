@@ -188,12 +188,12 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
                 mb = 0
                 while 2*mb <= j
                     for ma = 0:j 
-                        ma1min = maximum([ 0, (2 * ma - j - j2 + j1) / 2]);
-                        ma2max = (2 * ma - j - (2 * ma1min - j1) + j2) / 2;
-                        na = minimum( [j1, (2 * ma - j + j2 + j1) / 2] ) - ma1min + 1;
-                        mb1min = maximum([0, (2 * mb - j - j2 + j1) / 2]);
-                        mb2max = (2 * mb - j - (2 * mb1min - j1) + j2) / 2;
-                        nb = minimum([ j1, (2 * mb - j + j2 + j1) / 2] ) - mb1min + 1;
+                        ma1min = maximum([ 0, (2 * ma - j - j2 + j1) ÷ 2]);
+                        ma2max = (2 * ma - j - (2 * ma1min - j1) + j2) ÷ 2;
+                        na = minimum( [j1, (2 * ma - j + j2 + j1) ÷ 2] ) - ma1min + 1;
+                        mb1min = maximum([0, (2 * mb - j - j2 + j1) ÷ 2]);
+                        mb2max = (2 * mb - j - (2 * mb1min - j1) + j2) ÷ 2;
+                        nb = minimum([ j1, (2 * mb - j + j2 + j1) ÷ 2] ) - mb1min + 1;
                         # // apply to z(j1,j2,j,ma,mb) to unique element of y(j)
 
                         jju = idxu_block[j+1] + (j+1)*mb + ma;
@@ -241,11 +241,11 @@ end
 
 
 function deltacg(j1::Int, j2::Int, j::Int)
-    sfaccg = factorial( Int( (j1+j2+j) / 2 + 1 ) )
+    sfaccg = factorial( (j1+j2+j) ÷ 2 + 1  )
     return sqrt( 
-            factorial( Int( (j1+j2 -j)/2 ) ) * 
-            factorial( Int( (j1-j2+j)/2 ) )  * 
-            factorial( Int( (-j1+j2+j) / 2) ) / sfaccg
+            factorial( (j1+j2 -j) ÷ 2 ) * 
+            factorial( (j1-j2+j) ÷ 2  )  * 
+            factorial( (-j1+j2+j) ÷ 2 ) / sfaccg
     )
 end
 
@@ -260,7 +260,7 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
     
                     for m2 = 0:j2   
                         bb2 = 2 * m2 - j2;
-                        m = Int( (aa2 + bb2 + j) / 2 );
+                        m = (aa2 + bb2 + j) ÷ 2 ;
         
                         if (m < 0) || (m > j) 
                             cglist[idxcg_count+1] = 0.0;
@@ -269,27 +269,27 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
                         else
                             # println("j $j")
                             sum = 0.0;
-                            min_z = Int(maximum([0, maximum([-(j-j2+aa2)/2, -(j-j1-bb2)/2])]))
-                            max_z = Int(minimum([ (j1 + j2 - j) / 2, minimum([ (j1-aa2)/2, (j2+bb2) / 2 ])]))
+                            min_z = maximum([0, maximum([-(j-j2+aa2) ÷ 2, -(j-j1-bb2) ÷ 2])])
+                            max_z = minimum([ (j1 + j2 - j) ÷ 2, minimum([ (j1-aa2) ÷ 2, (j2+bb2) ÷ 2 ])])
                             for z = min_z:max_z
                                 ifac = ( (z % 2)==0 ) ? -1.0 : 1.0;
                                 sum += ifac /
                                     (factorial(Int(z)) *
-                                    factorial( Int( (j1 + j2 - j) / 2 - z) ) *
-                                    factorial( Int( (j1 - aa2) / 2 - z) ) *
-                                    factorial( Int( (j2 + bb2) / 2 - z) ) *
-                                    factorial( Int( (j - j2 + aa2) / 2 + z) ) *
-                                    factorial( Int( (j - j1 - bb2) / 2 + z)) );
+                                    factorial( (j1 + j2 - j) ÷ 2 - z) *
+                                    factorial( (j1 - aa2) ÷ 2 - z) *
+                                    factorial( (j2 + bb2) ÷ 2 - z) *
+                                    factorial( (j - j2 + aa2) ÷ 2 + z) *
+                                    factorial( (j - j1 - bb2) ÷ 2 + z)) ;
                             end
             
                             cc2 = 2 * m - j;
                             dcg = deltacg(j1, j2, j);
-                            sfaccg = sqrt(factorial(Int( (j1 + aa2) / 2) )  *
-                                        factorial( Int( (j1 - aa2) / 2) ) *
-                                        factorial( Int( (j2 + bb2) / 2) ) *
-                                        factorial( Int( (j2 - bb2) / 2) ) *
-                                        factorial( Int( (j  + cc2) / 2) ) *
-                                        factorial( Int( (j  - cc2) / 2) )*
+                            sfaccg = sqrt(factorial( (j1 + aa2) ÷ 2)   *
+                                        factorial( (j1 - aa2) ÷ 2)  *
+                                        factorial( (j2 + bb2) ÷ 2)  *
+                                        factorial( (j2 - bb2) ÷ 2)  *
+                                        factorial( (j  + cc2) ÷ 2)  *
+                                        factorial( (j  - cc2) ÷ 2) *
                                         (j + 1));
                             
                             # println("j1 $j1, j2 $j2, m1 $m1, m2 $m2, j $j, m, $m")

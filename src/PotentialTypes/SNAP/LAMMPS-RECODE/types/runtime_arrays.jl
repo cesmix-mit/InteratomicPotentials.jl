@@ -46,7 +46,7 @@ function initialize_runtime_arrays(i::Int, ai::StaticAtom, A::AbstractSystem, sn
         wj_temp     = snap.weight[elem_temp]
         rij_temp = ustrip.(ai.position - aj.position )
         norm_ij = norm(rij_temp)
-        if (norm_ij > rcutij_temp)
+        if (norm_ij <= 0) || (norm_ij > rcutij_temp)
             continue;
         else
             push!(ind_ij, SVector{2}([i, j]) )
