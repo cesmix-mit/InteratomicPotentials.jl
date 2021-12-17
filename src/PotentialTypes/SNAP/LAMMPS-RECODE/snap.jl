@@ -8,9 +8,11 @@ function compute_sna(A::AbstractSystem, snap::SNAPParams)
     dB = [zeros(num_coeff, 3) for i = 1:length(A.particles)]
     W = [zeros(num_coeff, 6) for i = 1:length(A.particles)]
     for  (i, ai) in enumerate(A.particles)
+        my_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
         runtime_arrays = initialize_runtime_arrays(i, ai, A, snap)
         # These must be done with each new configuration
-        compute_ui(snap, runtime_arrays)
+        compute_ui(my_element, snap, runtime_arrays)
+        println(runtime_arrays.ulisttot_r)
         compute_dui(snap, runtime_arrays)
         compute_zi(snap, runtime_arrays)
         compute_bi(snap, runtime_arrays)

@@ -40,9 +40,10 @@ function initialize_runtime_arrays(i::Int, ai::StaticAtom, A::AbstractSystem, sn
     rij  = SVector{3, AbstractFloat}[] 
     element = Int[]
     elements = snap.elements
+    my_element = findall(x->x==Symbol(ai.element.symbol), elements)[1]
     for (j, aj) in enumerate(A.particles)
         elem_temp = findall(x->x==Symbol(aj.element.symbol), elements)[1]
-        rcutij_temp = snap.rcut[elem_temp]
+        rcutij_temp = snap.rcut[my_element] + snap.rcut[elem_temp]
         wj_temp     = snap.weight[elem_temp]
         rij_temp = ustrip.(ai.position - aj.position )
         norm_ij = norm(rij_temp)

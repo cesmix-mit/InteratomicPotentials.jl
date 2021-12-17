@@ -36,6 +36,7 @@ struct PrebuiltArrays{T}
     cglist      :: Vector{T}
 
     # bzero 
+    wself       :: T
     bzero       :: Vector{T}
 end
 
@@ -81,9 +82,7 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
             end
         end
     end
-                
-    idxcg_max = idxcg_count;
-
+    idxcg_max = idxcg_count
     #   // index list for uarray
     #   // need to include both halves
 
@@ -236,6 +235,7 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
     ncoeff,
     rootpqarray,
     cglist, 
+    wself,
     bzero)
 end
 
@@ -272,7 +272,7 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
                             min_z = maximum([0, maximum([-(j-j2+aa2) ÷ 2, -(j-j1-bb2) ÷ 2])])
                             max_z = minimum([ (j1 + j2 - j) ÷ 2, minimum([ (j1-aa2) ÷ 2, (j2+bb2) ÷ 2 ])])
                             for z = min_z:max_z
-                                ifac = ( (z % 2)==0 ) ? -1.0 : 1.0;
+                                ifac = ( (z % 2)==0 ) ? 1.0 : -1.0;
                                 sum += ifac /
                                     (factorial(Int(z)) *
                                     factorial( (j1 + j2 - j) ÷ 2 - z) *
@@ -311,8 +311,8 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
 end
 
 function init_rootpqarray(twojmax::Int, rootpqarray::Matrix{T}) where T<:AbstractFloat
-    for p = 1:twojmax+1
-        for q = 1:twojmax+1
+    for p = 1:twojmax
+        for q = 1:twojmax
             rootpqarray[p+1, q+1] = sqrt(p / q)
         end
     end

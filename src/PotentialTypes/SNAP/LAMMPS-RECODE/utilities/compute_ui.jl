@@ -3,9 +3,11 @@
 # compute Wigner U-functions for one neighbor
 # ------------------------------------------------------------------------- */
 function compute_ui(
+    ielem::Int,
     snap::SNAPParams, 
     runtime_arrays :: RuntimeArrays)
     jnum = length(runtime_arrays.rij)
+    zero_uarraytot(ielem, snap, runtime_arrays)
     for j = 1:jnum
         x = runtime_arrays.rij[j][1]
         y = runtime_arrays.rij[j][2]
@@ -14,7 +16,6 @@ function compute_ui(
         r   = sqrt(rsq) 
         theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0) 
         z0 = r / tan(theta0)
-        println("x $x y $y z $z, theta0 $theta0 z0 $z0, r $r")
         compute_uarray(x, y, z, z0, r, j, 
                 snap, 
                 runtime_arrays)
@@ -118,6 +119,29 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     runtime_arrays.ulist_r_ij[jj, :] = ulist_r
     runtime_arrays.ulist_i_ij[jj, :] = ulist_i
 end
+
+function zero_uarraytot(ielem::Int, snap::SNAPParams, runtime_arrays::RuntimeArrays)
+    for jelem = 0:(length(snap.elements)-1)
+        for j = 0:snap.twojmax 
+            jju = snap.prebuilt_arrays.idxu_block[j+1];
+            for mb = 0:j 
+                for ma = 0:j 
+                    runtime_arrays.ulisttot_r[jelem*snap.prebuilt_arrays.idxu_max+jju+1] = 0.0;
+                    runtime_arrays.ulisttot_i[jelem*snap.prebuilt_arrays.idxu_max+jju+1] = 0.0;
+
+                    # // utot(j,ma,ma) = wself, sometimes
+                    if ((jelem+1) == ielem) || (snap.wselfall_flag)
+                        if (ma==mb)
+                            runtime_arrays.ulisttot_r[jelem*snap.prebuilt_arrays.idxu_max+jju+1] = snap.prebuilt_arrays.wself; # ///// double check this
+                        end
+                    end
+                    jju+=1;
+                end
+            end
+        end
+    end
+end
+
 
 function add_uarraytot(r::AbstractFloat, rcut::AbstractFloat, wj::AbstractFloat,
         jj::Int, jelem :: Int,

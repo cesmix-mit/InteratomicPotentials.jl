@@ -3,6 +3,7 @@ using InteratomicPotentials
 using StaticArrays
 using Unitful
 using UnitfulAtomic
+using Statistics
 
 include("./lammps_snap/bispectrum_functions.jl")
 position1 = @SVector [0.0, 0.0, 0.0] 

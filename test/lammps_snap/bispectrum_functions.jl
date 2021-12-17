@@ -340,4 +340,4 @@ end
 # end
 
 
-A = get_bispectrum(2, 1, "./lammps_snap/starting_configuration.lj")
+A = get_bispectrum(2, 1, "test/lammps_snap/starting_configuration.lj")
