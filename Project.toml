@@ -5,8 +5,6 @@ version = "0.1.6"
 
 [deps]
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
-CGcoefficient = "c862aa61-d51e-47d1-b396-b1e789b4e0b6"
-ExtXYZ = "352459e4-ddd7-4360-8937-99dcb397b478"
 LAMMPS = "ee2e13b9-eee9-4449-aafa-cfa6a2dbe14d"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -16,6 +14,4 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
 
 [compat]
-ExtXYZ = "0.1"
-LAMMPS = "0.1"
 julia = "1.6"

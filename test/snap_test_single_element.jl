@@ -15,6 +15,10 @@ box = [[-5.0, 5.0], [-5.0, 5.0]]
 system   = FlexibleSystem(box * 1u"Å", [Periodic(), Periodic()], atoms)
 
 snap = SNAPParams(2, 4, [:Ar], [1.5], 0.00, 0.989, [1.0])
+println(snap.prebuilt_arrays.cglist)
+
+
+
 B, dB, W = compute_sna(system, snap)
 
 
@@ -25,6 +29,6 @@ println(" ")
 show(stdout, "text/plain", A)
 println(" ")
 
-@test norm(A[:, 1] - B[1]) < 1e-5
+@test mean(A[:, 1] - B[1]) < 1e-5
 
-@test norm(A[:, 2] - B[2]) < 1e-5
+@test mean(A[:, 2] - B[2]) < 1e-5
