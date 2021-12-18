@@ -305,10 +305,8 @@ end
 function snappotential(x, t, a, b, c, pbc, sna)
 
     dim, N = size(x)
-    e = zeros(N)
-    f = zeros(dim,N)    
     
-    idxcg_max = sna.idxcg_max;
+    #idxcg_max = sna.idxcg_max;
     idxu_max = sna.idxu_max;
     idxb_max = sna.idxb_max;
     idxz_max = sna.idxz_max;    
@@ -329,7 +327,7 @@ function snappotential(x, t, a, b, c, pbc, sna)
 
     map = sna.map;
     idxz = sna.idxz;
-    idxz_block = sna.idxz_block;
+    #idxz_block = sna.idxz_block;
     idxb = sna.idxb;
     idxb_block = sna.idxb_block;
     idxu_block = sna.idxu_block;
@@ -432,8 +430,6 @@ end
 function snapdescriptors(x, t, a, b, c, pbc, sna)
 
     dim, N = size(x)
-    e = zeros(N)
-    f = zeros(dim,N)    
     
     #idxcg_max = sna.idxcg_max;
     idxu_max = sna.idxu_max;
@@ -446,7 +442,7 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
     nelem = sna.nelements;    
     ndoubles = sna.ndoubles;   
     ntriples = sna.ntriples;   
-    nperdim = sna.nperdim;
+    #nperdim = sna.nperdim;
     bnormflag = sna.bnormflag;
     chemflag = sna.chemflag;    
     quadraticflag = sna.quadraticflag;
