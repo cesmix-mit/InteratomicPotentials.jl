@@ -7,14 +7,14 @@ end
 
 function accumarray2d(A, subs, val)
     for i = 1:length(val)
-        @inbounds A[:,subs[i]] += val[:,i]
+        A[:,subs[i]] = A[:,subs[i]] .+ val[:,i]
     end
     return A
 end
 
 function accumarray3d(A, subs, val)
     for i = 1:length(val)
-        @inbounds A[:,subs[i],:] += val[:,i,:]
+        A[:,subs[i],:] = A[:,subs[i],:] .+ val[:,i,:]
     end
     return A
 end
@@ -33,7 +33,7 @@ function accumarray2d(subs, val)
     m = size(val,1)
     A = zeros(eltype(val), (m, n))
     for i = 1:length(val)
-        @inbounds A[:,subs[i]] += val[:,i]
+        A[:,subs[i]] = A[:,subs[i]] .+ val[:,i]
     end
     return A
 end
@@ -44,7 +44,7 @@ function accumarray3d(subs, val)
     p = size(val,3)
     A = zeros(eltype(val), (m, n, p))
     for i = 1:length(val)
-        @inbounds A[:,subs[i],:] += val[:,i,:]
+        A[:,subs[i],:] = A[:,subs[i],:] .+ val[:,i,:]
     end
     return A
 end

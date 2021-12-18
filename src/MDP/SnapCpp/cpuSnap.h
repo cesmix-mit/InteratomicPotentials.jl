@@ -49,6 +49,10 @@ void cpuComputeSij(double *Sr, double *Si, double *Srx, double *Six, double *Sry
         double *rootpqarray, double *rij, double *wjelem, double *radelem, double rmin0, double rfac0, double rcutfac, int *idxu_block,  
         int *ti, int *tj, int twojmax, int idxu_max, int ijnum, int switch_flag);
 
+void cpuComputeUij(double *Sr, double *Si, double *dSr, double *dSi, double *rootpqarray, double *rij, 
+        double *wjelem, double *radelem, double rmin0, double rfac0, double rcutfac, int *idxu_block,  
+        int *ti, int *tj, int twojmax, int idxu_max, int ijnum, int switch_flag);
+                        
 void cpuZeroUarraytot2(double *Stotr, double *Stoti, double wself, int *idxu_block, 
         int *type, int *map, int *ai, int wselfall_flag, int chemflag, int idxu_max, int nelements, 
          int twojmax, int inum);

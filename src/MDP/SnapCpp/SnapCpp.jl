@@ -372,16 +372,11 @@ function snappotential(x, t, a, b, c, pbc, sna)
         Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint), 
         ulisttot_r, ulisttot_i, rootpqarray, rij, wjelem, radelem, rmin0, rfac0, rcutfac, 
         map, ai, ti, tj, twojmax, idxu_max, N, ijnum, switchflag, chemflag)    
-    # void cpuSnapComputeUi(double *Utotr, double *Utoti, double *rootpqarray, double *rij, 
-    # double *wjelem, double *radelem,  double rmin0, double rfac0, double rcutfac, int *map, int *aii, int *ti, int *tj, 
-    # int twojmax, int idxu_max, int inum, int ijnum, int switchflag, int chemflag)                
 
     ccall(Libdl.dlsym(snaplib, :cpuAddWself2Ui), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, 
         Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint), 
         ulisttot_r, ulisttot_i, wself, idxu_block, atomtype, map, wselfallflag, chemflag, 
         idxu_max, nelem, twojmax, N)    
-    # AddWself2Ui(ulisttot_r, ulisttot_i, wself, idxu_block, atomtype,
-    #         map, ai, wselfallflag, chemflag, idxu_max, nelem, twojmax, N);        
 
     eatom = zeros(N)
     ccall(Libdl.dlsym(snaplib, :cpuSnapComputeEi), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
@@ -390,9 +385,6 @@ function snappotential(x, t, a, b, c, pbc, sna)
         eatom, ulisttot_r, ulisttot_i, cglist, bzero, coeffelem, ilist, map, atomtype, 
         idxb, idxcg_block, idxu_block, twojmax, idxb_max, idxu_max, nelem, 
         ncoeffall, bnormflag, bzeroflag, wselfallflag, quadraticflag, N)    
-    # SnapComputeEi(eatom, ulisttot_r, ulisttot_i, cglist, bzero, coeffelem, ilist, map, atomtype, 
-    #         idxb, idxcg_block, idxu_block, twojmax, idxb_max, idxu_max, nelem, 
-    #         ncoeffall, bnormflag, bzeroflag, wselfallflag, quadraticflag, na);           
     
     ylist_r = zeros(N*idxu_max*nelem)
     ylist_i = zeros(N*idxu_max*nelem)
@@ -401,9 +393,6 @@ function snappotential(x, t, a, b, c, pbc, sna)
         Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint, Cint, Cint), 
         ylist_r, ylist_i, ulisttot_r, ulisttot_i, cglist, coeffelem, map, atomtype, idxz, idxb_block, 
         idxu_block, idxcg_block, twojmax, idxb_max, idxu_max, idxz_max, nelem, ncoeffall, bnormflag, N)    
-    # SnapComputeYi(ylist_r, ylist_i, ulisttot_r, ulisttot_i, cglist, coeffelem, map, &atomtype[e1], 
-    #         idxz, idxb_block, idxu_block, idxcg_block, twojmax, idxb_max, idxu_max, idxz_max, 
-    #         nelem, ncoeffall, bnormflag, na, backend);                
 
     fatom = zeros(3*N)       
     vatom = zeros(6*N)            
@@ -413,9 +402,6 @@ function snappotential(x, t, a, b, c, pbc, sna)
         Cint, Cint, Cint, Cint), 
         fatom, vatom, ylist_r, ylist_i, rootpqarray, rij, wjelem, radelem, rmin0, rfac0, rcutfac, 
         map, ai, ai, aj, ti, tj, twojmax, idxu_max, N, N, ijnum, switchflag, chemflag)    
-    # void cpuSnapComputeFi(double *fatom, double *vatom, double *ylist_r, double *ylist_i, double *rootpqarray, double *rij, 
-    # double *wjelem, double *radelem,  double rmin0, double rfac0, double rcutfac, int *map, int *aii, int *ai, int *aj, 
-    # int *ti, int *tj, int twojmax, int idxu_max, int inum, int anum, int ijnum, int switchflag, int chemflag) 
 
     return eatom, fatom, vatom 
 end
@@ -470,8 +456,8 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
     rcutsq = sna.rcutsq;    
     radelem = sna.radelem;
     wjelem = sna.wjelem; 
-    #coeffelem = sna.coeffelem;           
-    
+    #coeffelem = sna.coeffelem;                   
+
     y, alist, neighlist, neighnum = Potential.fullneighborlist(x, a, b, c, pbc, rcutmax);
     ilist = Int32.(Array(1:N));   
     atomtype = Int32.(t[:])
@@ -483,42 +469,56 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
     rij, ai, aj, ti, tj = Potential.neighpairs(y, pairlist, pairnum, atomtype, ilist, alist);                
     ijnum = pairnum[end]
 
+
     # offset 1 for C++ code
     ilist = ilist .- Int32(1)
     alist = alist .- Int32(1)
     ai = ai .- Int32(1)
     aj = aj .- Int32(1)
 
+    # n = idxu_max*ijnum
+    # ulist_r = zeros(n)
+    # ulist_i = zeros(n)
+    # ulist_rx = zeros(n)
+    # ulist_ry = zeros(n)
+    # ulist_rz = zeros(n)    
+    # ulist_ix = zeros(n)
+    # ulist_iy = zeros(n)
+    # ulist_iz = zeros(n)    
+    # ccall(Libdl.dlsym(snaplib, :cpuComputeSij), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
+    #     Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
+    #     Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, Cdouble, Cdouble, Ptr{Cint}, Ptr{Cint}, 
+    #     Ptr{Cint}, Cint, Cint, Cint, Cint), 
+    #     ulist_r, ulist_i, ulist_rx, ulist_ix, ulist_ry, ulist_iy,
+    #     ulist_rz, ulist_iz, rootpqarray, rij, wjelem, radelem, rmin0, 
+    #     rfac0, rcutfac, idxu_block, ti, tj, twojmax, idxu_max, ijnum, switchflag)    
+    
+    # dulist_r = [ulist_rx ulist_ry ulist_rz]
+    # dulist_i = [ulist_ix ulist_iy ulist_iz]
+    # dulist_r = dulist_r[:]
+    # dulist_i = dulist_i[:]
+
     n = idxu_max*ijnum
     ulist_r = zeros(n)
     ulist_i = zeros(n)
     dulist_r = zeros(3*n)
     dulist_i = zeros(3*n)    
-    ccall(Libdl.dlsym(snaplib, :cpuComputeSij), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
-        Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
-        Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, Cdouble, Cdouble, Ptr{Cint}, Ptr{Cint}, 
-        Ptr{Cint}, Cint, Cint, Cint, Cint), 
-        ulist_r, ulist_i, dulist_r[1:n], dulist_i[1:n], dulist_r[(n+1):2*n], dulist_i[(n+1):2*n],
-        dulist_r[(2*n+1):3*n], dulist_i[(2*n+1):3*n], rootpqarray, rij, wjelem, radelem, rmin0, 
+    ccall(Libdl.dlsym(snaplib, :cpuComputeUij), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
+        Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, Cdouble, 
+        Cdouble, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint), 
+        ulist_r, ulist_i, dulist_r, dulist_i, rootpqarray, rij, wjelem, radelem, rmin0, 
         rfac0, rcutfac, idxu_block, ti, tj, twojmax, idxu_max, ijnum, switchflag)    
-    # ComputeSij(ulist_r, ulist_i, &dulist_r[0*n], &dulist_i[0*n], &dulist_r[1*n], &dulist_i[1*n],
-    #         &dulist_r[2*n], &dulist_i[2*n], rootpqarray, rij, wjelem, radelem, rmin0, rfac0, rcutfac, 
-    #         idxu_block, ti, tj, twojmax, idxu_max, ijnum, switchflag, backend);      
-    
+
     ulisttot_r = zeros(N*idxu_max*nelem)
     ulisttot_i = zeros(N*idxu_max*nelem)
     ccall(Libdl.dlsym(snaplib, :cpuZeroUarraytot2), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, 
         Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint},  Cint, Cint, Cint, Cint, Cint, Cint), 
         ulisttot_r, ulisttot_i, wself, idxu_block, atomtype, map, ai, wselfallflag, chemflag, 
         idxu_max, nelem, twojmax, N)    
-    # ZeroUarraytot2(ulisttot_r, ulisttot_i, wself, idxu_block, atomtype,
-    #         map, ai, wselfallflag, chemflag, idxu_max, nelem, twojmax, inum, backend);    
 
     ccall(Libdl.dlsym(snaplib, :cpuAddUarraytot), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, 
         Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint), 
         ulisttot_r, ulisttot_i, ulist_r, ulist_i, map, ai, tj, idxu_max, N, ijnum, chemflag)    
-    # AddUarraytot(ulisttot_r, ulisttot_i, ulist_r, ulist_i, map, ai, tj, idxu_max, 
-    #         inum, ineighmax, chemflag, backend);    
 
     zlist_r = zeros(idxz_max*ndoubles*N)
     zlist_i = zeros(idxz_max*ndoubles*N)
@@ -526,8 +526,6 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
         Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint), 
         zlist_r, zlist_i, ulisttot_r, ulisttot_i, cglist, idxz, idxu_block, idxcg_block, twojmax, 
         idxu_max, idxz_max, nelem, bnormflag, N)    
-    # ComputeZi2(zlist_r, zlist_i, ulisttot_r, ulisttot_i, cglist, idxz, idxu_block, 
-    #       idxcg_block, twojmax, idxu_max, idxz_max, nelem, bnormflag, inum, backend);
 
     blist = zeros(idxb_max*ntriples*N)
     ccall(Libdl.dlsym(snaplib, :cpuComputeBi2), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, 
@@ -536,9 +534,6 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
         blist, zlist_r, zlist_i, ulisttot_r, ulisttot_i, bzero, ilist, atomtype, 
         map, idxb, idxu_block, idxz_block, twojmax, idxb_max, idxu_max, idxz_max, 
         nelem, bzeroflag, wselfallflag, chemflag, N)    
-    # ComputeBi2(blist, zlist_r, zlist_i, ulisttot_r, ulisttot_i, bzero, ilist, atomtype, 
-    #       map, idxb, idxu_block, idxz_block, twojmax, idxb_max, idxu_max, idxz_max, 
-    #       nelem, bzeroflag,  wselfallflag, chemflag, inum, backend);           
     
     dblist = zeros(idxb_max*ntriples*dim*ijnum)          
     ccall(Libdl.dlsym(snaplib, :cpuComputeDbidrj), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, 
@@ -546,28 +541,24 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
         Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint, Cint, Cint, Cint), 
         dblist, zlist_r, zlist_i, dulist_r, dulist_i, idxb, idxu_block, idxz_block, map, ai, tj, 
         twojmax, idxb_max, idxu_max, idxz_max, nelem, bnormflag, chemflag, N, ijnum)    
-    # ComputeDbidrj(dblist, zlist_r, zlist_i, dulist_r, dulist_i, idxb, idxu_block, idxz_block, map, ai, tj, 
-    #         twojmax, idxb_max, idxu_max, idxz_max, nelements, bnormflag, chemflag, inum, ineighmax, backend);
     
     bi = zeros(ntypes*ncoeff)
     ccall(Libdl.dlsym(snaplib, :cpuSnapTallyBispectrum), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble},  
         Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint), 
         bi, blist, ilist, atomtype, N, ncoeff, ncoeff, ntypes, quadraticflag)    
-    #SnapTallyBispectrum(bi, blist, alist, atomtype, inum, ncoeff, nperdim, ntypes, quadraticflag, backend);            
 
     bd = zeros(ntypes*ncoeff*3*N)
     ccall(Libdl.dlsym(snaplib, :cpuSnapTallyBispectrumDeriv), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble},  
         Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint), 
         bd, blist, dblist, ai, ai, aj, ti, N, ijnum, ncoeff, ncoeff, ntypes, quadraticflag)    
-    # void cpuSnapTallyBispectrumDeriv(double *db, double *bispectrum, double *dbdr, int *aii, 
-    # int *ai, int *aj, int *ti, int inum, int ijnum, int ncoeff, int nperdim, int ntype, int quadraticflag)
     
     bv = zeros(6*ntypes*ncoeff)
     ccall(Libdl.dlsym(snaplib, :cpuSnapTallyBispectrumVirial), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},   
         Ptr{Cdouble}, Ptr{Cint}, Ptr{Cint}, Cint, Cint, Cint, Cint, Cint, Cint), 
         bv, blist, dblist, rij, ai, ti, N, ijnum, ncoeff, ncoeff, ntypes, quadraticflag)  
-    # void cpuSnapTallyBispectrumVirial(double *bv, double *bispectrum, double *dbdr, double *rij, int *aii, 
-    # int *ti, int inum, int ijnum, int ncoeff, int nperdim, int ntype, int quadraticflag)
+
+    bd = reshape(bd, (3,N,ntypes*ncoeff))
+    bv = reshape(bv, (6,ntypes*ncoeff))
 
     return bi, bd, bv           
 end

@@ -40,7 +40,7 @@ for i = 1:length(potential)
     end
     if (style == "pair")
         xij, ai, aj, ti, tj, qi, qj = neighpairs(y, q, pairlist, pairnum, t, ilist, alist);            
-        eij, fij = potentialfunc(xij, qi, qj, ti, tj, mu, eta, kappa);                
+        eij, fij = potentialfunc(xij, qi, qj, ti, tj, mu, eta, kappa);            
         ea, fa = tallypair(eij, fij, ai, aj);            
     end
 

@@ -6,15 +6,8 @@
  ***************************************************************************/
 
 // clang++ -std=c++11 -Wall -Wextra -pedantic -c -fPIC cpuSnap.cpp -o cpusnap.o
-// clang++ -shared cpuSnap.o -o cpuSnap.dylib
-
-// snaplib = Libdl.dlopen("cpusnap.dylib")
-// idxbcount = Libdl.dlsym(snaplib, :idxbcount)
-// count = ccall(idxbcount, Cint, (Cint,), 8)
-// idxucount = Libdl.dlsym(snaplib, :idxucount)
-// count = ccall(idxucount, Cint, (Cint,), 8)
-// initsna = Libdl.dlsym(snaplib, :cpuInitSna)
-// Libdl.dlclose(snaplib)
+// clang++ -shared cpuSnap.o -o cpuSnap.dylib (MacOS system)
+// clang++ -shared cpuSnap.o -o cpuSnap.so (Linux system)
 
 #ifndef CPUSNAP
 #define CPUSNAP
@@ -1410,6 +1403,221 @@ void cpuComputeSij(double *Sr, double *Si, double *Srx, double *Six, double *Sry
         double *rootpqarray, double *rij, double *wjelem, double *radelem, double rmin0, double rfac0, double rcutfac, int *idxu_block,  
         int *ti, int *tj, int twojmax, int idxu_max, int ijnum, int switch_flag)                
 {    
+  for(int ij=0; ij<ijnum; ij++) {        
+    double x = rij[ij*3+0];
+    double y = rij[ij*3+1];
+    double z = rij[ij*3+2];
+    double rsq = x * x + y * y + z * z;
+    double r = sqrt(rsq);
+    double rinv = 1.0 / r;
+    double ux = x * rinv;
+    double uy = y * rinv;
+    double uz = z * rinv;
+
+    double rcutij = (radelem[ti[ij]]+radelem[tj[ij]])*rcutfac; //(radelem[type[ii]]+radelem[type[jj]])*rcutfac;
+    double rscale0 = rfac0 * M_PI / (rcutij - rmin0);
+    double theta0 = (r - rmin0) * rscale0;
+    double z0 = r / tan(theta0);                
+    double dz0dr = z0 / r - (r*rscale0) * (rsq + z0 * z0) / rsq;
+            
+    double sfac = 0.0, dsfac = 0.0;        
+    if (switch_flag == 0) {
+        sfac = 1.0;
+        dsfac = 0.0;
+    }
+    else if (switch_flag == 1) {
+        if (r <= rmin0) {
+            sfac = 1.0;
+            dsfac = 0.0;
+        }
+        else if(r > rcutij) {
+            sfac = 1.0;
+            dsfac = 0.0;
+        }
+        else {
+            double rcutfac = M_PI / (rcutij - rmin0);
+            sfac =  0.5 * (cos((r - rmin0) * rcutfac) + 1.0);   
+            dsfac = -0.5 * sin((r - rmin0) * rcutfac) * rcutfac;
+        }
+    } 
+    sfac *= wjelem[tj[ij]];
+    dsfac *= wjelem[tj[ij]];
+
+    //sfac = 1.0; 
+    //dsfac = 0.0;
+    
+    double r0inv, dr0invdr;
+    double a_r, a_i, b_r, b_i;
+    double da_r[3], da_i[3], db_r[3], db_i[3];
+    double dz0[3], dr0inv[3];
+    double rootpq;
+    int jdim = twojmax + 1;
+  
+    r0inv = 1.0 / sqrt(r * r + z0 * z0);
+    a_r = r0inv * z0;
+    a_i = -r0inv * z;
+    b_r = r0inv * y;
+    b_i = -r0inv * x;
+
+    dr0invdr = -pow(r0inv, 3.0) * (r + z0 * dz0dr);
+
+    dr0inv[0] = dr0invdr * ux;
+    dr0inv[1] = dr0invdr * uy;
+    dr0inv[2] = dr0invdr * uz;
+
+    dz0[0] = dz0dr * ux;
+    dz0[1] = dz0dr * uy;
+    dz0[2] = dz0dr * uz;
+
+    for (int k = 0; k < 3; k++) {
+        da_r[k] = dz0[k] * r0inv + z0 * dr0inv[k];
+        da_i[k] = -z * dr0inv[k];
+    }
+    da_i[2] += -r0inv;
+
+    for (int k = 0; k < 3; k++) {
+        db_r[k] = y * dr0inv[k];
+        db_i[k] = -x * dr0inv[k];
+    }
+    db_i[0] += -r0inv;
+    db_r[1] += r0inv;
+    
+    Sr[ij+0*ijnum] = 1.0;
+    Si[ij+0*ijnum] = 0.0;
+    Srx[ij+0*ijnum] = 0.0;
+    Six[ij+0*ijnum] = 0.0;
+    Sry[ij+0*ijnum] = 0.0;
+    Siy[ij+0*ijnum] = 0.0;
+    Srz[ij+0*ijnum] = 0.0;
+    Siz[ij+0*ijnum] = 0.0;
+    for (int j = 1; j <= twojmax; j++) {
+        int jju = idxu_block[j];
+        int jjup = idxu_block[j-1];
+        
+        // fill in left side of matrix layer from previous layer
+        for (int mb = 0; 2*mb <= j; mb++) {
+            Sr[ij+jju*ijnum] = 0.0;
+            Si[ij+jju*ijnum] = 0.0;
+            Srx[ij+jju*ijnum] = 0.0;
+            Six[ij+jju*ijnum] = 0.0;
+            Sry[ij+jju*ijnum] = 0.0;
+            Siy[ij+jju*ijnum] = 0.0;
+            Srz[ij+jju*ijnum] = 0.0;
+            Siz[ij+jju*ijnum] = 0.0;
+            for (int ma = 0; ma < j; ma++) {
+                rootpq = rootpqarray[(j - ma)*jdim + (j - mb)];
+                int njju = ij+jju*ijnum;
+                int njju1 = ij+(jju+1)*ijnum;
+                int njjup = ij+jjup*ijnum;
+                double u_r = Sr[njjup];
+                double u_i = Si[njjup];
+                double ux_r = Srx[njjup];
+                double ux_i = Six[njjup];
+                double uy_r = Sry[njjup];
+                double uy_i = Siy[njjup];
+                double uz_r = Srz[njjup];
+                double uz_i = Siz[njjup];
+
+                Sr[njju] += rootpq * (a_r * u_r + a_i * u_i);
+                Si[njju] += rootpq * (a_r * u_i - a_i * u_r);
+                Srx[njju] += rootpq * (da_r[0] * u_r + da_i[0] * u_i + a_r * ux_r + a_i * ux_i);
+                Six[njju] += rootpq * (da_r[0] * u_i - da_i[0] * u_r + a_r * ux_i - a_i * ux_r);
+                Sry[njju] += rootpq * (da_r[1] * u_r + da_i[1] * u_i + a_r * uy_r + a_i * uy_i);
+                Siy[njju] += rootpq * (da_r[1] * u_i - da_i[1] * u_r + a_r * uy_i - a_i * uy_r);
+                Srz[njju] += rootpq * (da_r[2] * u_r + da_i[2] * u_i + a_r * uz_r + a_i * uz_i);
+                Siz[njju] += rootpq * (da_r[2] * u_i - da_i[2] * u_r + a_r * uz_i - a_i * uz_r);
+
+                rootpq = rootpqarray[(ma + 1)*jdim + (j - mb)];
+                Sr[njju1] = -rootpq * (b_r * u_r + b_i * u_i);
+                Si[njju1] = -rootpq * (b_r * u_i - b_i * u_r);
+                Srx[njju1] = -rootpq * (db_r[0] * u_r + db_i[0] * u_i + b_r * ux_r + b_i * ux_i);
+                Six[njju1] = -rootpq * (db_r[0] * u_i - db_i[0] * u_r + b_r * ux_i - b_i * ux_r);
+                Sry[njju1] = -rootpq * (db_r[1] * u_r + db_i[1] * u_i + b_r * uy_r + b_i * uy_i);
+                Siy[njju1] = -rootpq * (db_r[1] * u_i - db_i[1] * u_r + b_r * uy_i - b_i * uy_r);
+                Srz[njju1] = -rootpq * (db_r[2] * u_r + db_i[2] * u_i + b_r * uz_r + b_i * uz_i);
+                Siz[njju1] = -rootpq * (db_r[2] * u_i - db_i[2] * u_r + b_r * uz_i - b_i * uz_r);
+                jju++;
+                jjup++;
+            }
+            jju++;
+        }
+
+    // copy left side to right side with inversion symmetry VMK 4.4(2)
+    // u[ma-j][mb-j] = (-1)^(ma-mb)*Conj([u[ma][mb])
+                   
+        jju = idxu_block[j];
+        jjup = jju+(j+1)*(j+1)-1;
+        int mbpar = 1;
+        for (int mb = 0; 2*mb <= j; mb++) {
+            int mapar = mbpar;
+            for (int ma = 0; ma <= j; ma++) {
+                int njju = ij+jju*ijnum;
+                int njjup = ij+jjup*ijnum;
+                if (mapar == 1) {
+                    Sr[njjup] = Sr[njju];
+                    Si[njjup] = -Si[njju];
+                    if (j%2==1 && mb==(j/2)) {                    
+                    Srx[njjup] =  Srx[njju];
+                    Six[njjup] = -Six[njju];
+                    Sry[njjup] =  Sry[njju];
+                    Siy[njjup] = -Siy[njju];
+                    Srz[njjup] =  Srz[njju];
+                    Siz[njjup] = -Siz[njju];
+                    }
+                } else {
+                    Sr[njjup] = -Sr[njju];
+                    Si[njjup] =  Si[njju];
+                    if (j%2==1 && mb==(j/2)) {
+                    Srx[njjup] = -Srx[njju];
+                    Six[njjup] =  Six[njju];
+                    Sry[njjup] = -Sry[njju];
+                    Siy[njjup] =  Siy[njju];
+                    Srz[njjup] = -Srz[njju];
+                    Siz[njjup] =  Siz[njju];                    
+                    }
+                }
+                mapar = -mapar;
+                jju++;
+                jjup--;
+            }
+            mbpar = -mbpar;
+        }        
+    }        
+
+    for (int j = 0; j <= twojmax; j++) {
+        int jju = idxu_block[j];
+        for (int mb = 0; 2*mb <= j; mb++)
+          for (int ma = 0; ma <= j; ma++) {
+            int ijk = ij+jju*ijnum;               
+            Srx[ijk] = dsfac * Sr[ijk] * ux + sfac * Srx[ijk]; 
+            Six[ijk] = dsfac * Si[ijk] * ux + sfac * Six[ijk]; 
+            Sry[ijk] = dsfac * Sr[ijk] * uy + sfac * Sry[ijk]; 
+            Siy[ijk] = dsfac * Si[ijk] * uy + sfac * Siy[ijk]; 
+            Srz[ijk] = dsfac * Sr[ijk] * uz + sfac * Srz[ijk]; 
+            Siz[ijk] = dsfac * Si[ijk] * uz + sfac * Siz[ijk];                  
+            jju++;
+          }
+    }
+    
+    for (int k=0; k<idxu_max; k++) {
+        int ijk = ij + ijnum*k;
+        Sr[ijk] = sfac*Sr[ijk];
+        Si[ijk] = sfac*Si[ijk];
+    }            
+  }
+};
+
+void cpuComputeUij(double *Sr, double *Si, double *dSr, double *dSi, double *rootpqarray, double *rij, 
+        double *wjelem, double *radelem, double rmin0, double rfac0, double rcutfac, int *idxu_block,  
+        int *ti, int *tj, int twojmax, int idxu_max, int ijnum, int switch_flag)                
+{    
+  double *Srx = &dSr[0];  
+  double *Sry = &dSr[idxu_max*ijnum];  
+  double *Srz = &dSr[2*idxu_max*ijnum];  
+  double *Six = &dSi[0];  
+  double *Siy = &dSi[idxu_max*ijnum];  
+  double *Siz = &dSi[2*idxu_max*ijnum];  
+
   for(int ij=0; ij<ijnum; ij++) {        
     double x = rij[ij*3+0];
     double y = rij[ij*3+1];

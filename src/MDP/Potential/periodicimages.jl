@@ -34,7 +34,11 @@ function periodicimages(pbc::Array{Int64,1}, a::Array{Float64,1}, b::Array{Float
         elseif (pbc[1]==1) && (pbc[2]==1)
             indx = [1 2 3 4 5 6 7 8 9];        
         end
-        ximages = px[:,indx[:]];    
+        if length(indx)==1
+            ximages = px[:,indx];    
+        else
+            ximages = px[:,indx[:]];    
+        end
     else    
         a = a[:];
         b = b[:];
@@ -89,8 +93,12 @@ function periodicimages(pbc::Array{Int64,1}, a::Array{Float64,1}, b::Array{Float
         elseif (pbc[1]==1) && (pbc[2]==1) && (pbc[3]==1)
             indx = reshape(collect(1:27), 1, 27);        
         end    
-        ximages = px[:,indx[:]];    
-    
+        if length(indx)==1
+            ximages = px[:,indx];    
+        else
+            ximages = px[:,indx[:]];    
+        end
+
         return ximages;
     end
     
