@@ -28,13 +28,15 @@ N = length(e);
 dim = size(fij,1);
 
 # forces
-f = zeros(dim,N);
-for d = 1:dim
-    # tally forces on each dimension
-    f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
-end
+f = accumarray2d(ai, fij) - accumarray2d(aj, fij);
+# f = zeros(dim,N);
+# for d = 1:dim
+#     # tally forces on each dimension
+#     f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
+# end
 
 return e, f
+
 
 end
 
@@ -48,12 +50,14 @@ N = length(e);
 dim = size(fij,1);
 
 # forces
-f = zeros(dim,N);
-for d = 1:dim
-    # tally forces on each dimension
-    f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
-    f[d,:] = reshape(accumarray(ai, fik[d,:]),(1, N)) - reshape(accumarray(ak, fik[d,:]),(1, N)); 
-end
+f = accumarray2d(ai, fij) - accumarray2d(aj, fij);
+f = f + accumarray2d(ai, fik) - accumarray2d(ak, fik);
+# f = zeros(dim,N);
+# for d = 1:dim
+#     # tally forces on each dimension
+#     f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
+#     f[d,:] = reshape(accumarray(ai, fik[d,:]),(1, N)) - reshape(accumarray(ak, fik[d,:]),(1, N)); 
+# end
 
 return e, f
 
@@ -69,13 +73,16 @@ N = length(e);
 dim = size(fij,1);
 
 # forces
-f = zeros(dim,N);
-for d = 1:dim
-    # tally forces on each dimension
-    f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
-    f[d,:] = reshape(accumarray(ai, fik[d,:]),(1, N)) - reshape(accumarray(ak, fik[d,:]),(1, N)); 
-    f[d,:] = reshape(accumarray(ai, fil[d,:]),(1, N)) - reshape(accumarray(al, fil[d,:]),(1, N)); 
-end
+f = accumarray2d(ai, fij) - accumarray2d(aj, fij);
+f = f + accumarray2d(ai, fik) - accumarray2d(ak, fik);
+f = f + accumarray2d(ai, fil) - accumarray2d(al, fil);
+# f = zeros(dim,N);
+# for d = 1:dim
+#     # tally forces on each dimension
+#     f[d,:] = reshape(accumarray(ai, fij[d,:]),(1, N)) - reshape(accumarray(aj, fij[d,:]),(1, N)); 
+#     f[d,:] = reshape(accumarray(ai, fik[d,:]),(1, N)) - reshape(accumarray(ak, fik[d,:]),(1, N)); 
+#     f[d,:] = reshape(accumarray(ai, fil[d,:]),(1, N)) - reshape(accumarray(al, fil[d,:]),(1, N)); 
+# end
 
 return e, f
 
