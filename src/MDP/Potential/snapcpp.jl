@@ -5,18 +5,35 @@
 #  Contributing authors: Ngoc-Cuong Nguyen (cuongng@mit.edu, exapde@gmail.com)
 #****************************************************************************
 
-__precompile__()
-
-module SnapCpp
-
-using Libdl, Potential
-
-include("snastruct.jl");
+using Libdl
 
 global snaplib
 
-function loadsnap(libpath::String)
-    #push!(Libdl.DL_LOAD_PATH,libpath)
+function loadsnap(mdppath::String)    
+    libexist = 0
+    if Sys.isapple()
+        libpath = mdppath * "Potential/cpuSnap.dylib";
+    elseif Sys.isunix()
+        libpath = mdppath * "Potential/cpuSnap.so";
+    elseif Sys.windows()
+        libpath = mdppath * "Potential/cpuSnap.so";
+    end
+    if isfile(libpath)
+        libexist = 1;
+    end        
+    if libexist==0            
+        cdir = pwd();
+        cd(mdppath * "Potential")        
+        cstr = `g++ -std=c++11 -Wall -Wextra -pedantic -c -fPIC cpuSnap.cpp -o cpusnap.o`                
+        run(cstr)
+        if Sys.isapple()            
+            cstr = `g++ -shared cpusnap.o -o cpuSnap.dylib`            
+        else
+            cstr = `g++ -shared cpusnap.o -o cpuSnap.so`            
+        end 
+        run(cstr)
+        cd(cdir)                   
+    end
     global snaplib = Libdl.dlopen(libpath)
 end
 
@@ -347,16 +364,16 @@ function snappotential(x, t, a, b, c, pbc, sna)
     wjelem = sna.wjelem; 
     coeffelem = sna.coeffelem;           
     
-    y, alist, neighlist, neighnum = Potential.fullneighborlist(x, a, b, c, pbc, rcutmax);
+    y, alist, neighlist, neighnum = fullneighborlist(x, a, b, c, pbc, rcutmax);
     ilist = Int32.(Array(1:N));   
     atomtype = Int32.(t[:])
     alist = Int32.(alist)
     neighlist = Int32.(neighlist)
     neighnum = Int32.(neighnum)
 
-    #pairlist, pairnum = Potential.neighpairlist(y, ilist, neighlist, neighnum, rcutmax*rcutmax);
-    pairlist, pairnum = Potential.neighpairlist(y, ilist, alist, atomtype, neighlist, neighnum, rcutsq, ntypes)    
-    rij, ai, aj, ti, tj = Potential.neighpairs(y, pairlist, pairnum, atomtype, ilist, alist);                
+    #pairlist, pairnum = neighpairlist(y, ilist, neighlist, neighnum, rcutmax*rcutmax);
+    pairlist, pairnum = neighpairlist(y, ilist, alist, atomtype, neighlist, neighnum, rcutsq, ntypes)    
+    rij, ai, aj, ti, tj = neighpairs(y, pairlist, pairnum, atomtype, ilist, alist);                
     ijnum = pairnum[end]
     
     # offset 1 for C++ code
@@ -458,15 +475,15 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
     wjelem = sna.wjelem; 
     #coeffelem = sna.coeffelem;                   
 
-    y, alist, neighlist, neighnum = Potential.fullneighborlist(x, a, b, c, pbc, rcutmax);
+    y, alist, neighlist, neighnum = fullneighborlist(x, a, b, c, pbc, rcutmax);
     ilist = Int32.(Array(1:N));   
     atomtype = Int32.(t[:])
     alist = Int32.(alist)
     neighlist = Int32.(neighlist)
     neighnum = Int32.(neighnum)
     
-    pairlist, pairnum = Potential.neighpairlist(y, ilist, alist, atomtype, neighlist, neighnum, rcutsq, ntypes)    
-    rij, ai, aj, ti, tj = Potential.neighpairs(y, pairlist, pairnum, atomtype, ilist, alist);                
+    pairlist, pairnum = neighpairlist(y, ilist, alist, atomtype, neighlist, neighnum, rcutsq, ntypes)    
+    rij, ai, aj, ti, tj = neighpairs(y, pairlist, pairnum, atomtype, ilist, alist);                
     ijnum = pairnum[end]
 
 
@@ -475,28 +492,6 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
     alist = alist .- Int32(1)
     ai = ai .- Int32(1)
     aj = aj .- Int32(1)
-
-    # n = idxu_max*ijnum
-    # ulist_r = zeros(n)
-    # ulist_i = zeros(n)
-    # ulist_rx = zeros(n)
-    # ulist_ry = zeros(n)
-    # ulist_rz = zeros(n)    
-    # ulist_ix = zeros(n)
-    # ulist_iy = zeros(n)
-    # ulist_iz = zeros(n)    
-    # ccall(Libdl.dlsym(snaplib, :cpuComputeSij), Cvoid, (Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
-    #     Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble},
-    #     Ptr{Cdouble}, Ptr{Cdouble}, Ptr{Cdouble}, Cdouble, Cdouble, Cdouble, Ptr{Cint}, Ptr{Cint}, 
-    #     Ptr{Cint}, Cint, Cint, Cint, Cint), 
-    #     ulist_r, ulist_i, ulist_rx, ulist_ix, ulist_ry, ulist_iy,
-    #     ulist_rz, ulist_iz, rootpqarray, rij, wjelem, radelem, rmin0, 
-    #     rfac0, rcutfac, idxu_block, ti, tj, twojmax, idxu_max, ijnum, switchflag)    
-    
-    # dulist_r = [ulist_rx ulist_ry ulist_rz]
-    # dulist_i = [ulist_ix ulist_iy ulist_iz]
-    # dulist_r = dulist_r[:]
-    # dulist_i = dulist_i[:]
 
     n = idxu_max*ijnum
     ulist_r = zeros(n)
@@ -559,8 +554,8 @@ function snapdescriptors(x, t, a, b, c, pbc, sna)
 
     bd = reshape(bd, (3,N,ntypes*ncoeff))
     bv = reshape(bv, (6,ntypes*ncoeff))
+    bv = bv[[1; 2; 3; 6; 5; 4],:]
 
     return bi, bd, bv           
 end
 
-end

@@ -11,9 +11,10 @@ module Potential
 
 using Revise, LinearAlgebra
 
-export empiricalpotential, addpotential, getpotential, accumarray, boundingbox, domainmaps
-export atomlist, neighborlist, fullneighborlist, neighsingles, neighpairlist, neighpairs 
-export neightripletlist, neightriplets, neighquadletlist, neighquadlets 
+export empiricalpotential, empiricaldescriptors, lammpspotential, lammpssnapdescriptors
+export addpotential, getpotential, initsna, snappotential, snapdescriptors
+export boundingbox, domainmaps, atomlist, neighborlist, fullneighborlist, neighsingles, accumarray 
+export neighpairlist, neighpairs, neightripletlist, neightriplets, neighquadletlist, neighquadlets 
 export tallysingle, tallypair, tallytriplet, tallyquadlet, findatomtype, periodicimages
 
 include("accumarray.jl");
@@ -34,7 +35,12 @@ include("neightriplets.jl");
 include("neighquadletlist.jl");
 include("neighquadlets.jl");
 include("empiricalpotential.jl");
+include("empiricaldescriptors.jl");
 include("tally.jl");
+include("snastruct.jl");
+include("snapcpp.jl");
+include("lammpspotential.jl");
+include("lammpssnapdescriptors.jl");
 
 end
 
