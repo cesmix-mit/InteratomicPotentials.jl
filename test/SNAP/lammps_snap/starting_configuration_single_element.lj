@@ -1,6 +1,6 @@
 LAMMPS data file via write_data, version 29 Oct 2020, timestep = 1000
 
-2 atoms
+3 atoms
 1 atom types
 
 -5.0 5.0 xlo xhi
@@ -15,6 +15,7 @@ Atoms # atomic
 
 1 1 0.0  0.0 0.0 0 0 0
 2 1 0.50 0.40 0.30 0 0 0
+3 1 0.2 0.25 0.1 0 0 0
 
 
 

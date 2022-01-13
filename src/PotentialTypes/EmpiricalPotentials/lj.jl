@@ -1,7 +1,8 @@
 ############################## Lennard Jones ###################################
 mutable struct LennardJones <: EmpiricalPotential
-    ϵ :: Real
-    σ :: Real
+    ϵ :: AbstractFloat
+    σ :: AbstractFloat
+    rcutoff :: AbstractFloat
 end
 
 function LennardJones()
@@ -21,8 +22,8 @@ end
 
 ############################# Energies ##########################################
 
-function potential_energy(r::SVector{3, <:AbstractFloat}, p::LennardJones)
-    d = p.σ / norm(r)
+function potential_energy(R::AbstractFloat, p::LennardJones)
+    d = p.σ / R
     return 4.0 * p.ϵ * ( d^12 - d^6 )
 end
 
@@ -33,6 +34,9 @@ function force(r::SVector{3, <:AbstractFloat}, p::LennardJones)
     return SVector(24.0 * p.ϵ * ( 2.0 * ( p.σ / d )^12 -  ( p.σ / d)^6 ) .* r ./ d ./ d)
 end
 
+function force(R::AbstractFloat, r::SVector{3, <:AbstractFloat}, p::LennardJones)
+    return SVector(24.0 * p.ϵ * ( 2.0 * ( p.σ / R )^12 -  ( p.σ / R)^6 ) .* r ./ R ./ R)
+end
 ############################## Gradients ########################################
 function grad_potential_energy(r::SVector{3, <:AbstractFloat}, p::LennardJones)
     d = p.σ / norm(r)

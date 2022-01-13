@@ -29,6 +29,7 @@ struct PrebuiltArrays{T}
     idxb      :: Vector{SNA_BINDICES}
     idxz      :: Vector{SNA_ZINDICES}
     ncoeff    :: Int 
+    num_elements :: Int
 
 
     # Clebsch Gordan
@@ -44,7 +45,7 @@ end
 # /* ---------------------------------------------------------------------- */
 ## Initialize
 
-function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::Bool, bnorm_flag::Bool)
+function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, chem_flag::Bool, bzero_flag::Bool, bnorm_flag::Bool)
     jdim = twojmax+1
     ncount = 0
 
@@ -61,6 +62,11 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
         end
     end
 
+    if (chem_flag)
+        num_elements = n_elements
+    else
+        num_elements = 1
+    end
 
     idxcg_block = zeros(Int, jdim, jdim, jdim)
     idxu_block = zeros(Int, jdim)
@@ -219,7 +225,7 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
 
     
     # Calculate number of coefficients
-    ncoeff = ncount * n_elements * n_elements * n_elements
+    ncoeff = ncount * num_elements * num_elements * num_elements
 
     return PrebuiltArrays(
     idxcg_block,
@@ -233,6 +239,7 @@ function initialize_prebuilt_arrays(twojmax::Int, n_elements::Int, bzero_flag::B
     idxb,
     idxz,
     ncoeff,
+    num_elements,
     rootpqarray,
     cglist, 
     wself,

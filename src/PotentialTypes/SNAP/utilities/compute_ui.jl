@@ -6,33 +6,42 @@ function compute_ui(
     ielem::Int,
     snap::SNAPParams, 
     runtime_arrays :: RuntimeArrays)
-    jnum = length(runtime_arrays.rij)
+
+    if ~snap.chem_flag
+        ielem = 1
+    end
+
+
+
     zero_uarraytot(ielem, snap, runtime_arrays)
-    for j = 1:jnum
-        x = runtime_arrays.rij[j][1]
-        y = runtime_arrays.rij[j][2]
-        z = runtime_arrays.rij[j][3]
+
+    num_of_interactions = length(runtime_arrays.indij)
+    for ind = 1:num_of_interactions
+        jj = runtime_arrays.indij[ind][2]
+        rij = runtime_arrays.rij[ind]
+        rcutij = runtime_arrays.rcutij[ind]
+        wj = runtime_arrays.wj[ind]
+        elementj = runtime_arrays.element[ind]
+
+        x = rij[1]
+        y = rij[2]
+        z = rij[3]
         rsq = x*x + y*y + z*z 
         r   = sqrt(rsq) 
-        theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (runtime_arrays.rcutij[j] - snap.rmin0) 
+        theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (rcutij - snap.rmin0) 
         z0 = r / tan(theta0)
-        compute_uarray(x, y, z, z0, r, j, 
+        compute_uarray(x, y, z, z0, r, jj, 
                 snap, 
                 runtime_arrays)
-        add_uarraytot(r, runtime_arrays.rcutij[j], runtime_arrays.wj[j],
-                j, runtime_arrays.element[j], snap, runtime_arrays)
+        
+        if (snap.chem_flag)
+            add_uarraytot(r, rcutij, wj,
+                    jj, elementj, snap, runtime_arrays)
+        else
+            add_uarraytot(r, rcutij, wj, jj, 1, snap, runtime_arrays)
+        end
     end
 end
-
-function compute_dui(snap::SNAPParams, runtime_arrays::RuntimeArrays)
-    jnum = length(runtime_arrays.rij)
-    for j = 1:jnum
-        compute_duidrj(runtime_arrays.rij[j], runtime_arrays.wj[j],
-            runtime_arrays.rcutij[j], j, snap, runtime_arrays
-            )
-    end
-end
-
 
 
 ####################################################################################
@@ -43,7 +52,6 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     snap::SNAPParams, runtime_arrays::RuntimeArrays)
 
     # compute Cayley-Klein parameters for unit quaternion
-
     r0inv = 1.0 / sqrt(r * r + z0 * z0);
     a_r = r0inv * z0;
     a_i = -r0inv * z;
@@ -121,7 +129,8 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
 end
 
 function zero_uarraytot(ielem::Int, snap::SNAPParams, runtime_arrays::RuntimeArrays)
-    for jelem = 0:(length(snap.elements)-1)
+    num_elements = snap.prebuilt_arrays.num_elements
+    for jelem = 0:(num_elements-1)
         for j = 0:snap.twojmax 
             jju = snap.prebuilt_arrays.idxu_block[j+1];
             for mb = 0:j 
@@ -209,11 +218,17 @@ function compute_duarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     ulist_r = runtime_arrays.ulist_r_ij[jj, :];
     ulist_i = runtime_arrays.ulist_i_ij[jj, :];
 
+    runtime_arrays.dulist_r[1, :] = [0.0, 0.0, 0.0]
+    runtime_arrays.dulist_i[1, :] = [0.0, 0.0, 0.0]
+
     for j = 1:snap.twojmax 
         jju = snap.prebuilt_arrays.idxu_block[j+1];
         jjup = snap.prebuilt_arrays.idxu_block[j];
         mb = 0
         while 2*mb <= j
+
+            runtime_arrays.dulist_r[jju+1, :] = [0.0, 0.0, 0.0]
+            runtime_arrays.dulist_i[jju+1, :] = [0.0, 0.0, 0.0]
 
             for ma = 0:(j-1) 
                 rootpq = snap.prebuilt_arrays.rootpqarray[j - ma+1, j - mb+1];
@@ -251,6 +266,7 @@ function compute_duarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
             mb +=1;
         end
 
+
         #  // copy left side to right side with inversion symmetry VMK 4.4(2)
         #  // u[ma-j][mb-j] = (-1)^(ma-mb)*Conj([u[ma][mb])
 
@@ -283,7 +299,6 @@ function compute_duarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
 
     sfac = compute_sfac(snap, r, rcut);
     dsfac = compute_dsfac(snap, r, rcut);
-
     sfac *= wj;
     dsfac *= wj;
     for j = 0:snap.twojmax 
@@ -350,7 +365,7 @@ end
 
 function compute_dsfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
     if ~snap.switch_flag
-        dsfac = 1.0
+        dsfac = 0.0
     else
         if r <= snap.rmin0
             dsfac = 0.0 

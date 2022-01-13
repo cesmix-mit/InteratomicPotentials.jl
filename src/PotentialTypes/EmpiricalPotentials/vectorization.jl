@@ -1,86 +1,86 @@
 # ############################## Energy ################################
 
-function potential_energy(a::StaticAtom, p::EmpiricalPotential)
-    return potential_energy(ustrip.(a.position), p)
-end
+# function potential_energy(a::StaticAtom, p::EmpiricalPotential)
+#     return potential_energy(ustrip.(a.position), p)
+# end
 
-function potential_energy(a::AbstractSystem, p::EmpiricalPotential)
-    pe = 0.0
-    r = a.particles
-    N = length(r)
-    for i = 1:(N-1)
-        ai = ustrip.(r[i].position)
-        for j = (i+1):N
-            aj = ustrip.(r[j].position)
-            rtemp = ai - aj
-            pe +=  potential_energy(rtemp, p)
-        end
-    end
-    return pe
-end
+# function potential_energy(a::AbstractSystem, p::EmpiricalPotential)
+#     pe = 0.0
+#     r = a.particles
+#     N = length(r)
+#     for i = 1:(N-1)
+#         ai = ustrip.(r[i].position)
+#         for j = (i+1):N
+#             aj = ustrip.(r[j].position)
+#             rtemp = ai - aj
+#             pe +=  potential_energy(rtemp, p)
+#         end
+#     end
+#     return pe
+# end
 
 # ############################## Force ################################
-function force(a::StaticAtom, p::EmpiricalPotential)
-    return force(ustrip.(a.position), p)
-end
+# function force(a::StaticAtom, p::EmpiricalPotential)
+#     return force(ustrip.(a.position), p)
+# end
 
-function force(s::AbstractSystem, p::EmpiricalPotential)
-    r = s.particles
-    n = length(r)
-    f = [ zeros(3) for j = 1:n]
-    for i = 1:n
-        ai = ustrip.(r[i].position)
-        for j = (i+1):n
-            aj = ustrip.(r[j].position)
-            rtemp = ai - aj
-            if (norm(rtemp) < 1e-8) 
-                continue
-            else
-                f[i] += force(rtemp, p)
-                f[j] -= f[i]
-            end
-        end
-    end
-    return SVector{n}([SVector{3}(fi) for fi in f])
-end
+# function force(s::AbstractSystem, p::EmpiricalPotential)
+#     r = s.particles
+#     n = length(r)
+#     f = [ zeros(3) for j = 1:n]
+#     for i = 1:n
+#         ai = ustrip.(r[i].position)
+#         for j = (i+1):n
+#             aj = ustrip.(r[j].position)
+#             rtemp = ai - aj
+#             if (norm(rtemp) < 1e-8) || (norm(rtemp) > p.rcutoff) 
+#                 continue
+#             else
+#                 f[i] += force(rtemp, p)
+#                 f[j] -= f[i]
+#             end
+#         end
+#     end
+#     return SVector{n}([SVector{3}(fi) for fi in f])
+# end
 # ############################## Virial ################################
-function virial(a::StaticAtom, p::EmpiricalPotential)
-    return virial(ustrip.(a.position), p)
-end
+# function virial(a::StaticAtom, p::EmpiricalPotential)
+#     return virial(ustrip.(a.position), p)
+# end
 
-function virial(S::AbstractSystem, p::EmpiricalPotential)
-    r = S.particles
-    n = length(r)
-    v = 0.0
-    for i = 1:(n-1)
-        ri = ustrip.(r[i].position)
-        for j = (i+1):n
-            rj = ustrip.(r[j].position)
-            rtemp = ri - rj
-            v +=  virial(rtemp, p)
-        end
-    end
-    return v
-end
+# function virial(S::AbstractSystem, p::EmpiricalPotential)
+#     r = S.particles
+#     n = length(r)
+#     v = 0.0
+#     for i = 1:(n-1)
+#         ri = ustrip.(r[i].position)
+#         for j = (i+1):n
+#             rj = ustrip.(r[j].position)
+#             rtemp = ri - rj
+#             v +=  virial(rtemp, p)
+#         end
+#     end
+#     return v
+# end
 
-function virial_stress(a::StaticAtom, p::EmpiricalPotential)
-    return virial_stress(ustrip.(a.position), p)
-end
+# function virial_stress(a::StaticAtom, p::EmpiricalPotential)
+#     return virial_stress(ustrip.(a.position), p)
+# end
 
-function virial_stress(S::AbstractSystem, p::EmpiricalPotential)
-    v = zeros(Real, 6)
-    r = S.particles
-    n = length(r)
-    for i = 1:(n-1)
-        ri = ustrip.(r[i].position)
-        for j = (i+1):n
-            rj = ustrip.(r[j].position)
-            rtemp = ri - rj
-            v += virial_stress(rtemp, p)
-        end
-    end
-    return SVector{6}(v)
-end
+# function virial_stress(S::AbstractSystem, p::EmpiricalPotential)
+#     v = zeros(Real, 6)
+#     r = S.particles
+#     n = length(r)
+#     for i = 1:(n-1)
+#         ri = ustrip.(r[i].position)
+#         for j = (i+1):n
+#             rj = ustrip.(r[j].position)
+#             rtemp = ri - rj
+#             v += virial_stress(rtemp, p)
+#         end
+#     end
+#     return SVector{6}(v)
+# end
 # function potential_energy(a::Atom, p::EmpiricalPotential)
 #     return potential_energy(a.Position, p)
 # end

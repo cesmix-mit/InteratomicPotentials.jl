@@ -1,100 +1,202 @@
-########################################################################
-##############################  SNAP  ###################################
-#########################################################################
+include("types/types.jl")
+include("utilities/utl.jl")
 
-mutable struct SNAPkeywords
-    n_elements      :: Int
-    switchflag      :: Int 
-    bzeroflag       :: Int 
-    quadraticflag   :: Int
-    chemflag        :: Int 
-    bnormflag       :: Int
-end
+function potential_energy(A::AbstractSystem, snap::SNAPParams)
+    number_of_particles = length(A.particles)
+    # Produce NeighborList
+    nnlist = neighborlist(A, snap)
+    println(nnlist)
+    # Get number of coefficients
+    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
-mutable struct SNAP <: FittedPotential
-    β :: Vector{Float64}
-    rcutfac         :: Float64
-    twojmax         :: Int
-    keywords        :: SNAPkeywords
-end
+    # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
+    B = zeros(num_coeff) 
 
-function get_num_coeffs(twojmax :: Int)
-    J = twojmax 
-    if J % 2 == 0
-        m = J/2 + 1
-        num_coeffs = Int( m * (m+1) * (2*m+1) / 6 )
-    elseif J % 2 == 1
-        m = (J+1)/2
-        num_coeffs = Int( m * (m+1) * (m+2) / 3 )
-    else
-        AssertionError("twojmax must be an integer!")
-    end 
-    return num_coeffs
-end
+    for  (i, ai) in enumerate(A.particles)
+        i_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
 
+        runtime_arrays = initialize_runtime_arrays(i, nnlist, A, snap)
+        # These must be done with each new configuration
+        compute_ui(i_element, snap, runtime_arrays)
+        compute_zi(snap, runtime_arrays)
+        compute_bi(snap, runtime_arrays)
 
-function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration)
-    keywords = SNAPkeywords(0, 0, 0, 0, 0)
-    num_coeffs = get_num_coeffs(twojmax)
-
-    return SNAP( zeros(c.num_atom_types * num_coeffs + 1) , rcutfac, twojmax, keywords)
-end
-
-function SNAP(rcutfac::Float64, twojmax::Int, c::Configuration, keywords::SNAPkeywords)
-    num_coeffs = get_num_coeffs(twojmax)
-    if keywords.quadraticflag == 1
-        num_coeffs += num_coeffs * (num_coeffs+1) / 2
+        B += runtime_arrays.blist
     end
-    if keywords.chemflag == 1
-        num_coeffs = num_coeffs * (c.num_atom_types^3)
-        keywords.bnormflag = 1
-    else
-        num_coeffs = num_coeffs * c.num_atom_types
-    end
+    return B
+end 
 
-    return SNAP( zeros(num_coeffs + 1) , rcutfac, twojmax, keywords)
-end
+function force(A::AbstractSystem, snap::SNAPParams)
+    number_of_particles = length(A.particles)
+    # Produce NeighborList
+    nnlist = neighborlist(A, snap)
+    println(nnlist)
+    # Get number of coefficients
+    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
+    # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
+    dB = [zeros(num_coeff*length(snap.elements), 3) for i = 1:number_of_particles]
+    W = [zeros(num_coeff*length(snap.elements), 6) for i = 1:number_of_particles]
 
-function get_trainable_params(snap::SNAP)
-    return (β = snap.β, )
-end
+    for  (i, ai) in enumerate(A.particles)
+        i_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
 
-function set_trainable_params!(snap::SNAP, params::NamedTuple)
-    snap.β = params.β
-    return snap
-end
+        runtime_arrays = initialize_runtime_arrays(i, nnlist, A, snap)
+        # These must be done with each new configuration
+        compute_ui(i_element, snap, runtime_arrays)
+        compute_zi(snap, runtime_arrays)
+        compute_bi(snap, runtime_arrays)
 
-function get_nontrainable_params(snap::SNAP)
-    return (rcut = snap.rcut, twojmax = snap.twojmax)
-end
+        i_offset = num_coeff * (i_element - 1)
+        # Compute Forces and Stresses
+        for ind = 1:length(runtime_arrays.indij)
+            ij = runtime_arrays.indij[ind]
+            ii = ij[1]
+            jj = ij[2]
+            rij = runtime_arrays.rij[ind]
+            wj = runtime_arrays.wj[ind]
+            rcut = runtime_arrays.rcutij[ind]
+            j_element = findall(x->x==Symbol(A.particles[jj].element.symbol), snap.elements)[1]
+            ## Need to zero-out dulist and dblist each time
 
-function create_snap_files(c::Configuration, snap::SNAP, file)
-    open(file*".snapcoeff", "w") do f 
-        write(f, "#UNITS: $(c.units)\n")
-        write(f, "#LAMMPS SNAP COEFFICIENTS\n")
-        write(f, "$(c.num_atom_types) $(length(snap.β))\n")
-        for i = 1:c.num_atom_types
-            write(f, "$(c.atom_names[i]) $(c.radii[i]) $(c.weights[i])\n")
-        end
-        write(f, "$(snap.β[end])\n")
-        for b = snap.β[1:end-1]
-            write(f, "$b\n")
+            # Now compute dulist for (i,j)
+            compute_duidrj(rij, wj, rcut, jj, snap, runtime_arrays)
+            compute_dbidrj(j_element, snap, runtime_arrays)
+
+            dB[ii][(i_offset+1):(num_coeff+i_offset), :] += runtime_arrays.dblist
+            dB[jj][(i_offset+1):(num_coeff+i_offset), :] -= runtime_arrays.dblist
+
         end
     end
+    return dB
+end 
 
-    open(file*".snapparam", "w") do f
-        write(f, "#UNITS: $(c.units)\n")
-        write(f, "#LAMMPS SNAP PARAMETERS\n")
-        write(f, "rcutfac $(snap.rcutfac)\n")
-        write(f, "twojmax $(snap.twojmax)\n")
+function virial_stress(A::AbstractSystem, snap::SNAPParams)
+    number_of_particles = length(A.particles)
+    # Produce NeighborList
+    nnlist = neighborlist(A, snap)
+    println(nnlist)
+    # Get number of coefficients
+    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
+
+    # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
+    W = [zeros(num_coeff*length(snap.elements), 6) for i = 1:number_of_particles]
+
+    for  (i, ai) in enumerate(A.particles)
+        i_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
+
+        runtime_arrays = initialize_runtime_arrays(i, nnlist, A, snap)
+        # These must be done with each new configuration
+        compute_ui(i_element, snap, runtime_arrays)
+        compute_zi(snap, runtime_arrays)
+        compute_bi(snap, runtime_arrays)
+
+        B[i] = runtime_arrays.blist
+
+        i_offset = num_coeff * (i_element - 1)
+        # Compute Forces and Stresses
+        for ind = 1:length(runtime_arrays.indij)
+            ij = runtime_arrays.indij[ind]
+            ii = ij[1]
+            jj = ij[2]
+            rij = runtime_arrays.rij[ind]
+            wj = runtime_arrays.wj[ind]
+            rcut = runtime_arrays.rcutij[ind]
+            j_element = findall(x->x==Symbol(A.particles[jj].element.symbol), snap.elements)[1]
+            ## Need to zero-out dulist and dblist each time
+
+            # Now compute dulist for (i,j)
+            compute_duidrj(rij, wj, rcut, jj, snap, runtime_arrays)
+            compute_dbidrj(j_element, snap, runtime_arrays)
+
+            dB[ii][(i_offset+1):(num_coeff+i_offset), :] += runtime_arrays.dblist
+            dB[jj][(i_offset+1):(num_coeff+i_offset), :] -= runtime_arrays.dblist
+
+            xi, yi, zi = ustrip.(A.particles[ii].position)
+            xj, yj, zj = ustrip.(A.particles[jj].position)
+
+            W[ii][(i_offset+1):(num_coeff+i_offset), :] += reshape([runtime_arrays.dblist[:, 1]*xi; 
+                         runtime_arrays.dblist[:, 2]*yi;
+                         runtime_arrays.dblist[:, 3]*zi;
+                         runtime_arrays.dblist[:, 2]*zi;
+                         runtime_arrays.dblist[:, 1]*zi;
+                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6)
+            W[jj][(i_offset+1):(num_coeff+i_offset), :] -= reshape([runtime_arrays.dblist[:, 1]*xj; 
+                         runtime_arrays.dblist[:, 2]*yj;
+                         runtime_arrays.dblist[:, 3]*zj;
+                         runtime_arrays.dblist[:, 2]*zj;
+                         runtime_arrays.dblist[:, 1]*zj;
+                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6)
+        end
     end
+    return sum(W)
+end 
+
+function virial(A::AbstractSystem, snap::SNAPParams)
+    v = virial(A, snap)
+    return sum(v, dims = 2)
 end
 
-##########################################################################################
+function compute_snap(A::AbstractSystem, snap::SNAPParams)
+    number_of_particles = length(A.particles)
+    # Produce NeighborList
+    nnlist = neighborlist(A, snap)
+    # Get number of coefficients
+    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
-include("bispectrum.jl")
-include("energy.jl")
-include("force.jl")
-include("virial.jl")
-include("gradients.jl")
+    # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
+    B = [zeros(num_coeff) for i = 1:number_of_particles]
+    dB = [zeros(num_coeff*length(snap.elements), 3) for i = 1:number_of_particles]
+    W = [zeros(num_coeff*length(snap.elements), 6) for i = 1:number_of_particles]
+
+    for  (i, ai) in enumerate(A.particles)
+        i_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
+
+        runtime_arrays = initialize_runtime_arrays(i, nnlist, A, snap)
+        # These must be done with each new configuration
+        compute_ui(i_element, snap, runtime_arrays)
+        compute_zi(snap, runtime_arrays)
+        compute_bi(snap, runtime_arrays)
+
+        B[i] = runtime_arrays.blist
+
+        i_offset = num_coeff * (i_element - 1)
+        # Compute Forces and Stresses
+        for ind = 1:length(runtime_arrays.indij)
+            ij = runtime_arrays.indij[ind]
+            ii = ij[1]
+            jj = ij[2]
+            rij = runtime_arrays.rij[ind]
+            wj = runtime_arrays.wj[ind]
+            rcut = runtime_arrays.rcutij[ind]
+            j_element = findall(x->x==Symbol(A.particles[jj].element.symbol), snap.elements)[1]
+            ## Need to zero-out dulist and dblist each time
+
+            # Now compute dulist for (i,j)
+            compute_duidrj(rij, wj, rcut, jj, snap, runtime_arrays)
+            compute_dbidrj(j_element, snap, runtime_arrays)
+
+            dB[ii][(i_offset+1):(num_coeff+i_offset), :] += runtime_arrays.dblist
+            dB[jj][(i_offset+1):(num_coeff+i_offset), :] -= runtime_arrays.dblist
+
+            xi, yi, zi = ustrip.(A.particles[ii].position)
+            xj, yj, zj = ustrip.(A.particles[jj].position)
+
+            W[ii][(i_offset+1):(num_coeff+i_offset), :] += reshape([runtime_arrays.dblist[:, 1]*xi; 
+                         runtime_arrays.dblist[:, 2]*yi;
+                         runtime_arrays.dblist[:, 3]*zi;
+                         runtime_arrays.dblist[:, 2]*zi;
+                         runtime_arrays.dblist[:, 1]*zi;
+                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6)
+            W[jj][(i_offset+1):(num_coeff+i_offset), :] -= reshape([runtime_arrays.dblist[:, 1]*xj; 
+                         runtime_arrays.dblist[:, 2]*yj;
+                         runtime_arrays.dblist[:, 3]*zj;
+                         runtime_arrays.dblist[:, 2]*zj;
+                         runtime_arrays.dblist[:, 1]*zj;
+                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6)
+        end
+    end
+    return B, dB, W
+end 
+
+

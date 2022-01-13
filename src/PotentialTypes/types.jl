@@ -15,10 +15,12 @@ include("EmpiricalPotentials/lj.jl")
 # include("EmpiricalPotentials/coulomb.jl")
 include("EmpiricalPotentials/virials.jl")
 include("EmpiricalPotentials/vectorization.jl")
+include("EmpiricalPotentials/potential_energy.jl")
+include("EmpiricalPotentials/force.jl")
+
 
 ################################ SNAP ##############################################################
-# include("SNAP/snap.jl")
+include("SNAP/snap.jl")
 
 ################################ GaN ###############################################################
 # include("GaN/gan.jl")
-

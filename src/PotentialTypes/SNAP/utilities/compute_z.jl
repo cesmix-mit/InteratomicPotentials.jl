@@ -1,8 +1,9 @@
 function compute_zi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
     idouble = 0;
-    n_elements = length(snap.elements)
-    for elem1 = 0:(n_elements-1)
-        for elem2 = 0:(n_elements-1)
+    num_elements = snap.prebuilt_arrays.num_elements
+    # n_elements = length(snap.elements)
+    for elem1 = 0:(num_elements-1)
+        for elem2 = 0:(num_elements-1)
 
             for jjz = 1:snap.prebuilt_arrays.idxz_max
                 j1 = snap.prebuilt_arrays.idxz[jjz].j1;
