@@ -32,7 +32,7 @@ struct RuntimeArrays{T}
 end
 
 
-function initialize_runtime_arrays(i::Int, ai::StaticAtom, A::AbstractSystem, snap :: SNAPParams)
+function initialize_runtime_arrays(i::Int, ai::AtomsBase.Atom, A::AbstractSystem, snap :: SNAPParams)
     ind_ij     = SVector{2, Int}[]
     rcutij     = AbstractFloat[] 
     inside  = AbstractFloat[]

@@ -1,6 +1,6 @@
 # ############################## Energy ################################
 
-function potential_energy(a::StaticAtom, p::EmpiricalPotential)
+function potential_energy(a::AtomsBase.Atom, p::EmpiricalPotential)
     return potential_energy(ustrip.(a.position), p)
 end
 
@@ -20,7 +20,7 @@ function potential_energy(a::AbstractSystem, p::EmpiricalPotential)
 end
 
 # ############################## Force ################################
-function force(a::StaticAtom, p::EmpiricalPotential)
+function force(a::AtomsBase.Atom, p::EmpiricalPotential)
     return force(ustrip.(a.position), p)
 end
 
@@ -44,7 +44,7 @@ function force(s::AbstractSystem, p::EmpiricalPotential)
     return SVector{n}([SVector{3}(fi) for fi in f])
 end
 # ############################## Virial ################################
-function virial(a::StaticAtom, p::EmpiricalPotential)
+function virial(a::AtomsBase.Atom, p::EmpiricalPotential)
     return virial(ustrip.(a.position), p)
 end
 
@@ -63,7 +63,7 @@ function virial(S::AbstractSystem, p::EmpiricalPotential)
     return v
 end
 
-function virial_stress(a::StaticAtom, p::EmpiricalPotential)
+function virial_stress(a::AtomsBase.Atom, p::EmpiricalPotential)
     return virial_stress(ustrip.(a.position), p)
 end
 

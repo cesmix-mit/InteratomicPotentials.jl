@@ -9,7 +9,7 @@ position2 = @SVector [0.5, .50, 0.0]
 position3 = @SVector [0.0, -2.0, 0.0]
 
 
-atoms = [StaticAtom(position1 * 1u"Å", :Ar), StaticAtom(position2 * 1u"Å", :Ar)]#, StaticAtom(position3 * 1u"Å", :Xe)]
+atoms = [AtomsBase.Atom(:Ar, position1 * 1u"Å"), AtomsBase.Atom(:Ar, position2 * 1u"Å")]#, AtomsBase.Atom(:Xe, position3 * 1u"Å")]
 
 box = [[-4.0, 4.0], [-4.0, 4.0]]
 system   = FlexibleSystem(box * 1u"Å", [Periodic(), Periodic()], atoms)
