@@ -6,16 +6,16 @@ using UnitfulAtomic
 
 position = @SVector [1.0, 1.0, 1.0] 
 element  = :Ar
-atom     = StaticAtom(position * 1u"Å", element)
+atom     = AtomsBase.Atom(element, position * 1u"Å")
 lj       = LennardJones(1.0, 1.0)
-@test isa(atom, StaticAtom)
+@test isa(atom, AtomsBase.Atom)
 @test isa(lj, EmpiricalPotential)
 @test isa(potential_energy(atom, lj), AbstractFloat)
 @test isa(force(atom, lj), SVector{3, <:AbstractFloat})
 @test isa(virial(atom, lj), AbstractFloat)
 @test isa(virial_stress(atom, lj), SVector{6, <:AbstractFloat})
 
-atom2    = StaticAtom(0.0*position *1u"Å", element)
+atom2    = AtomsBase.Atom(element, 0.0*position *1u"Å")
 box = [[0.0, 1.0], [0.0, 1.0]]
 system   = FlexibleSystem(box * 1u"Å", [Periodic(), Periodic()], [atom, atom2])
 
