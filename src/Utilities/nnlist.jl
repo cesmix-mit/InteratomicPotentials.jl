@@ -30,11 +30,10 @@ function get_distance(L::SVector{3, <:AbstractFloat}, x::SVector{3, <:AbstractFl
 end
 
 function to_array(A::AbstractSystem)
-    particles = A.particles
-    n_particles = length(particles)
+    positions = position(A)
     X = SVector{3, Float64}[]
-    for i = 1:n_particles
-        push!(X, ustrip.(particles[i].position) )
+    for p in positions
+        push!(X, ustrip.(p) )
     end
     return X
 end

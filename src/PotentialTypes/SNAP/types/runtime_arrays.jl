@@ -42,11 +42,11 @@ function initialize_runtime_arrays(i::Int, nnlist::NeighborList, A::AbstractSyst
     i_list = nnlist.i[i]
     j = nnlist.j[i]
     r = nnlist.r[i]
-    i_element = findall(x->x==Symbol(A.particles[i].element.symbol), elements)[1]
+    i_element = findall(x->x==Symbol(A[i].atomic_symbol), elements)[1]
     for (jj, rj) in zip(j, r)
         push!(ind_ij, SVector{2}([i, jj]))
 
-        j_element = findall(x->x==Symbol(A.particles[jj].element.symbol), elements)[1]
+        j_element = findall(x->x==Symbol(A[jj].atomic_symbol), elements)[1]
         push!(element, j_element)
         push!(rcut_ij, (snap.radii[i_element] + snap.radii[j_element])*snap.rcutfac)
         push!(wj, snap.weight[j_element])

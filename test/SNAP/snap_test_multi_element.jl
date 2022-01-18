@@ -3,7 +3,6 @@ using InteratomicPotentials
 using StaticArrays
 using Unitful
 using UnitfulAtomic
-using Statistics
 
 num_elements = 2
 num_atoms = 3
@@ -28,10 +27,10 @@ position2 = @SVector [0.5, .40, 0.30]
 position3 = @SVector [0.2, 0.25, 0.1]
 
 
-atoms = [StaticAtom(position1 * 1u"Å", :Ar), StaticAtom(position2 * 1u"Å", :Ar), StaticAtom(position3 * 1u"Å", :Xe)]
+atoms = [Atom(:Ar, position1 * 1u"Å"), Atom(:Ar, position2 * 1u"Å"), Atom(:Xe, position3 * 1u"Å")]
 
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
-system   = FlexibleSystem(box * 1u"Å", [DirichletZero(), DirichletZero(), DirichletZero()], atoms)
+system   = FlexibleSystem(atoms, box * 1u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
                                                           
 snap = SNAPParams(num_atoms, twojmax, [:Ar, :Xe], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag)
 
@@ -47,11 +46,11 @@ if print_flag
     println(" \n ")
 end
 
-@test mean(A[:, 1] - B[1]) < 1e-5
+@test sum(A[:, 1] - B[1]) < 1e-5
 
-@test mean(A[:, 2] - B[2]) < 1e-5
+@test sum(A[:, 2] - B[2]) < 1e-5
 
-@test mean(A[:, 3] - B[3]) < 1e-5
+@test sum(A[:, 3] - B[3]) < 1e-5
 
 if print_flag
     println("dB")
@@ -75,9 +74,9 @@ if print_flag
     println(" \n ")
 end
 
-@test mean(dB[1] - reshape(dA[:, 1], :, 3)) < 1e-5
-@test mean(dB[2] - reshape(dA[:, 2], :, 3)) < 1e-5
-@test mean(dB[3] - reshape(dA[:, 3], :, 3)) < 1e-5
+@test sum(dB[1] - reshape(dA[:, 1], :, 3)) < 1e-5
+@test sum(dB[2] - reshape(dA[:, 2], :, 3)) < 1e-5
+@test sum(dB[3] - reshape(dA[:, 3], :, 3)) < 1e-5
 
 
 if print_flag
@@ -102,7 +101,7 @@ if print_flag
     println("\n")
 end
 
-@test mean(vB[1] - reshape(vA[:, 1], :, 6)) < 1e-5
-@test mean(vB[2] - reshape(vA[:, 2], :, 6)) < 1e-5
-@test mean(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
+@test sum(vB[1] - reshape(vA[:, 1], :, 6)) < 1e-5
+@test sum(vB[2] - reshape(vA[:, 2], :, 6)) < 1e-5
+@test sum(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
 

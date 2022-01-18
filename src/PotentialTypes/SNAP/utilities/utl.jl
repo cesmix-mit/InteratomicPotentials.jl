@@ -55,8 +55,9 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
     # Build Ball tree
     tree = BallTree(X, d)
 
-    elements = unique([ai.element.symbol for ai in A.particles])
-    # println(elements)
+    # elements = unique([element(ai) for ai in A])
+    elements = unique(atomic_symbol(A))
+
     # Intialize empty vectors
     i = Vector{Int64}[] # i 
     j = Vector{Int64}[] # j 
@@ -65,15 +66,14 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
 
     # Fill vectors
     for n = 1:length(X)
-        n_element = findall(x->x==A.particles[n].element.symbol, elements)[1]
-        # println(j_element)
+        n_element = findall(x->x==Symbol(A[n].atomic_symbol), elements)[1]
         neighbors = inrange(tree, X[n], sqrt(cutmax), true)
         itemp = Int64[]
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3, Float64}[]
         for m in 1:length(neighbors)
-            m_element = findall(x->x==A.particles[neighbors[m]].element.symbol, elements)[1]
+            m_element = findall(x->x==Symbol(A[m].atomic_symbol), elements)[1]
             rr = get_distance(L, X[n], X[neighbors[m]])
             rsq = dot(rr,rr)
             if (neighbors[m] != n) & (rsq <= cutsq[n_element, m_element])

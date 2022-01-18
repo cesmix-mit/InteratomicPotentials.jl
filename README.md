@@ -1,45 +1,44 @@
 # [WIP] InteratomicPotentials.jl
-This module implements methods (energies, forces, and virial tensors) for a variety of interatomic potentials, including the SNAP Potential (Thompson et al. 2014). 
+This module implements methods (energies, forces, and virial tensors) for a variety of interatomic potentials, including the SNAP Potential (Thompson et al. 2014, see notes for current limitations). 
 
 Project goals:
 - Having a defined structure for each potential
     - The potential structure will hold the trainable and nontrainable parameters 
     - The potential structure will naturally plug-and-play with fitting and uncertainty quantification codes (PotentialLearning.jl and PotentialUQ.jl)
-- Have a defined structure for each configuration of atoms.
-    - A configuration of atom holds identifying information for a group of atoms (atom masses, names, positions, velocities, etc..).
-    - Energy, force, and virial methods are implemented for these configurations.
-    - Configurations have enough information to allow for use with LAMMPS.jl (and potentially other codes in the future). 
-    - Input and output of atomic data is supported through configurations. 
+    - Todo: Develop a struct and interface for Interatomic Potentials that allows the creation of more complex potentials (i.e., sums of potentials or mixed type potentials for systems with multiple elements.)
 - Allow for easy use of automatic differentiation through framework.
-- Provide fledgling support for molecular dynamics codes (potentially LAMMPS.jl, NBodySimulator.jl, and others...)
 
 Right now, this module contains the framework for the following potentials
-- Lennard - Jones
-- Born - Mayer 
-- Coulomb
-- GaN (special mixed type, more of an application than a true potential)
-- SNAP 
+- Lennard Jones
+- SNAP (explicit multi-element support (chem flag) is nominally supported but not currently tested.)
+
+To Dos:
+- Improve neighborlist framework for multi-element systems (i.e. allowing potentials to differentiate based on the element of atom i and atom j).
+- Finish testing SNAP potential for explicit multi-element flag.
+- Create a structure that allows for the complexification and combination of interatomic potentials.
+    - Ideally this would allow for the specification of which potential should be used in multi-element systems for each pair of elements.
+- Add zbl potential.
+- Interface with MDP.
 
 ## Working Example
-Load a configuration of Argon atoms in a periodic system with Lennard-Jones potential and units ([LAMMPS DATA File](https://docs.lammps.org/2001/data_format.html)).
 ```julia
-r        = load_lammps_data(file_path; atom_names = [:Ar],              
-                                radii = [1.0], weights = [1.0], 
-                                boundaries = ["p", "p", "p"], units = "lj")  
-                                # typeof(r) <: Potentials.Configuration
-ϵ        = 1
-σ        = 1
-lj       = LennardJones(ϵ, σ)                    # <: EmpiricalPotential <: ArbitraryPotential
-pe       = potential_energy(r, lj)               # <: Real                    
-f        = Potentials.force(r, lj)               # <: Vector{Real}(, 3)
-v        = Potentials.virial(r, lj)              # <: Real
-v_tensor = Potentials.virial_stress(r, lj)       # <: Vector{Real}(, 6)
+
+# Define an atomic system
+atom1     = Atom(element, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
+atom2    = Atom(element, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
+box = [[1., 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]] * 1u"Å"
+bcs = [DirichletZero(), Periodic(), Periodic()]
+system   = FlexibleSystem(atoms, box , bcs)
+
+ϵ = 1.0
+σ = 0.25 * 1u"Å"
+rcutoff  = 2.0 * 1u"Å"
+lj       = LennardJones(ϵ, σ, rcutoff)           # <: EmpiricalPotential <: ArbitraryPotential
+pe       = potential_energy(r, lj)               # <: Float64                   
+f        = Potentials.force(r, lj)               # <: SVector{2, SVector{3, Float64}}
+v        = Potentials.virial(r, lj)              # <: Float64
+v_tensor = Potentials.virial_stress(r, lj)       # <: SVector{6, Float64}
 ```
 See "/test/" for further examples.
 
 
-To do:
-- Make usable with PotentialLearning.jl and PotentialUQ.jl
-- Finish implemented gradients of energies, forces, stresses w.r.t. potential parameters.
-- Improve input and output support.
-- Improve molecular dynamics support.

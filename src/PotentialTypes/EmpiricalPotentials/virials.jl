@@ -9,7 +9,6 @@ end
 
 
 function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
-    number_of_particles = length(A.particles)
     v = zeros(6)
     nnlist = neighborlist(A, p.rcutoff)
 

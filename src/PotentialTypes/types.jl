@@ -14,7 +14,7 @@ include("EmpiricalPotentials/lj.jl")
 # include("EmpiricalPotentials/bm.jl")
 # include("EmpiricalPotentials/coulomb.jl")
 include("EmpiricalPotentials/virials.jl")
-include("EmpiricalPotentials/vectorization.jl")
+# include("EmpiricalPotentials/vectorization.jl")
 include("EmpiricalPotentials/potential_energy.jl")
 include("EmpiricalPotentials/force.jl")
 
