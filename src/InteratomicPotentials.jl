@@ -22,7 +22,6 @@
 ################################################################################
 module InteratomicPotentials
 
-using Base: Float64
 using StaticArrays
 using LAMMPS
 using LinearAlgebra
@@ -37,8 +36,5 @@ export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
 export SNAPParams, compute_snap, get_num_coeffs
 export EmpiricalPotential, LennardJones
 # export BornMayer, Coulomb, GaN, MixedPotential
-
-
-
 
 end

@@ -1,4 +1,4 @@
-function load_json_data(file_path :: String)
+function load_json_data(file_path::String)
     println("This is not yet implemented")
 end
 

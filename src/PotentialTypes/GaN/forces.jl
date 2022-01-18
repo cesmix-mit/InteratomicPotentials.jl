@@ -13,7 +13,6 @@
 #     end
 # end
 
-
 # function force(r::Vector{Atom}, p::MixedPotential)
 #     n = length(r)
 #     # f = Array{Float64}(undef, 3, n)
@@ -44,10 +43,3 @@
 #     end
 #     return f
 # end
-
-
-
-
-
-
-

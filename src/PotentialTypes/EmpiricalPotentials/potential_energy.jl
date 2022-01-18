@@ -5,7 +5,7 @@ function potential_energy(A::AbstractSystem, p::EmpiricalPotential)
 
     for i in nnlist.i
         R = nnlist.R[i[1]]
-        for Ri in R 
+        for Ri in R
             e += potential_energy(Ri, p)
         end
     end

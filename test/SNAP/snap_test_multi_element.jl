@@ -6,11 +6,11 @@ using UnitfulAtomic
 
 num_elements = 2
 num_atoms = 3
-twojmax   = 4
-rcutfac      = 1.2
-radii      = [1.5, 1.5]
-rcut0   = 0.989
-weight    = [1.0, 1.0]
+twojmax = 4
+rcutfac = 1.2
+radii = [1.5, 1.5]
+rcut0 = 0.989
+weight = [1.0, 1.0]
 
 chem_flag = false
 bzero_flag = false
@@ -22,16 +22,16 @@ print_flag = false
 file = "./SNAP/lammps_snap/starting_configuration_multi_element.lj"
 
 include("./lammps_snap/bispectrum_functions.jl")
-position1 = @SVector [0.0, 0.0, 0.0] 
-position2 = @SVector [0.5, .40, 0.30]
+position1 = @SVector [0.0, 0.0, 0.0]
+position2 = @SVector [0.5, 0.40, 0.30]
 position3 = @SVector [0.2, 0.25, 0.1]
 
 
-atoms = [Atom(:Ar, position1 * 1u"Å"), Atom(:Ar, position2 * 1u"Å"), Atom(:Xe, position3 * 1u"Å")]
+atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Xe, position3 * u"Å")]
 
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
-system   = FlexibleSystem(atoms, box * 1u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
-                                                          
+system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
+
 snap = SNAPParams(num_atoms, twojmax, [:Ar, :Xe], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag)
 
 B, dB, vB = compute_snap(system, snap)

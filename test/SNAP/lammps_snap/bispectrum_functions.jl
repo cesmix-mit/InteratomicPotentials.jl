@@ -16,7 +16,7 @@
 ################################################################################
 using LAMMPS
 function get_bispectrum(num_atoms, num_elements, file::String)
-    num_coeff = num_coeffs 
+    num_coeff = num_coeffs
     A = LMP(["-screen", "none"]) do lmp
         bispectrum = Array{Float64}(undef, num_coeff, num_atoms)
         for i = 1
@@ -36,9 +36,9 @@ function get_bispectrum(num_atoms, num_elements, file::String)
             # Setup Forcefield
             command(lmp, "pair_style zero 6.0")
             command(lmp, "pair_coeff * *")
-            
+
             command(lmp, "compute PE all pe")
-            command(lmp, "compute S all pressure thermo_temp")                
+            command(lmp, "compute S all pressure thermo_temp")
             radii_command = ""
             for r in radii
                 radii_command *= "$r "
@@ -47,12 +47,12 @@ function get_bispectrum(num_atoms, num_elements, file::String)
             for w in weight
                 weight_command *= "$w "
             end
-            string_command = "compute b all sna/atom $rcutfac $rcut0 $twojmax " 
+            string_command = "compute b all sna/atom $rcutfac $rcut0 $twojmax "
             string_command *= radii_command
-            string_command *= weight_command 
-            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0" 
-            
-            if chem_flag 
+            string_command *= weight_command
+            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0"
+
+            if chem_flag
                 chem_command = "chem $(num_elements) "
                 for i = 0:(num_elements-1)
                     chem_command *= "$(i) "
@@ -64,8 +64,7 @@ function get_bispectrum(num_atoms, num_elements, file::String)
             command(lmp, "run 0")
 
             ## Extract bispectrum
-            bs = extract_compute(lmp, "b",  LAMMPS.API.LMP_STYLE_ATOM,
-                                            LAMMPS.API.LMP_TYPE_ARRAY)
+            bs = extract_compute(lmp, "b", LAMMPS.API.LMP_STYLE_ATOM, LAMMPS.API.LMP_TYPE_ARRAY)
             bispectrum[:, :] = bs
             command(lmp, "clear")
         end
@@ -75,7 +74,7 @@ function get_bispectrum(num_atoms, num_elements, file::String)
 end
 
 function get_dbispectrum(num_atoms, num_elements, file::String)
-    num_coeff = 3*num_coeffs*num_elements
+    num_coeff = 3 * num_coeffs * num_elements
     A = LMP(["-screen", "none"]) do lmp
         bispectrum = Array{Float64}(undef, num_coeff, num_atoms)
         for i = 1
@@ -95,7 +94,7 @@ function get_dbispectrum(num_atoms, num_elements, file::String)
             # Setup Forcefield
             command(lmp, "pair_style zero 6.0")
             command(lmp, "pair_coeff * *")
-            
+
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             radii_command = ""
@@ -106,12 +105,12 @@ function get_dbispectrum(num_atoms, num_elements, file::String)
             for w in weight
                 weight_command *= "$w "
             end
-            string_command = "compute db all snad/atom $rcutfac $rcut0 $twojmax " 
+            string_command = "compute db all snad/atom $rcutfac $rcut0 $twojmax "
             string_command *= radii_command
-            string_command *= weight_command 
-            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0" 
-            
-            if chem_flag 
+            string_command *= weight_command
+            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0"
+
+            if chem_flag
                 chem_command = "chem $(num_elements) "
                 for i = 0:(num_elements-1)
                     chem_command *= "$(i) "
@@ -123,8 +122,7 @@ function get_dbispectrum(num_atoms, num_elements, file::String)
             command(lmp, "run 0")
 
             ## Extract bispectrum
-            bs = extract_compute(lmp, "db",  LAMMPS.API.LMP_STYLE_ATOM,
-                                            LAMMPS.API.LMP_TYPE_ARRAY)
+            bs = extract_compute(lmp, "db", LAMMPS.API.LMP_STYLE_ATOM, LAMMPS.API.LMP_TYPE_ARRAY)
             bispectrum[:, :] = bs
             command(lmp, "clear")
         end
@@ -134,7 +132,7 @@ function get_dbispectrum(num_atoms, num_elements, file::String)
 end
 
 function get_vbispectrum(num_atoms, num_elements, file::String)
-    num_coeff = 6*num_coeffs*num_elements
+    num_coeff = 6 * num_coeffs * num_elements
     A = LMP(["-screen", "none"]) do lmp
         bispectrum = Array{Float64}(undef, num_coeff, num_atoms)
         for i = 1
@@ -154,7 +152,7 @@ function get_vbispectrum(num_atoms, num_elements, file::String)
             # Setup Forcefield
             command(lmp, "pair_style zero 6.0")
             command(lmp, "pair_coeff * *")
-            
+
             command(lmp, "compute PE all pe")
             command(lmp, "compute S all pressure thermo_temp")
             radii_command = ""
@@ -165,12 +163,12 @@ function get_vbispectrum(num_atoms, num_elements, file::String)
             for w in weight
                 weight_command *= "$w "
             end
-            string_command = "compute vb all snav/atom $rcutfac $rcut0 $twojmax " 
+            string_command = "compute vb all snav/atom $rcutfac $rcut0 $twojmax "
             string_command *= radii_command
-            string_command *= weight_command 
-            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0" 
-            
-            if chem_flag 
+            string_command *= weight_command
+            string_command *= "rmin0 0.00 bnormflag $(Int(bnorm_flag)) bzeroflag $(Int(bzero_flag)) switchflag 0"
+
+            if chem_flag
                 chem_command = "chem $(num_elements) "
                 for i = 0:(num_elements-1)
                     chem_command *= "$(i) "
@@ -182,8 +180,7 @@ function get_vbispectrum(num_atoms, num_elements, file::String)
             command(lmp, "run 0")
 
             ## Extract bispectrum
-            bs = extract_compute(lmp, "vb",  LAMMPS.API.LMP_STYLE_ATOM,
-                                            LAMMPS.API.LMP_TYPE_ARRAY)
+            bs = extract_compute(lmp, "vb", LAMMPS.API.LMP_STYLE_ATOM, LAMMPS.API.LMP_TYPE_ARRAY)
             bispectrum[:, :] = bs
             command(lmp, "clear")
         end
