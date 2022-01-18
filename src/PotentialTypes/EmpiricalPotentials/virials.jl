@@ -1,14 +1,26 @@
 #############################################################################
 ############################## Simple Virial ################################
 #############################################################################
-function virial(r::SVector{3, <:AbstractFloat}, p::EmpiricalPotential)
-    f = force(r, p)
-    return f[1] * r[1] + f[2] * r[2] + f[3] * r[3]
+function virial(A::AbstractSystem, p::EmpiricalPotential)
+    v = virial_stress(A, p)
+    return v[1] + v[2] + v[3]
 end
 
 
-function virial_stress(r::SVector{3, <:AbstractFloat}, p::EmpiricalPotential)
-    f = force(r, p)
-    vi = r * f'
-    return SA[vi[1, 1], vi[2, 2], vi[3, 3], vi[2, 3], vi[1, 3], vi[1,2]]
+
+function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
+    v = zeros(6)
+    nnlist = neighborlist(A, p.rcutoff)
+
+    for i in nnlist.i
+        j = nnlist.j[i[1]]
+        r = nnlist.r[i[1]]
+        R = nnlist.R[i[1]]
+        for (jj, rj, Rj) in zip(j, r, R)
+            fo = force(Rj, rj, p)
+            vi = rj * fo'
+            v += [vi[1,1], vi[2, 2], vi[3, 3], vi[3, 2], vi[3, 1], vi[2, 1]]
+        end
+    end
+    return SVector{6}(v)
 end

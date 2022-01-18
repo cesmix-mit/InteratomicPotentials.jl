@@ -1,3 +1,0 @@
-struct Improper
-
-end

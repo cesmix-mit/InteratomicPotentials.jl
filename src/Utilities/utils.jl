@@ -21,8 +21,9 @@ import Base.-
 import Base.*
 import Base.copy
 import Base.vec
-
-include("param.jl")
+import Base.length
+# include("param.jl")
+include("nnlist.jl")
 
 
 

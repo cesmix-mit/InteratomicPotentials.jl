@@ -18,20 +18,7 @@
 #           5. (For inference) Having a method to produce the gradient of each of the above methods with 
 #               respect to the potential parameters.
 #
-#       Right now, this module contains the framework for the following potentials
-#           1. Lennard Jones
-#           2. Born - Mayer 
-#           3. Coulomb
-#           4. ZBL
-#           5. GaN (special mixed type, more of an application than a true potential)
-#           6. SNAP 
 
-#
-#       To do:
-#           1. Improve configuration implementation
-#           2. Implement ACE potentials (with ACE.jl)
-#
-#
 ################################################################################
 module InteratomicPotentials
 
@@ -39,26 +26,18 @@ using Base: Float64
 using StaticArrays
 using LAMMPS
 using LinearAlgebra
-using ExtXYZ
 using AtomsBase
 using Unitful
 using UnitfulAtomic
-using CGcoefficient
-# include("Utilities/utils.jl")
-# include("Configurations/config.jl")
-# include("IO/io.jl")
+include("Utilities/utils.jl")
 include("PotentialTypes/types.jl")
-include("PotentialTypes/SNAP/LAMMPS-RECODE/snap.jl")
-# include("MD/md.jl")
-
+export NeighborList, neighborlist
 export potential_energy, force, virial, virial_stress
 export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
-export SNAPParams, compute_sna
+export SNAPParams, compute_snap, get_num_coeffs
 export EmpiricalPotential, LennardJones
 # export BornMayer, Coulomb, GaN, MixedPotential
-# export SNAP, SNAPkeywords, get_bispectrum, get_dbispectrum, get_vbispectrum, get_snap
-# export Atom, Angle, Bond, Configuration, Dihedral, Domain, Improper
-# export load_lammps
+
 
 
 
