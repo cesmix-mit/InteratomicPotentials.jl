@@ -47,4 +47,3 @@
 #     println("The Coulomb potential has no trainable parameters")
 #     return (dvdnull =  0 .* r ./ d )
 # end
-

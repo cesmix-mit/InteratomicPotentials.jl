@@ -6,7 +6,6 @@
 #     return f[1] * r[1] + f[2] * r[2] + f[3] * r[3]
 # end
 
-
 # function virial(r::Vector{Atom}, p::MixedPotential)
 #     n = length(r)
 #     v = 0.0
@@ -66,9 +65,3 @@
 #     end
 #     return v
 # end
-
-
-
-
-
-

@@ -1,8 +1,8 @@
 # #########################################################################
 # ##############################   GaN  ###################################
 # #########################################################################
+
 # function potential_energy(r::Vector{<:Real}, p::GaN, Type1::Symbol, Type2::Symbol)
-    
 #     if (Type1 == :Ga) && (Type2 == :Ga) # Ga-Ga interaction
 #         return potential_energy(r, p.c) + potential_energy(r, p.lj_Ga_Ga)
 #     elseif (Type1 == :N) && (Type2 == :N) # N-N interaction
@@ -26,7 +26,6 @@
 #     return pe
 # end
 
-
 # function potential_energy(c::Configuration, p::MixedPotential)
 #     return potential_energy(c.Atoms, p)
 # end
@@ -39,11 +38,3 @@
 #     end
 #     return pe
 # end
-
-
-
-
-
-
-
-
