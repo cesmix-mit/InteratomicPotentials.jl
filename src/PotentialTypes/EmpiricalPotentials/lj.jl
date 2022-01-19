@@ -7,7 +7,7 @@ end
 
 get_trainable_params(lj::LennardJones) = Parameter{:ϵ,:σ}((lj.ϵ, lj.σ))
 
-get_nontrainable_params(lj::LennardJones) = Parameter{}(())
+get_nontrainable_params(lj::LennardJones) = Parameter{:rcutoff}((lj.rcutoff,))
 
 ############################# Energies ##########################################
 
@@ -18,11 +18,10 @@ end
 
 ############################### Forces ##########################################
 
-force(r::SVector{3,<:AbstractFloat}, p::LennardJones) = force(r, norm(r), p)
-
 function force(R::AbstractFloat, r::SVector{3,<:AbstractFloat}, p::LennardJones)
     SVector(24.0 * p.ϵ * (2.0 * (p.σ / R)^12 - (p.σ / R)^6) .* r ./ R ./ R)
 end
+
 ############################## Gradients ########################################
 function grad_potential_energy(r::SVector{3,<:AbstractFloat}, p::LennardJones)
     d = p.σ / norm(r)

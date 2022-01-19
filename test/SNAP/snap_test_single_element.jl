@@ -15,7 +15,7 @@ weight = [1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-num_coeffs = get_num_coeffs(twojmax, num_elements, chem_flag)
+num_coeffs = get_num_snap_coeffs(twojmax, num_elements, chem_flag)
 
 print_flag = false
 
@@ -34,7 +34,7 @@ system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), 
 
 snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
 
-B, dB, vB = compute_snap(system, snap)
+B, dB, vB = evaluate_full(system, snap)
 
 if print_flag
     println("B")
@@ -81,3 +81,6 @@ end
 @test sum(vB[2] - reshape(vA[:, 2], :, 6)) < 1e-5
 @test sum(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
 
+
+@test isa(potential_energy(system, SNAP(ones(num_coeffs), snap) ), Float64)
+@test isa(force(system, SNAP(ones(num_coeffs), snap)), AbstractVector{<:SVector{3,<:AbstractFloat}})

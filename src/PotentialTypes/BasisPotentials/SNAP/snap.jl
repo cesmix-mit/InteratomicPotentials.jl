@@ -1,11 +1,18 @@
 include("types/types.jl")
 include("utilities/utl.jl")
 
-function potential_energy(A::AbstractSystem, snap::SNAPParams)
+struct SNAP <: BasisPotential
+    coefficients :: AbstractVector
+    basis_params :: SNAPParams
+end
+
+
+
+function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
     # Get number of coefficients
-    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
+    num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
     B = zeros(num_coeff) 
@@ -24,20 +31,19 @@ function potential_energy(A::AbstractSystem, snap::SNAPParams)
     return B
 end 
 
-function force(A::AbstractSystem, snap::SNAPParams)
+function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
-    println(nnlist)
     # Get number of coefficients
-    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
+    num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
     dB = [zeros(num_coeff*length(snap.elements), 3) for i = 1:number_of_particles]
     W = [zeros(num_coeff*length(snap.elements), 6) for i = 1:number_of_particles]
 
     for  (i, ai) in enumerate(A.particles)
-        i_element = findall(x->x==Symbol(ai.element.symbol), snap.elements)[1]
+        i_element = findall(x->x==atomic_symbol(A, i), snap.elements)[1]
 
         runtime_arrays = initialize_runtime_arrays(i, nnlist, A, snap)
         # These must be done with each new configuration
@@ -54,7 +60,7 @@ function force(A::AbstractSystem, snap::SNAPParams)
             rij = runtime_arrays.rij[ind]
             wj = runtime_arrays.wj[ind]
             rcut = runtime_arrays.rcutij[ind]
-            j_element = findall(x->x==Symbol(A.particles[jj].element.symbol), snap.elements)[1]
+            j_element = findall(x->x==atomic_symbol(A, jj), snap.elements)[1]
             ## Need to zero-out dulist and dblist each time
 
             # Now compute dulist for (i,j)
@@ -69,13 +75,12 @@ function force(A::AbstractSystem, snap::SNAPParams)
     return dB
 end 
 
-function virial_stress(A::AbstractSystem, snap::SNAPParams)
+function evaluate_basis_v(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
-    println(nnlist)
     # Get number of coefficients
-    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
+    num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
     W = [zeros(num_coeff*length(snap.elements), 6) for i = 1:number_of_particles]
@@ -130,17 +135,12 @@ function virial_stress(A::AbstractSystem, snap::SNAPParams)
     return sum(W)
 end 
 
-function virial(A::AbstractSystem, snap::SNAPParams)
-    v = virial(A, snap)
-    return sum(v, dims = 2)
-end
-
-function compute_snap(A::AbstractSystem, snap::SNAPParams)
+function evaluate_full(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
     # Get number of coefficients
-    num_coeff = get_num_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
+    num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.elements), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
     B = [zeros(num_coeff) for i = 1:number_of_particles]

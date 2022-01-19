@@ -1,55 +1,46 @@
 ##############################   Born-Mayer  ###################################
-# mutable struct BornMayer <: EmpiricalPotential
-#     A::Float64
-#     ρ::Float64
-# end
+struct BornMayer <: EmpiricalPotential
+    A::Float64
+    ρ::Float64
+    rcutoff :: AbstractFloat
+end
 
-# function BornMayer()
-#     #ToDO
-#     return BornMayer(1.0, 1.0)
-# end
+get_trainable_params(bm::BornMayer) = Parameter{:A,:ρ}((bm.A, bm.ρ))
 
-# function get_trainable_params(bm::BornMayer)
-#     return (A = bm.A, ρ = bm.ρ)
-# end
+get_nontrainable_params(bm::BornMayer) = Parameter{:rcutoff}((bm.rcutoff))
 
-# function get_nontrainable_params(lj::BornMayer)
-#     p = Parameter{}(())
-#     return p
-# end
 
 # ##############################   Energy  ###################################
 
-# function potential_energy(r::Vector{<:Real}, p::BornMayer)
-#     return p.A * exp(-norm(r) / p.ρ)
-# end
+function potential_energy(R::AbstractFloat, bm::BornMayer)
+    bm.A * exp(-R / bm.ρ)
+end
 
 
 # ##############################   Force   ###################################
 
-# function force(r::Vector{<:Real}, p::BornMayer)
-#     d = norm(r) 
-#     return p.A /p.ρ * exp(-d / p.ρ ) .* r ./ d
-# end
+function force(R::AbstractFloat, r::SVector{3,<:AbstractFloat}, bm::BornMayer)
+    SVector(bm.A /bm.ρ * exp(-R / bm.ρ ) .* r ./ R)
+end
 
 # ##############################   Gradients  ###################################
 
-# function grad_potential_energy(r::Vector{<:Real}, p::BornMayer)
-#     d = norm(r)
-#     return (dpdA = exp(-d / p.ρ),
-#             dpdρ = p.A * d * exp(-d/p.ρ) / p.ρ^2 )
-# end
+function grad_potential_energy(r::Vector{<:Real}, bm::BornMayer)
+    d = norm(r)
+    return (dpdA = exp(-d / bm.ρ),
+            dpdρ = bm.A * d * exp(-d/bm.ρ) / bm.ρ^2 )
+end
 
-# function grad_force(r::Vector{<:Real}, p::BornMayer)
-#     d = norm(r)
-#     return (dfdA = 1.0 /p.ρ * exp(-d / p.ρ ) .* r ./ d, 
-#             dfdρ = p.A / p.ρ^3 * exp(-d / p.ρ )*(d - p.ρ)  .* r ./ d)
-# end
+function grad_force(r::Vector{<:Real}, bm::BornMayer)
+    d = norm(r)
+    return (dfdA = 1.0 /bm.ρ * exp(-d / bm.ρ ) .* r ./ d, 
+            dfdρ = bm.A / bm.ρ^3 * exp(-d / bm.ρ )*(d - bm.ρ)  .* r ./ d)
+end
 
-# function grad_virial(r::Vector{<:Real}, p::BornMayer)
-#     df = grad_force(r, p)
-#     dfdA = df[:dfdA]
-#     dfdrho = df[:dfdρ]
-#     return (dvdA = dfdA[1]*r[1] + dfdA[2]*r[2] + dfdA[3]*r[3], 
-#             dvdρ = dfdrho[1]*r[1] + dfdrho[2]*r[2] + dfdrho[3]*r[3])
-# end
+function grad_virial(r::Vector{<:Real}, bm::BornMayer)
+    df = grad_force(r, bm)
+    dfdA = df[:dfdA]
+    dfdrho = df[:dfdρ]
+    return (dvdA = dfdA[1]*r[1] + dfdA[2]*r[2] + dfdA[3]*r[3], 
+            dvdρ = dfdrho[1]*r[1] + dfdrho[2]*r[2] + dfdrho[3]*r[3])
+end

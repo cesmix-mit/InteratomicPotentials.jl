@@ -3,7 +3,6 @@ using NearestNeighbors
 using StaticArrays
 
 struct NeighborList
-    i::Vector{Vector{Int}}
     j::Vector{Vector{Int}}
     R::Vector{Vector{Float64}}
     r::Vector{Vector{SVector{3,Float64}}}
@@ -32,7 +31,6 @@ function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     tree = BallTree(X, d)
 
     # Intialize empty vectors
-    i = Vector{Int64}[] # i 
     j = Vector{Int64}[] # j 
     R = Vector{Float64}[] # Distances
     r = Vector{SVector{3,Float64}}[] # Positions
@@ -40,24 +38,20 @@ function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     # Fill vectors
     for n = 1:length(X)
         neighbors = inrange(tree, X[n], rcutoff, true)
-        itemp = Int64[]
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3,Float64}[]
         for neighbor in neighbors
             if neighbor != n
-                push!(itemp, n)
                 push!(jtemp, neighbor)
                 rr = get_distance(L, X[n], X[neighbor])
                 push!(rtemp, rr)
                 push!(Rtemp, norm(rr))
             end
         end
-
-        push!(i, itemp)
         push!(j, jtemp)
         push!(R, Rtemp)
         push!(r, rtemp)
     end
-    NeighborList(i, j, R, r)
+    NeighborList(j, R, r)
 end
