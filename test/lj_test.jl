@@ -34,8 +34,3 @@ nnlist = neighborlist(system, rcutoff)
 
 @test isa(virial(system, lj), AbstractFloat)
 @test isa(virial_stress(system, lj), SVector{6,<:AbstractFloat})
-
-@test potential_energy(system, lj) == InteratomicPotentials.potential_energy2(system, lj)
-@test force(system, lj) == InteratomicPotentials.force2(system, lj)
-@test virial(system, lj) == InteratomicPotentials.virial2(system, lj)
-@test virial_stress(system, lj) == InteratomicPotentials.virial_stress2(system, lj)
