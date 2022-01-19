@@ -11,20 +11,10 @@ end
 length(nn::NeighborList) = length(nn.i)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
-    r = [0.0, 0.0, 0.0]
-    for i = 1:3
-        if L == Inf
-            r[i] += y[i] - x[i]
-        else
-            m = mod(abs(y[i] - x[i]), L[i])
-            if m < L[i] - m
-                r[i] += y[i] - x[i]
-            else
-                r[i] += L[i] - (y[i] - x[i])
-            end
-        end
+    broadcast(L, x, y) do L, x, y
+        d = y - x
+        2mod(abs(d), L) < L ? d : L - d
     end
-    SVector{3}(r)
 end
 
 to_array(A::AbstractSystem) = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
