@@ -7,7 +7,7 @@ end
 
 get_trainable_params(lj::LennardJones) = Parameter{:ϵ,:σ}((lj.ϵ, lj.σ))
 
-get_nontrainable_params(lj::LennardJones) = Parameter{}(())
+get_nontrainable_params(lj::LennardJones) = Parameter{:rcutoff}((lj.rcutoff,))
 
 ############################# Energies ##########################################
 

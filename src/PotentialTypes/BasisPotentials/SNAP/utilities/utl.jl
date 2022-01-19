@@ -4,7 +4,7 @@ include("compute_b.jl")
 include("compute_yi.jl")
 include("compute_dij.jl")
 
-function get_num_coeffs(twojmax :: Int, n_elems :: Int, chem_flag :: Bool)
+function get_num_snap_coeffs(twojmax :: Int, n_elems :: Int, chem_flag :: Bool)
     J = twojmax 
     if J % 2 == 0
         m = J/2 + 1
@@ -59,7 +59,6 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
     elements = unique(atomic_symbol(A))
 
     # Intialize empty vectors
-    i = Vector{Int64}[] # i 
     j = Vector{Int64}[] # j 
     R = Vector{Float64}[] # Distances
     r = Vector{SVector{3, Float64}}[] # Positions
@@ -68,7 +67,6 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
     for n = 1:length(X)
         n_element = findall(x->x==Symbol(A[n].atomic_symbol), elements)[1]
         neighbors = inrange(tree, X[n], sqrt(cutmax), true)
-        itemp = Int64[]
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3, Float64}[]
@@ -77,17 +75,15 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
             rr = get_distance(L, X[n], X[neighbors[m]])
             rsq = dot(rr,rr)
             if (neighbors[m] != n) & (rsq <= cutsq[n_element, m_element])
-                push!(itemp, n)
                 push!(jtemp, neighbors[m])
                 push!(rtemp, rr)
                 push!(Rtemp, sqrt(rsq))
             end
         end
     
-        push!(i, itemp)
         push!(j, jtemp)
         push!(R, Rtemp)
         push!(r, rtemp)
     end
-    return NeighborList(i, j, R, r)
+    return NeighborList(j, R, r)
 end

@@ -39,7 +39,6 @@ function initialize_runtime_arrays(i::Int, nnlist::NeighborList, A::AbstractSyst
     element = Int[]            # Element of particle (j) 
     elements = snap.elements
 
-    i_list = nnlist.i[i]
     j = nnlist.j[i]
     r = nnlist.r[i]
     i_element = findall(x->x==Symbol(A[i].atomic_symbol), elements)[1]

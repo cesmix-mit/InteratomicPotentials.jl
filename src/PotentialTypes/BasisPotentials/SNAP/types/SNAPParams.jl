@@ -1,4 +1,4 @@
-struct SNAPParams{S<:Integer, T<:AbstractFloat}
+struct SNAPParams{S<:Integer, T<:AbstractFloat} <: BasisParameters
     n_atoms    :: S
     twojmax    :: S 
     elements   :: Vector{Symbol}
