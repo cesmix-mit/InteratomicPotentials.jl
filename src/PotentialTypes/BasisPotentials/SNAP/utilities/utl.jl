@@ -65,13 +65,13 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
 
     # Fill vectors
     for n = 1:length(X)
-        n_element = findall(x->x==Symbol(A[n].atomic_symbol), elements)[1]
+        n_element = findall(x->x==atomic_symbol(A, n), elements)[1]
         neighbors = inrange(tree, X[n], sqrt(cutmax), true)
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3, Float64}[]
         for (m, neighbor) in enumerate(neighbors)
-            m_element = findall(x->x==Symbol(A[m].atomic_symbol), elements)[1]
+            m_element = findall(x->x==atomic_symbol(A, m), elements)[1]
             rr = get_distance(L, X[n], X[neighbor])
             rsq = dot(rr,rr)
             if (neighbor != n) & (rsq <= cutsq[n_element, m_element])

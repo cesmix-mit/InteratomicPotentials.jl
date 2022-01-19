@@ -19,8 +19,6 @@ end
 
 # ##############################   Force   ###################################
 
-force(r::SVector{3,<:AbstractFloat}, bm::BornMayer) = force(r, norm(r), bm)
-
 function force(R::AbstractFloat, r::SVector{3,<:AbstractFloat}, bm::BornMayer)
     SVector(bm.A /bm.ρ * exp(-R / bm.ρ ) .* r ./ R)
 end

@@ -1,3 +1,5 @@
+force(r::SVector{3,<:AbstractFloat}, p::EmpiricalPotential) = force(norm(r), r, c)
+
 function force(A::AbstractSystem, p::EmpiricalPotential)
     f = fill(zeros(3), length(A))
     nnlist = neighborlist(A, p.rcutoff)
@@ -12,5 +14,7 @@ function force(A::AbstractSystem, p::EmpiricalPotential)
             f[jj] -= fo
         end
     end
-    [SVector{3}(fi) for fi in f]
+    SVector{3}.(f)
 end
+
+
