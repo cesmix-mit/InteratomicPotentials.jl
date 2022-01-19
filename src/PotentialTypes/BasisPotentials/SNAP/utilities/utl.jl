@@ -70,12 +70,12 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3, Float64}[]
-        for m in 1:length(neighbors)
+        for (m, neighbor) in enumerate(neighbors)
             m_element = findall(x->x==Symbol(A[m].atomic_symbol), elements)[1]
-            rr = get_distance(L, X[n], X[neighbors[m]])
+            rr = get_distance(L, X[n], X[neighbor])
             rsq = dot(rr,rr)
-            if (neighbors[m] != n) & (rsq <= cutsq[n_element, m_element])
-                push!(jtemp, neighbors[m])
+            if (neighbor != n) & (rsq <= cutsq[n_element, m_element])
+                push!(jtemp, neighbor)
                 push!(rtemp, rr)
                 push!(Rtemp, sqrt(rsq))
             end
