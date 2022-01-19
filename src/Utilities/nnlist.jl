@@ -8,9 +8,7 @@ struct NeighborList
     R::Vector{Vector{Float64}}
     r::Vector{Vector{SVector{3,Float64}}}
 end
-function length(nn::NeighborList)
-    return length(nn.i)
-end
+length(nn::NeighborList) = length(nn.i)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     r = [0.0, 0.0, 0.0]
@@ -26,19 +24,12 @@ function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloa
             end
         end
     end
-    return SVector{3}(r)
+    SVector{3}(r)
 end
 
-function to_array(A::AbstractSystem)
-    positions = position(A)
-    X = SVector{3,Float64}[]
-    for p in positions
-        push!(X, ustrip.(p))
-    end
-    return X
-end
-function neighborlist(A::AbstractSystem, rcutoff::Float64)
+to_array(A::AbstractSystem) = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
 
+function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     # Convert Positions to Matrix for Ball tree
     X = to_array(A)
 
@@ -63,11 +54,11 @@ function neighborlist(A::AbstractSystem, rcutoff::Float64)
         jtemp = Int64[]
         Rtemp = Float64[]
         rtemp = SVector{3,Float64}[]
-        for m in 1:length(neighbors)
-            if neighbors[m] != n
+        for neighbor in neighbors
+            if neighbor != n
                 push!(itemp, n)
-                push!(jtemp, neighbors[m])
-                rr = get_distance(L, X[n], X[neighbors[m]])
+                push!(jtemp, neighbor)
+                rr = get_distance(L, X[n], X[neighbor])
                 push!(rtemp, rr)
                 push!(Rtemp, norm(rr))
             end
@@ -78,5 +69,5 @@ function neighborlist(A::AbstractSystem, rcutoff::Float64)
         push!(R, Rtemp)
         push!(r, rtemp)
     end
-    return NeighborList(i, j, R, r)
+    NeighborList(i, j, R, r)
 end
