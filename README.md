@@ -35,9 +35,9 @@ system   = FlexibleSystem(atoms, box , bcs)
 rcutoff  = 2.0 * 1u"Å"
 lj       = LennardJones(ϵ, σ, rcutoff)           # <: EmpiricalPotential <: ArbitraryPotential
 pe       = potential_energy(r, lj)               # <: Float64                   
-f        = Potentials.force(r, lj)               # <: SVector{2, SVector{3, Float64}}
-v        = Potentials.virial(r, lj)              # <: Float64
-v_tensor = Potentials.virial_stress(r, lj)       # <: SVector{6, Float64}
+f        = force(r, lj)                          # <: Vector{SVector{3, Float64}}
+v        = virial(r, lj)                         # <: Float64
+v_tensor = virial_stress(r, lj)                  # <: SVector{6, Float64}
 ```
 See "/test/" for further examples.
 
