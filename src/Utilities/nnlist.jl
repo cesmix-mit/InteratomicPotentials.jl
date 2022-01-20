@@ -10,9 +10,9 @@ end
 length(nn::NeighborList) = length(nn.i)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
-    broadcast(L, x, y) do L, x, y
-        d = y - x
-        2mod(abs(d), L) < L ? d : L - d
+    broadcast(L, x, y) do Li, xi, yi
+        d = mod(xi - yi, Li)
+        2d < Li ? d : d - Li
     end
 end
 
