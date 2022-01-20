@@ -19,15 +19,28 @@ lj = LennardJones(ϵ, σ, rcutoff)
 atom2 = Atom(element, 0.25 * position * u"Å")
 atom3 = Atom(element, 0.5 * position * u"Å")
 atom4 = Atom(element, 0.75 * position * u"Å")
-atom5 = Atom(element, 1.5 * position * u"Å")
+atom5 = Atom(element, 1.1 * position * u"Å")
 atom6 = Atom(element, 2.0 * position * u"Å")
-atoms = [atom1, atom2, atom3, atom4, atom5, atom6]
+# atoms = [atom1, atom2, atom3, atom4, atom5, atom6]
+atoms = [atom3, atom4, atom5]
 box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
-bcs = [DirichletZero(), Periodic(), Periodic()]
+bcs = [Periodic(), Periodic(), Periodic()]
 system = FlexibleSystem(atoms, box * u"Å", bcs)
 n = length(system)
 nnlist = neighborlist(system, rcutoff)
+println(nnlist)
 @test isa(nnlist, NeighborList)
+
+true_r = [ [ SVector{3}([0.25, 0.0, 0.0]), SVector{3}([-.40, 0.0, 0.0]) ], 
+            [ SVector{3}([-0.25, 0.0, 0.0]), SVector{3}([0.35, 0.0, 0.0]) ],
+            [ SVector{3}([0.4, 0.0, 0.0]), SVector{3}([-0.35, 0.0, 0.0]) ] ]
+nnlist_r = nnlist.r
+
+for (ri, ri_true) in zip(nnlist_r, true_r)
+    for (rij, rij_true) in zip(ri, ri_true)
+        @test isapprox(sum(rij + rij_true), 0.0, atol = eps(2.0))
+    end
+end
 
 @test isa(potential_energy(system, lj), AbstractFloat)
 @test isa(force(system, lj), AbstractVector{<:SVector{3,<:AbstractFloat}})
