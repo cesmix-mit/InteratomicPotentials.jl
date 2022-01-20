@@ -72,7 +72,7 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
         rtemp = SVector{3, Float64}[]
         for (m, neighbor) in enumerate(neighbors)
             m_element = findall(x->x==atomic_symbol(A, m), elements)[1]
-            rr = get_distance(L, X[n], X[neighbor])
+            rr = -1.0get_distance(L, X[n], X[neighbor])
             rsq = dot(rr,rr)
             if (neighbor != n) & (rsq <= cutsq[n_element, m_element])
                 push!(jtemp, neighbor)
