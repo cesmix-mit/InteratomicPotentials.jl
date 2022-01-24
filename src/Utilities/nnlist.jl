@@ -11,7 +11,6 @@ length(nn::NeighborList) = length(nn.i)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     broadcast(L, x, y) do Li, xi, yi
-        d = mod(xi - yi, Li)
         if Li == Inf
             xi - yi
         else
