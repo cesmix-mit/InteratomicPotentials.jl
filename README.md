@@ -19,10 +19,15 @@ To Dos:
     - Ideally this would allow for the specification of which potential should be used in multi-element systems for each pair of elements.
 - Add zbl potential.
 - Interface with MDP.
+- See issues for more topics.
 
 ## Working Example
-```julia
+In order to compute the interatomic energy of a system, or the forces between atoms in a system, the user has to
+- 1) define an ```AbstractSystem``` using ``` AtomsBase``` and 
+- 2) construct a potential (subtype of an ArbitraryPotential).
 
+Once these two structures have ben instantiated, the quantity of interest can be computed using the signature ```func(system, potential)```.
+```julia
 # Define an atomic system
 atom1     = Atom(element, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
 atom2    = Atom(element, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
@@ -34,10 +39,10 @@ system   = FlexibleSystem(atoms, box , bcs)
 σ = 0.25 * 1u"Å"
 rcutoff  = 2.0 * 1u"Å"
 lj       = LennardJones(ϵ, σ, rcutoff)           # <: EmpiricalPotential <: ArbitraryPotential
-pe       = potential_energy(r, lj)               # <: Float64                   
-f        = force(r, lj)                          # <: Vector{SVector{3, Float64}}
-v        = virial(r, lj)                         # <: Float64
-v_tensor = virial_stress(r, lj)                  # <: SVector{6, Float64}
+pe       = potential_energy(system, lj)               # <: Float64                   
+f        = force(system, lj)                          # <: Vector{SVector{3, Float64}}
+v        = virial(system, lj)                         # <: Float64
+v_tensor = virial_stress(system, lj)                  # <: SVector{6, Float64}
 ```
 See "/test/" for further examples.
 
