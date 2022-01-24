@@ -46,4 +46,27 @@ v_tensor = virial_stress(system, lj)                  # <: SVector{6, Float64}
 ```
 See "/test/" for further examples.
 
+## Potential Types
+All interatomic potentials listed in this project are subtypes of ```ArbitraryPotential```. At this point, as of v0.11, there are two branches of potentials: ```EmpiricalPotential``` and ```BasisPotential```. ```EmpiricalPotential```s include two-body potentials like ```BornMayer```, ```LennardJones```. ```BasisPotential``` require the expansion of the configration of atoms using some basis set of functions and a set of coefficients for each of the members of the expansion in order to calculate energies and forces (i.e. ```SNAP```).
+
+```julia
+EmpiricalPotential <: ArbitraryPotential
+BornMayer <: EmpiricalPotential
+LennardJones <: EmpiricalPotential
+Coulomb     <: EmpiricalPotential
+ZBL         <: EmpiricalPotential
+
+BasisPotential <: ArbitraryPotential
+SNAP           <: BasisPotential
+```
+
+```BasisPotential``` are associated with the functions that evaluate the basis set with parameters necessary for the particular basis expansion used. For example,
+```julia
+SNAP_parameters = SNAPParams(...)
+basis_evaluation = evaluate(system, SNAP_parameters)
+gradient_basis_evaulation = evaluate_d(system, SNAP_parameters)
+```
+For linear basis expansions, the energies and forces are dot products between the potential coefficients and the results of ```evaulate``` and ```evalulate_d```, respectively.
+
+
 
