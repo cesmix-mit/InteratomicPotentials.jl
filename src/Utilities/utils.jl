@@ -16,16 +16,5 @@
 #               - A system is a collection of Configurations. (Primarily used for training SNAP potentials)
 
 ################################################################################
-import Base.+
-import Base.-
-import Base.*
-import Base.copy
-import Base.vec
-import Base.length
-# include("param.jl")
+
 include("nnlist.jl")
-
-
-
-
-

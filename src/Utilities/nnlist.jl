@@ -7,7 +7,7 @@ struct NeighborList
     R::Vector{Vector{Float64}}
     r::Vector{Vector{SVector{3,Float64}}}
 end
-length(nn::NeighborList) = length(nn.i)
+Base.length(nn::NeighborList) = length(nn.j)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     broadcast(L, x, y) do Li, xi, yi
