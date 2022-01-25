@@ -7,8 +7,7 @@
 abstract type ArbitraryPotential end
 abstract type EmpiricalPotential <:ArbitraryPotential end
 abstract type BasisPotential <: ArbitraryPotential end
-abstract type MixedPotential <:ArbitraryPotential end
-
+abstract type MixedPotential end
 ############################### Empirical Potentials ################################################
 include("EmpiricalPotentials/empirical_potentials.jl")
 
@@ -16,5 +15,5 @@ include("EmpiricalPotentials/empirical_potentials.jl")
 ################################ BasisPotentials ##############################################################
 include("BasisPotentials/basis_potentials.jl")
 
-################################ GaN ###############################################################
-# include("GaN/gan.jl")
+################################ MixedPotential ###############################################################
+include("MixedPotentials/mixed_potentials.jl")

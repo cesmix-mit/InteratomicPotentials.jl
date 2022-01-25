@@ -47,3 +47,39 @@ end
 
 @test isa(virial(system, lj), AbstractFloat)
 @test isa(virial_stress(system, lj), SVector{6,<:AbstractFloat})
+
+
+lj2 = LennardJones(2*ϵ, 2*σ, rcutoff)
+
+sum_lj = lj+lj2
+mixed_potentials = [lj+lj2, lj-lj2, 2.0*lj, -2.0*lj, 2.0*lj - 1.0*lj2, lj2 / 2.0]
+true_energies = [potential_energy(system, lj) + potential_energy(system, lj2), 
+                    potential_energy(system, lj) - potential_energy(system, lj2),
+                    2.0*potential_energy(system, lj), 
+                    -2.0*potential_energy(system, lj),
+                    2.0*potential_energy(system, lj) - 1.0potential_energy(system, lj2), 
+                    potential_energy(system, lj2)/2.0]
+
+true_forces = [force(system, lj) + force(system, lj2), 
+                    force(system, lj) - force(system, lj2),
+                    2.0*force(system, lj), 
+                    -2.0*force(system, lj),
+                    2.0*force(system, lj) - 1.0force(system, lj2), 
+                    force(system, lj2)/2.0]
+
+true_virial = [virial(system, lj) + virial(system, lj2), 
+                    virial(system, lj) - virial(system, lj2),
+                    2.0*virial(system, lj), 
+                    -2.0*virial(system, lj),
+                    2.0*virial(system, lj) - 1.0virial(system, lj2), 
+                    virial(system, lj2)/2.0]
+
+for (result_lj, te, tf, tv) in zip(mixed_potentials, true_energies, true_forces, true_virial) 
+    @test isa(result_lj, MixedPotential)
+    @test isa(potential_energy(system, result_lj), AbstractFloat)
+    @test isapprox(potential_energy(system, result_lj), te, rtol = 1e-6)
+    @test isa(force(system, result_lj), AbstractVector{<:SVector{3,<:AbstractFloat}})
+    @test isapprox(force(system, result_lj), tf, rtol = 1e-6)
+    @test isa(virial(system, result_lj), AbstractFloat)
+    @test isapprox(virial(system, result_lj), tv, rtol = 1e-6)
+end
