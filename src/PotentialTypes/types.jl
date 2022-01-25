@@ -5,9 +5,8 @@
 ################################################################################
 
 abstract type ArbitraryPotential end
-abstract type ElementalPotential <: ArbitraryPotential end # Single potentials
-abstract type EmpiricalPotential <: ElementalPotential end
-abstract type BasisPotential <: ElementalPotential end
+abstract type EmpiricalPotential <: ArbitraryPotential end
+abstract type BasisPotential <: ArbitraryPotential end
 
 abstract type MixedPotential <: ArbitraryPotential end # Combined potentials
 ############################### Empirical Potentials ################################################

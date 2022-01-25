@@ -1,9 +1,28 @@
 # ####################### Parameters #############################################
-# Abstract type
-import Base.NamedTuple as Parameter
+# import Base.NamedTuple as Parameter
+# import Base.+
+# function +(p::Parameter, q::Parameter)
+#     names_p = keys(p)
+#     names_q = keys(q)
+#     new_names_q = []
+#     for (i, key) in enumerate(names_q)
+#         j = 1
+#         while !isempty( intersect(names_p, [key] ) )
+#             key = Symbol( string(key) * "_$j") 
+#             j+=1
+#         end
+#         println(new_names_q)
+#         println(key)
+#         new_names_q = (new_names_q..., (key, )...)
+#     end
 
-# Operators
-Base.:+(p::Parameter, q::Parameter) = merge(p, q)
+#     merge(Parameter{names_p}(values(p)), Parameter{new_names_q}(values(q)))
+# end
+        
+
+
+
+
 
 ## Convert parameter (named tuple) to vector for use in fitting
 function parameter_to_vec(p::Parameter)
