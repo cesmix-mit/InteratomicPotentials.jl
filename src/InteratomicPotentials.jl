@@ -15,13 +15,13 @@ include("PotentialTypes/types.jl")
 export NeighborList, neighborlist
 
 # Export Potentials
-export EmpiricalPotential, LennardJones, BornMayer, Coulomb, ZBL 
+export EmpiricalPotential, LennardJones, BornMayer, Coulomb, ZBL
 export BasisPotential, BasisParameters
 export SNAP, SNAPParams, get_num_snap_coeffs  # Export SNAP 
 export MixedPotential
 
 # Export energies, forces, virial evaluations 
-export potential_energy, force, virial, virial_stress
+export energy_and_force, potential_energy, force, virial, virial_stress
 export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
 
 # Export Basis set evaluations 

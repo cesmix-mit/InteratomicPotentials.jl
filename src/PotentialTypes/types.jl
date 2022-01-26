@@ -7,13 +7,29 @@
 abstract type ArbitraryPotential end
 abstract type EmpiricalPotential <: ArbitraryPotential end
 abstract type BasisPotential <: ArbitraryPotential end
+abstract type MixedPotential <: ArbitraryPotential end
 
-abstract type MixedPotential <: ArbitraryPotential end # Combined potentials
-############################### Empirical Potentials ################################################
+################################################################################
+# InteratomicPotentials API default generic implmentations
+################################################################################
+include("ArbitraryPotential/arbitrary_potential.jl")
+
+################################################################################
+# Empirical Potentials
+################################################################################
 include("EmpiricalPotentials/empirical_potentials.jl")
 
-################################ BasisPotentials ##############################################################
+################################################################################
+# Basis Potentials
+################################################################################
 include("BasisPotentials/basis_potentials.jl")
 
-################################ MixedPotential ###############################################################
+################################################################################
+# Mixed Potentials
+################################################################################
 include("MixedPotentials/mixed_potentials.jl")
+
+################################################################################
+# GaN
+################################################################################
+# include("GaN/gan.jl")
