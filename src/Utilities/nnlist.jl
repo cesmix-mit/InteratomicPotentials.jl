@@ -7,7 +7,7 @@ struct NeighborList
     R::Vector{Vector{Float64}}
     r::Vector{Vector{SVector{3,Float64}}}
 end
-length(nn::NeighborList) = length(nn.i)
+length(nn::NeighborList) = length(nn.j)
 
 function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     broadcast(L, x, y) do Li, xi, yi
@@ -20,11 +20,9 @@ function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloa
     end
 end
 
-to_array(A::AbstractSystem) = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
-
 function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     # Convert Positions to Matrix for Ball tree
-    X = to_array(A)
+    X = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
 
     # Create Metric for Periodic Boundary Conditions
     periodic = periodicity(A)
@@ -35,27 +33,22 @@ function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     tree = BallTree(X, d)
 
     # Intialize empty vectors
-    j = Vector{Int64}[] # j 
-    R = Vector{Float64}[] # Distances
-    r = Vector{SVector{3,Float64}}[] # Positions
+    j = Vector{Vector{Int64}}(undef, length(X))              # Neighbors
+    R = Vector{Vector{Float64}}(undef, length(X))            # Distances
+    r = Vector{Vector{SVector{3,Float64}}}(undef, length(X)) # Positions
 
     # Fill vectors
-    for n = 1:length(X)
-        neighbors = inrange(tree, X[n], rcutoff, true)
-        jtemp = Int64[]
-        Rtemp = Float64[]
-        rtemp = SVector{3,Float64}[]
-        for neighbor in neighbors
-            if neighbor != n
-                push!(jtemp, neighbor)
-                rr = get_distance(L, X[n], X[neighbor])
-                push!(rtemp, rr)
-                push!(Rtemp, norm(rr))
-            end
+    for n in 1:length(X)
+        neighbors = filter(m -> m > n, inrange(tree, X[n], rcutoff, true))
+        j[n] = zeros(Int64, length(neighbors))
+        R[n] = zeros(Float64, length(neighbors))
+        r[n] = zeros(SVector{3,Float64}, length(neighbors))
+        for (i, m) in enumerate(neighbors)
+            rr = get_distance(L, X[n], X[m])
+            j[n][i] = m
+            R[n][i] = norm(rr)
+            r[n][i] = rr
         end
-        push!(j, jtemp)
-        push!(R, Rtemp)
-        push!(r, rtemp)
     end
     NeighborList(j, R, r)
 end

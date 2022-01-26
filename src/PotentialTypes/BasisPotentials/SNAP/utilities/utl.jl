@@ -45,7 +45,7 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
         
 
     # Convert Positions to Matrix for Ball tree
-    X = to_array(A)
+    X = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
 
     # Create Metric for Periodic Boundary Conditions
     periodic = periodicity(A)
