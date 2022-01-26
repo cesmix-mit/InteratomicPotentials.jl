@@ -6,17 +6,6 @@ struct SNAP <: BasisPotential
     basis_params :: SNAPParams
 end
 
-function energy_and_force(A::AbstractSystem, snap::SNAP)
-    B, dB, _ = evaluate_full(A, snap.basis_params)
-    e = dot(B, p.coefficients)
-    f = fill(zeros(3), length(A))
-    for (i, di) in enumerate(dB)
-        f[i] += di' * p.coefficients
-    end
-    SVector{3}.(f)
-    (; e, f)
-end
-
 function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -38,7 +27,7 @@ function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
         B += runtime_arrays.blist
     end
     return B
-end 
+end
 
 function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -82,7 +71,7 @@ function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return dB
-end 
+end
 
 function evaluate_basis_v(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -142,7 +131,7 @@ function evaluate_basis_v(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return sum(W)
-end 
+end
 
 function evaluate_full(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -204,6 +193,4 @@ function evaluate_full(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return B, dB, W
-end 
-
-
+end
