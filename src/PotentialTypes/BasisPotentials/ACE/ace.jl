@@ -26,7 +26,7 @@ end
 
 struct RPI <: ACEPotential
     coefficients 
-    basis_param :: RPIParams
+    basis_params :: RPIParams
 end
 
 function get_rpi(rpi::RPIParams)
