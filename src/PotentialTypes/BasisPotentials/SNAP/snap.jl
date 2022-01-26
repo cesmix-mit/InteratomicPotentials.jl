@@ -6,7 +6,16 @@ struct SNAP <: BasisPotential
     basis_params :: SNAPParams
 end
 
-
+function energy_and_force(A::AbstractSystem, snap::SNAP)
+    B, dB, _ = evaluate_full(A, snap.basis_params)
+    e = dot(B, p.coefficients)
+    f = fill(zeros(3), length(A))
+    for (i, di) in enumerate(dB)
+        f[i] += di' * p.coefficients
+    end
+    SVector{3}.(f)
+    (; e, f)
+end
 
 function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
     # Produce NeighborList
