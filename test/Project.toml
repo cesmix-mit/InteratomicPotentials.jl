@@ -1,5 +1,7 @@
 [deps]
+ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
+JuLIP = "945c410c-986d-556a-acb1-167a618e0462"
 LAMMPS = "ee2e13b9-eee9-4449-aafa-cfa6a2dbe14d"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

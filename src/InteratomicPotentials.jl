@@ -18,6 +18,7 @@ export NeighborList, neighborlist
 export EmpiricalPotential, LennardJones, BornMayer, Coulomb, ZBL 
 export BasisPotential, BasisParameters
 export SNAP, SNAPParams, get_num_snap_coeffs  # Export SNAP 
+export RPI, RPIParams
 export MixedPotential
 
 # Export energies, forces, virial evaluations 
