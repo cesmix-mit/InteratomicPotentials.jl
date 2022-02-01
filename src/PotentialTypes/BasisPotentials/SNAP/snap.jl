@@ -6,8 +6,6 @@ struct SNAP <: BasisPotential
     basis_params :: SNAPParams
 end
 
-
-
 function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -29,7 +27,7 @@ function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
         B += runtime_arrays.blist
     end
     return B
-end 
+end
 
 function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -73,7 +71,7 @@ function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return dB
-end 
+end
 
 function evaluate_basis_v(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -133,7 +131,7 @@ function evaluate_basis_v(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return sum(W)
-end 
+end
 
 function evaluate_full(A::AbstractSystem, snap::SNAPParams)
     number_of_particles = length(A.particles)
@@ -195,6 +193,4 @@ function evaluate_full(A::AbstractSystem, snap::SNAPParams)
         end
     end
     return B, dB, W
-end 
-
-
+end

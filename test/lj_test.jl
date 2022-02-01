@@ -28,12 +28,13 @@ bcs = [Periodic(), Periodic(), Periodic()]
 system = FlexibleSystem(atoms, box * u"Å", bcs)
 n = length(system)
 nnlist = neighborlist(system, rcutoff)
-println(nnlist)
 @test isa(nnlist, NeighborList)
 
-true_r = [ [ SVector{3}([0.25, 0.0, 0.0]), SVector{3}([-.40, 0.0, 0.0]) ], 
-            [ SVector{3}([-0.25, 0.0, 0.0]), SVector{3}([0.35, 0.0, 0.0]) ],
-            [ SVector{3}([0.4, 0.0, 0.0]), SVector{3}([-0.35, 0.0, 0.0]) ] ]
+true_r = [
+    [SVector{3}([0.25, 0.0, 0.0]), SVector{3}([-0.40, 0.0, 0.0])],
+    [SVector{3}([0.35, 0.0, 0.0])],
+    []
+]
 nnlist_r = nnlist.r
 
 for (ri, ri_true) in zip(nnlist_r, true_r)
