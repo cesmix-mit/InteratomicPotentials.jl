@@ -1,5 +1,7 @@
 # ####################### Parameters #############################################
-# import Base.NamedTuple as Parameter
+import Base.NamedTuple as Parameter
+export Parameter
+
 # import Base.+
 # function +(p::Parameter, q::Parameter)
 #     names_p = keys(p)

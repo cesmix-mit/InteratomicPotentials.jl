@@ -13,23 +13,23 @@ abstract type MixedPotential <: ArbitraryPotential end
 # InteratomicPotentials API default generic implmentations
 ################################################################################
 include("ArbitraryPotential/arbitrary_potential.jl")
+export ArbitraryPotential
 
 ################################################################################
 # Empirical Potentials
 ################################################################################
 include("EmpiricalPotentials/empirical_potentials.jl")
+export EmpiricalPotential
 
 ################################################################################
 # Basis Potentials
 ################################################################################
 include("BasisPotentials/basis_potentials.jl")
+export BasisPotential, BasisParameters
 
 ################################################################################
 # Mixed Potentials
 ################################################################################
 include("MixedPotentials/mixed_potentials.jl")
+export MixedPotential
 
-################################################################################
-# GaN
-################################################################################
-# include("GaN/gan.jl")

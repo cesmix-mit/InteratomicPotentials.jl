@@ -26,7 +26,7 @@ end
 function neighborlist(A::AbstractSystem, snap::SNAPParams)
 
     # Construct cutoff
-    num_elements = length(snap.elements) 
+    num_elements = length(snap.species) 
     cutsq = zeros(num_elements, num_elements)
     cutmax = 0.0
     for i = 1:num_elements

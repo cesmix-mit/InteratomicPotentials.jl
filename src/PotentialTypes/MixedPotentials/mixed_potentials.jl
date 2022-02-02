@@ -17,7 +17,9 @@ Base.:*(a::Real, mp::LinearCombinationPotential) = LinearCombinationPotential(mp
 
 apply_linear_combination(f::Function, sys::AbstractSystem, mp::LinearCombinationPotential) = sum(c * f(sys, p) for (p, c) in zip(mp.potentials, mp.coefficients))
 
+energy_and_force(sys::AbstractSystem, mp::LinearCombinationPotential) = apply_linear_combination(energy_and_force, sys, mp)
 potential_energy(sys::AbstractSystem, mp::LinearCombinationPotential) = apply_linear_combination(potential_energy, sys, mp)
 force(sys::AbstractSystem, mp::LinearCombinationPotential) = apply_linear_combination(force, sys, mp)
 virial(sys::AbstractSystem, mp::LinearCombinationPotential) = apply_linear_combination(virial, sys, mp)
 virial_stress(sys::AbstractSystem, mp::LinearCombinationPotential) = apply_linear_combination(virial_stress, sys, mp)
+

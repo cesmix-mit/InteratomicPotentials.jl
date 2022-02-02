@@ -11,7 +11,7 @@ atom1 = Atom(element, position * u"Å")
 ϵ = 1.0
 σ = 0.25
 rcutoff = 2.0
-lj = LennardJones(ϵ, σ, rcutoff)
+lj = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
 
 @test isa(atom1, Atom)
 @test isa(lj, EmpiricalPotential)
@@ -19,7 +19,7 @@ lj = LennardJones(ϵ, σ, rcutoff)
 atom2 = Atom(element, 0.25 * position * u"Å")
 atom3 = Atom(element, 0.5 * position * u"Å")
 atom4 = Atom(element, 0.75 * position * u"Å")
-atom5 = Atom(element, 1.1 * position * u"Å")
+atom5 = Atom(:H, 1.1 * position * u"Å")
 atom6 = Atom(element, 2.0 * position * u"Å")
 # atoms = [atom1, atom2, atom3, atom4, atom5, atom6]
 atoms = [atom3, atom4, atom5]
@@ -50,7 +50,7 @@ end
 @test isa(virial_stress(system, lj), SVector{6,<:AbstractFloat})
 
 
-lj2 = LennardJones(2*ϵ, 2*σ, rcutoff)
+lj2 = LennardJones(2*ϵ, 2*σ, rcutoff, [:Ar, :H])
 
 sum_lj = lj+lj2
 mixed_potentials = [lj+lj2, lj-lj2, 2.0*lj, -2.0*lj, 2.0*lj - 1.0*lj2, lj2 / 2.0]
