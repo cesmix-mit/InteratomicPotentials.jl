@@ -1,7 +1,6 @@
 module InteratomicPotentials
 
 using StaticArrays
-using LAMMPS
 using LinearAlgebra
 using AtomsBase
 using Unitful

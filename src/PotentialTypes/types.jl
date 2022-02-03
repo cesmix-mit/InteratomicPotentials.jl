@@ -6,7 +6,6 @@
 
 abstract type ArbitraryPotential end
 abstract type EmpiricalPotential <: ArbitraryPotential end
-abstract type BasisPotential <: ArbitraryPotential end
 abstract type MixedPotential <: ArbitraryPotential end
 
 ################################################################################
@@ -20,12 +19,6 @@ export ArbitraryPotential
 ################################################################################
 include("EmpiricalPotentials/empirical_potentials.jl")
 export EmpiricalPotential
-
-################################################################################
-# Basis Potentials
-################################################################################
-include("BasisPotentials/basis_potentials.jl")
-export BasisPotential, BasisParameters
 
 ################################################################################
 # Mixed Potentials
