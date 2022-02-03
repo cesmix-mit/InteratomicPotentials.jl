@@ -1,13 +1,22 @@
 ############################## Lennard Jones ###################################
 struct LennardJones <: EmpiricalPotential
-    ϵ::AbstractFloat
-    σ::AbstractFloat
-    rcutoff::AbstractFloat
+    ϵ
+    σ
+    rcutoff
+    species :: AbstractVector
 end
 
-get_trainable_params(lj::LennardJones) = Parameter{:ϵ,:σ}((lj.ϵ, lj.σ))
+get_parameters(lj::LennardJones) = Parameter{ (:ϵ,:σ) }((lj.ϵ, lj.σ))
+set_parameters(p::Parameter{(:ϵ, :σ)}, lj::LennardJones) = LennardJones(p.ϵ, p.σ, lj.rcutoff, lj.species)
 
-get_nontrainable_params(lj::LennardJones) = Parameter{:rcutoff}((lj.rcutoff,))
+deserialize_parameters(p::Parameter{(:ϵ, :σ)}, lj::LennardJones) = [p.ϵ, p.σ]
+serialize_parameters(p::Vector, lj::LennardJones) = Parameter{(:ϵ, :σ)}( (p[1], p[2]) )
+
+get_hyperparameters(lj::LennardJones) = Parameter{(:rcutoff,)}( (lj.rcutoff,) )
+set_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = LennardJones(lj.ϵ, lj.σ, p.rcutoff, lj.species)
+
+deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = [p.rcutoff]
+serialize_hyperparameters(p::Vector, lj::LennardJones) = Parameter{(:rcutoff, )}( (p[1],) )
 
 ############################# Energies ##########################################
 

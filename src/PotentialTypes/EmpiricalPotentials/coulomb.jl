@@ -1,14 +1,23 @@
 ##############################   Coulomb  ###################################
 mutable struct Coulomb <: EmpiricalPotential
-    q_1::AbstractFloat
-    q_2::AbstractFloat
-    ϵ0::AbstractFloat
-    rcutoff::AbstractFloat
+    q_1
+    q_2
+    ϵ0
+    rcutoff
+    species :: AbstractVector
 end
 
-get_trainable_params(c::Coulomb) = Parameter{}(())
+get_parameters(c::Coulomb) = Parameter{}(())
+set_parameters(p::Parameter{}, c::Coulomb) = c
 
-get_nontrainable_params(c::Coulomb) = Parameter{:q1, :q2, :ϵ0, :rcutoff}((c.q_1, c.q_2, c.ϵ0, c.rcutoff))
+deserialize_parameters(p::Parameter{()}, c::Coulomb) = []
+serialize_parameters(p::Vector, c::Coulomb) = Parameter{()}( () )
+
+get_hyperparameters(c::Coulomb) = Parameter{:rcutoff}((c.rcutoff, ))
+set_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = Coulomb(c.q_1, c.q_2, c.ϵ0, p.rcutoff, c.species)
+
+deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = [p.rcutoff]
+serialize_hyperparameters(p::Vector, c::Coulomb) = Parameter{(:rcutoff, )}( (p[1],) )
 
 # ############################# Energies ##########################################
 
