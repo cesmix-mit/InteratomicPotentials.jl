@@ -83,4 +83,9 @@ for (result_lj, te, tf, tv) in zip(mixed_potentials, true_energies, true_forces,
     @test isapprox(force(system, result_lj), tf, rtol = 1e-6)
     @test isa(virial(system, result_lj), AbstractFloat)
     @test isapprox(virial(system, result_lj), tv, rtol = 1e-6)
+
+    e_f = energy_and_force(system, result_lj)
+    @test isapprox(e_f.e, te, rtol = 1e-6)
+    @test isapprox(e_f.f, tf, rtol = 1e-6)
 end
+
