@@ -79,7 +79,7 @@ end
 
 function evaluate_full(A::AbstractSystem, rpi::RPIParams)
     B = hcat([site_energy(get_rpi(rpi), convert_system_to_atoms(A), i) for i = 1:length(A)]...)'
-    dB = reshape(hcat(evaluate_basis_d(A, rpi)...), 9, 8)
+    dB = reshape(hcat(evaluate_basis_d(A, rpi)...), :, length(rpi))
     W = evaluate_basis_v(A, rpi)
     return B, dB, W
 end
