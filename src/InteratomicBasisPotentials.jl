@@ -15,7 +15,7 @@ include("SNAP/snap.jl")
 export SNAP, SNAPParams, get_num_snap_coeffs  # Export SNAP
 
 include("ACE/ace.jl")
-export RPI, RPIParams # ACE
+export RPI, RPIParams, get_rpi # ACE
 
 # Export Basis set evaluations 
 export evaluate_basis, evaluate_basis_d, evaluate_basis_v, evaluate_full

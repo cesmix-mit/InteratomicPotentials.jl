@@ -3,6 +3,7 @@ using StaticArrays
 using Unitful
 using UnitfulAtomic
 using InteratomicPotentials
+using InteratomicBasisPotentials
 using ACE1
 # # Atom from AtomsBase
 # struct Atom{D, L<:Unitful.Length, V<:Unitful.Velocity, M<:Unitful.Mass}
@@ -47,4 +48,16 @@ e = evaluate_basis(system, rpi_params)
 @test isa(e, AbstractVector)
 f = evaluate_basis_d(system, rpi_params)
 @test isa(e, AbstractVector)
+
+v = evaluate_basis_v(system, rpi_params)
+@test isa(e, AbstractVector)
+
+B, dB, W = evaluate_full(system, rpi_params)
+
+basis = get_rpi(rpi_params)
+c = ones(length(basis))
+IP = JuLIP.MLIPs.combine(basis, c)
+ACE1.Export.export_ace("test.ace", IP)
+
+
 

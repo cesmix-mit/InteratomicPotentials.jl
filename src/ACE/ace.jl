@@ -1,4 +1,4 @@
-using JuLIP: Atoms, JVec, JMat
+using JuLIP: Atoms, JVec, JMat, site_energy, Ref
 using JuLIP.Chemistry: AtomicNumber
 import ACE1
 abstract type ACEPotential <: BasisPotential end 
@@ -50,5 +50,36 @@ function evaluate_basis(A::AbstractSystem, rpi::RPIParams)
 end
 
 function evaluate_basis_d(A::AbstractSystem, rpi::RPIParams)
-    ACE1.forces(get_rpi(rpi), convert_system_to_atoms(A))
+    ftemp = ACE1.forces(get_rpi(rpi), convert_system_to_atoms(A))
+    f = [zeros(3, length(rpi)) for i = 1:length(A)]
+
+    for i = 1:length(A)
+        for j = 1:3 
+            for k = 1:length(rpi)
+                f[i][j, k] = ftemp[k][i][j]
+            end
+        end
+    end
+    f
+end
+
+function evaluate_basis_v(A::AbstractSystem, rpi::RPIParams)
+    Wtemp = ACE1.virial(get_rpi(rpi), convert_system_to_atoms(A))
+    W = zeros(6, length(rpi))
+
+    for k = 1:length(rpi)
+        count = 1
+        for (i, j) in zip( [1, 2, 3, 3, 3, 2], [1, 2, 3, 2, 1, 1])
+            W[count, k] = Wtemp[k][i, j]
+            count +=1
+        end
+    end
+    W
+end
+
+function evaluate_full(A::AbstractSystem, rpi::RPIParams)
+    B = hcat([site_energy(get_rpi(rpi), convert_system_to_atoms(A), i) for i = 1:length(A)]...)'
+    dB = reshape(hcat(evaluate_basis_d(A, rpi)...), 9, 8)
+    W = evaluate_basis_v(A, rpi)
+    return B, dB, W
 end
