@@ -8,7 +8,7 @@ include("coulomb.jl")
 include("zbl.jl")
 include("morse.jl")
 
-export  LennardJones, BornMayer, Coulomb, ZBL
+export LennardJones, BornMayer, Coulomb, ZBL
 export get_parameters, get_hyperparameters, serialize_parameters, serialize_hyperparameters
 
 ################################################################################
@@ -22,7 +22,7 @@ function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
     f = fill(SVector{3}(zeros(3)), length(A))
     for ii in 1:length(A)
         for (jj, r, R) in zip(nnlist.j[ii], nnlist.r[ii], nnlist.R[ii])
-            species = unique([ atomic_symbol(A[ii]), atomic_symbol(A[jj]) ])
+            species = unique([atomic_symbol(A, ii), atomic_symbol(A, jj)])
             if (intersect(species, p.species) == species)
                 e += potential_energy(R, p)
                 fo = force(R, r, p)
