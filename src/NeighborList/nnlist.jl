@@ -38,7 +38,7 @@ function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     j = Vector{Vector{Int64}}(undef, length(X))              # Neighbors
     R = Vector{Vector{Float64}}(undef, length(X))            # Distances
     r = Vector{Vector{SVector{3,Float64}}}(undef, length(X)) # Positions
-    
+
     # Fill vectors
     for n in 1:length(X)
         neighbors = filter(m -> m > n, inrange(tree, X[n], rcutoff, true))

@@ -3,20 +3,20 @@ struct LennardJones <: EmpiricalPotential
     ϵ
     σ
     rcutoff
-    species :: AbstractVector
+    species::AbstractVector
 end
 
-get_parameters(lj::LennardJones) = Parameter{ (:ϵ,:σ) }((lj.ϵ, lj.σ))
+get_parameters(lj::LennardJones) = Parameter{(:ϵ, :σ)}((lj.ϵ, lj.σ))
 set_parameters(p::Parameter{(:ϵ, :σ)}, lj::LennardJones) = LennardJones(p.ϵ, p.σ, lj.rcutoff, lj.species)
 
 deserialize_parameters(p::Parameter{(:ϵ, :σ)}, lj::LennardJones) = [p.ϵ, p.σ]
-serialize_parameters(p::Vector, lj::LennardJones) = Parameter{(:ϵ, :σ)}( (p[1], p[2]) )
+serialize_parameters(p::Vector, lj::LennardJones) = Parameter{(:ϵ, :σ)}((p[1], p[2]))
 
-get_hyperparameters(lj::LennardJones) = Parameter{(:rcutoff,)}( (lj.rcutoff,) )
+get_hyperparameters(lj::LennardJones) = Parameter{(:rcutoff,)}((lj.rcutoff,))
 set_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = LennardJones(lj.ϵ, lj.σ, p.rcutoff, lj.species)
 
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = [p.rcutoff]
-serialize_hyperparameters(p::Vector, lj::LennardJones) = Parameter{(:rcutoff, )}( (p[1],) )
+serialize_hyperparameters(p::Vector, lj::LennardJones) = Parameter{(:rcutoff,)}((p[1],))
 
 ############################# Energies ##########################################
 
@@ -34,7 +34,8 @@ end
 ############################## Gradients ########################################
 function grad_potential_energy(r::SVector{3,<:AbstractFloat}, p::LennardJones)
     d = p.σ / norm(r)
-    (dpdϵ = 4.0 * (d^12 - d^6), dpdσ = 24.0 * p.ϵ / p.σ * (2 * d^12 - d^6))
+    (dpdϵ = 4.0 * (d^12 - d^6),
+        dpdσ = 24.0 * p.ϵ / p.σ * (2 * d^12 - d^6))
 end
 
 function grad_force(r::SVector{3,<:Real}, p::LennardJones)
