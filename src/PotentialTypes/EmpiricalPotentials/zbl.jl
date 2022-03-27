@@ -34,7 +34,7 @@ end
 
 ############################### Forces ##########################################
 
-function force(R::AbstractFloat, r::SVector{3,<:AbstractFloat}, zbl::ZBL)
+function force(R::AbstractFloat, r::SVector{3}, zbl::ZBL)
     a = 0.8854 * 0.529 / (Z_1^(0.23) + Z_2^(0.23))
     d = R / a
     f = zbl.Z_1 * zbl.Z_2 * e^2 * phi(d) / (4.0 * π * zbl.ϵ0 * R^2)
@@ -42,6 +42,6 @@ function force(R::AbstractFloat, r::SVector{3,<:AbstractFloat}, zbl::ZBL)
     SVector(f .* r / R)
 end
 
-# ##############################   Gradients  ###################################
+###############################   Gradients  ###################################
 
 # TODO
