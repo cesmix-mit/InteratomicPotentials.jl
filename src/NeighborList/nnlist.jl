@@ -11,7 +11,8 @@ struct NeighborList
 end
 Base.length(nn::NeighborList) = length(nn.j)
 
-function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
+# calculates displacement vector x - y with respect to the boundary conditions L
+function get_displacement(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     broadcast(L, x, y) do Li, xi, yi
         if Li == Inf
             xi - yi
@@ -46,7 +47,7 @@ function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
         R[n] = zeros(Float64, length(neighbors))
         r[n] = zeros(SVector{3,Float64}, length(neighbors))
         for (i, m) in enumerate(neighbors)
-            rr = get_distance(L, X[n], X[m])
+            rr = get_displacement(L, X[n], X[m])
             j[n][i] = m
             R[n][i] = norm(rr)
             r[n][i] = rr
