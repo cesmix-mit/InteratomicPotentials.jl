@@ -34,17 +34,16 @@ function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
     (; e, f)
 end
 
-force(r::SVector{3,<:AbstractFloat}, p::EmpiricalPotential) = force(norm(r), r, p)
+force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
 
 function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
     nnlist = neighborlist(A, p.rcutoff)
 
-    v = SVector{6}(zeros(6))
+    v = @SVector zeros(6)
     for ii in 1:length(A)
         for (r, R) in zip(nnlist.r[ii], nnlist.R[ii])
-            fo = force(R, r, p)
-            vi = r * fo'
-            v = v + [vi[1, 1], vi[2, 2], vi[3, 3], vi[3, 2], vi[3, 1], vi[2, 1]]
+            vi = r * force(R, r, p)'
+            v += (@SVector [vi[1, 1], vi[2, 2], vi[3, 3], vi[3, 2], vi[3, 1], vi[2, 1]])
         end
     end
     v
