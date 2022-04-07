@@ -8,8 +8,7 @@ include("coulomb.jl")
 include("zbl.jl")
 include("morse.jl")
 
-export LennardJones, BornMayer, Coulomb, ZBL
-export get_parameters, get_hyperparameters, serialize_parameters, serialize_hyperparameters
+export LennardJones, BornMayer, Coulomb, ZBL, Morse
 
 ################################################################################
 # InteratomicPotentials API implmentations for emperical potentials

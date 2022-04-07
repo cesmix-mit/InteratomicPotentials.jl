@@ -1,7 +1,3 @@
-using Distances
-using NearestNeighbors
-using StaticArrays
-
 export NeighborList, neighborlist
 
 struct NeighborList
