@@ -35,17 +35,17 @@ end
 
 function grad_potential_energy(r::SVector{3}, bm::BornMayer)
     d = norm(r)
-    (dpdA = exp(-d / bm.ρ),
-        dpdρ = bm.A * d * exp(-d / bm.ρ) / bm.ρ^2)
+    (dpdA=exp(-d / bm.ρ),
+        dpdρ=bm.A * d * exp(-d / bm.ρ) / bm.ρ^2)
 end
 
 function grad_force(r::SVector{3}, bm::BornMayer)
     d = norm(r)
-    (dfdA = 1.0 / bm.ρ * exp(-d / bm.ρ) .* r ./ d,
-        dfdρ = bm.A / bm.ρ^3 * exp(-d / bm.ρ) * (d - bm.ρ) .* r ./ d)
+    (dfdA=1.0 / bm.ρ * exp(-d / bm.ρ) .* r ./ d,
+        dfdρ=bm.A / bm.ρ^3 * exp(-d / bm.ρ) * (d - bm.ρ) .* r ./ d)
 end
 
 function grad_virial(r::SVector{3}, bm::BornMayer)
     dfdA, dfdρ = grad_force(r, bm)
-    (dvdA = dfdA ⋅ r, dvdρ = dfdρ ⋅ r)
+    (dvdA=dfdA ⋅ r, dvdρ=dfdρ ⋅ r)
 end
