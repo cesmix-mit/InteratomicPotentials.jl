@@ -33,6 +33,6 @@ end
 
 # ##############################   Gradients  ###################################
 
-grad_potential_energy(r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
-grad_force(r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
+grad_potential_energy(R::AbstractFloat, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
+grad_force(R::AbstractFloat, r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
 grad_virial(r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")

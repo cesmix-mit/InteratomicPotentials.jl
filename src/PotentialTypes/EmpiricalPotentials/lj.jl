@@ -37,14 +37,13 @@ end
 
 ############################## Gradients ########################################
 
-function grad_potential_energy(r::SVector{3}, p::LennardJones)
-    d⁶ = (p.σ / norm(r))^6
+function grad_potential_energy(R::AbstractFloat, p::LennardJones)
+    d⁶ = (p.σ / R)^6
     (dpdϵ=4(d⁶^2 - d⁶),
         dpdσ=24p.ϵ * (2d⁶^2 - d⁶) / p.σ)
 end
 
-function grad_force(r::SVector{3}, p::LennardJones)
-    R = norm(r)
+function grad_force(R::AbstractFloat, r::SVector{3}, p::LennardJones)
     d⁶ = (p.σ / R)^6
     (dfdϵ=(24(2d⁶^2 - d⁶) / R^2)r,
         dfdσ=(144p.ϵ * (4d⁶^2 - d⁶) / (p.σ * R^2))r)

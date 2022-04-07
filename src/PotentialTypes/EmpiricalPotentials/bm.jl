@@ -33,14 +33,12 @@ end
 
 # ##############################   Gradients  ###################################
 
-function grad_potential_energy(r::SVector{3}, bm::BornMayer)
-    R = norm(r)
+function grad_potential_energy(R::AbstractFloat, bm::BornMayer)
     (dpdA=exp(-R / bm.ρ),
         dpdρ=bm.A * R * exp(-R / bm.ρ) / bm.ρ^2)
 end
 
-function grad_force(r::SVector{3}, bm::BornMayer)
-    R = norm(r)
+function grad_force(R::AbstractFloat, r::SVector{3}, bm::BornMayer)
     (dfdA=(bm.ρ * exp(-R / bm.ρ) / (bm.ρ * R))r,
         dfdρ=(bm.A * (R - bm.ρ) * exp(-R / bm.ρ) / (bm.ρ^3 * R))r)
 end

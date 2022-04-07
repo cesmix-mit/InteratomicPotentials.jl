@@ -34,8 +34,6 @@ function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
     (; e=e * u"hartree", f=f * u"hartree / bohr")
 end
 
-force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
-
 function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
     nnlist = neighborlist(A, p.rcutoff)
 
@@ -48,3 +46,6 @@ function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
     end
     v * u"hartree"
 end
+
+force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
+grad_force(r::SVector{3}, p::EmpiricalPotential) = grad_force(norm(r), r, p)
