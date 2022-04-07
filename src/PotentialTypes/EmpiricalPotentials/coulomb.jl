@@ -1,5 +1,5 @@
 ##############################   Coulomb  ###################################
-mutable struct Coulomb <: EmpiricalPotential
+struct Coulomb <: EmpiricalPotential
     q_1
     q_2
     ϵ0
@@ -22,13 +22,13 @@ serialize_hyperparameters(p::Vector, c::Coulomb) = Parameter{(:rcutoff,)}((p[1],
 # ############################# Energies ##########################################
 
 function potential_energy(R::AbstractFloat, c::Coulomb)
-    c.q_1 * c.q_2 / (4.0 * π * c.ϵ0 * R)
+    c.q_1 * c.q_2 / (4π * c.ϵ0 * R)
 end
 
 # ############################### Forces ##########################################
 
 function force(R::AbstractFloat, r::SVector{3}, c::Coulomb)
-    SVector(c.q_1 * c.q_2 / (4.0 * π * c.ϵ0 * R^2) .* r ./ R)
+    (c.q_1 * c.q_2 / (4π * c.ϵ0 * R^3))r
 end
 
 # ##############################   Gradients  ###################################

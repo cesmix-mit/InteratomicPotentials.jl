@@ -22,11 +22,16 @@ serialize_hyperparameters(p::Vector, m::Morse) = Parameter{(:rcutoff,)}((p[1],))
 ############################# Energies ##########################################
 
 function potential_energy(R::AbstractFloat, p::Morse)
-    p.D * (1.0 - exp(-p.α * (R - p.σ)))^2
+    p.D * (1 - exp(-p.α * (R - p.σ)))^2
 end
 
 ############################### Forces ##########################################
 
 function force(R::AbstractFloat, r::SVector{3}, p::Morse)
-    SVector(2 * p.D * p.α * (1.0 - exp(-p.α * (R - p.σ))) * exp(-p.α * (R - p.σ)) .* r ./ R)
+    e = exp(-p.α * (R - p.σ))
+    (2 * p.D * p.α * (1 - e) * e / R)r
 end
+
+###############################   Gradients  ###################################
+
+# TODO

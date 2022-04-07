@@ -28,21 +28,21 @@ end
 # ##############################   Force   ###################################
 
 function force(R::AbstractFloat, r::SVector{3}, bm::BornMayer)
-    SVector(bm.A / bm.ρ * exp(-R / bm.ρ) .* r ./ R)
+    (bm.A * exp(-R / bm.ρ) / (bm.ρ * R))r
 end
 
 # ##############################   Gradients  ###################################
 
 function grad_potential_energy(r::SVector{3}, bm::BornMayer)
-    d = norm(r)
-    (dpdA=exp(-d / bm.ρ),
-        dpdρ=bm.A * d * exp(-d / bm.ρ) / bm.ρ^2)
+    R = norm(r)
+    (dpdA=exp(-R / bm.ρ),
+        dpdρ=bm.A * R * exp(-R / bm.ρ) / bm.ρ^2)
 end
 
 function grad_force(r::SVector{3}, bm::BornMayer)
-    d = norm(r)
-    (dfdA=1.0 / bm.ρ * exp(-d / bm.ρ) .* r ./ d,
-        dfdρ=bm.A / bm.ρ^3 * exp(-d / bm.ρ) * (d - bm.ρ) .* r ./ d)
+    R = norm(r)
+    (dfdA=(bm.ρ * exp(-R / bm.ρ) / (bm.ρ * R))r,
+        dfdρ=(bm.A * (R - bm.ρ) * exp(-R / bm.ρ) / (bm.ρ^3 * R))r)
 end
 
 function grad_virial(r::SVector{3}, bm::BornMayer)

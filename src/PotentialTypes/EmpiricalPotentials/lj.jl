@@ -24,27 +24,30 @@ serialize_hyperparameters(p::Vector, lj::LennardJones) = Parameter{(:rcutoff,)}(
 ############################# Energies ##########################################
 
 function potential_energy(R::AbstractFloat, p::LennardJones)
-    d = p.σ / R
-    4.0 * p.ϵ * (d^12 - d^6)
+    d⁶ = (p.σ / R)^6
+    4p.ϵ * (d⁶^2 - d⁶)
 end
 
 ############################### Forces ##########################################
 
 function force(R::AbstractFloat, r::SVector{3}, p::LennardJones)
-    SVector(24.0 * p.ϵ * (2.0 * (p.σ / R)^12 - (p.σ / R)^6) .* r ./ R ./ R)
+    d⁶ = (p.σ / R)^6
+    (24p.ϵ * (2d⁶^2 - d⁶) / R^2)r
 end
 
 ############################## Gradients ########################################
+
 function grad_potential_energy(r::SVector{3}, p::LennardJones)
-    d = p.σ / norm(r)
-    (dpdϵ=4.0 * (d^12 - d^6),
-        dpdσ=24.0 * p.ϵ / p.σ * (2 * d^12 - d^6))
+    d⁶ = (p.σ / norm(r))^6
+    (dpdϵ=4(d⁶^2 - d⁶),
+        dpdσ=24p.ϵ * (2d⁶^2 - d⁶) / p.σ)
 end
 
 function grad_force(r::SVector{3}, p::LennardJones)
-    d = norm(r)
-    (dfdϵ=48.0 * ((p.σ / d)^13 - 0.5 * (p.σ / d)^7) .* r ./ d,
-        dfdσ=144.0 * p.ϵ / p.σ * (4.0 * p.σ^12 / d^13 - p.σ^6 / d^7) .* r ./ d)
+    R = norm(r)
+    d⁶ = (p.σ / R)^6
+    (dfdϵ=(24(2d⁶^2 - d⁶) / R^2)r,
+        dfdσ=(144p.ϵ * (4d⁶^2 - d⁶) / (p.σ * R^2))r)
 end
 
 function grad_virial(r::SVector{3}, p::LennardJones)
