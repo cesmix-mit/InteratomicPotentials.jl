@@ -6,6 +6,9 @@ struct Morse <: EmpiricalPotential
     rcutoff
     species::AbstractVector
 end
+function Morse(D::Unitful.Energy, α::Real, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+    Morse(austrip(D), α, austrip(σ), austrip(rcutoff), species)
+end
 
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))
 set_parameters(p::Parameter{(:D, :α, :σ)}, m::Morse) = Morse(p.D, p.α, p.σ, m.rcutoff, m.species)

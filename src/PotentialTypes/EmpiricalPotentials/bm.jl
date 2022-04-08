@@ -5,6 +5,9 @@ struct BornMayer <: EmpiricalPotential
     rcutoff
     species::AbstractVector
 end
+function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+    BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), species)
+end
 
 get_parameters(bm::BornMayer) = Parameter{(:A, :ρ)}((bm.A, bm.ρ))
 set_parameters(p::Parameter{(:A, :ρ)}, bm::BornMayer) = BornMayer(p.A, p.ρ, bm.rcutoff, bm.species)

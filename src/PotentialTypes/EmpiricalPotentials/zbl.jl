@@ -5,9 +5,11 @@ struct ZBL <: EmpiricalPotential
     Z_1
     Z_2
     e
-    ϵ0
     rcutoff
     species::AbstractVector
+end
+function Morse(Z_1::Integer, Z_2::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector)
+    Morse(Z_1, Z_2, austrip(e), austrip(rcutoff), species)
 end
 
 get_parameters(zbl::ZBL) = Parameter{}(())
@@ -28,14 +30,14 @@ dϕdr(d::AbstractFloat) = -3.19980 * 0.18175 * e^(-3.19980 * d) - 0.94229 * 0.50
 
 function potential_energy(R::AbstractFloat, zbl::ZBL)
     d = R / (0.8854 * 0.529 / (zbl.Z_1^(0.23) + zbl.Z_2^(0.23)))
-    zbl.Z_1 * zbl.Z_2 * e^2 * ϕ(d) / (4π * zbl.ϵ0 * R)
+    kₑ * zbl.Z_1 * zbl.Z_2 * zbl.e^2 * ϕ(d) / R
 end
 
 ############################### Forces ##########################################
 
 function force(R::AbstractFloat, r::SVector{3}, zbl::ZBL)
     d = R / (0.8854 * 0.529 / (zbl.Z_1^(0.23) + zbl.Z_2^(0.23)))
-    (zbl.Z_1 * zbl.Z_2 * e^2 * (ϕ(d) + d * dϕdr(d)) / (4π * zbl.ϵ0 * R^3))r
+    (kₑ * zbl.Z_1 * zbl.Z_2 * zbl.e^2 * (ϕ(d) + d * dϕdr(d)) / R^3)r
 end
 
 ###############################   Gradients  ###################################
