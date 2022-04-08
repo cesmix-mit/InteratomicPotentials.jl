@@ -16,7 +16,6 @@ include("PotentialTypes/types.jl")
 
 # Export energies, forces, virial evaluations 
 export energy_and_force, potential_energy, force, virial, virial_stress
-export grad_potential_energy, grad_force, grad_virial, grad_virial_stress
 
 export get_parameters, set_parameters, serialize_parameters, deserialize_parameters
 export get_hyperparameters, set_hyperparameters, serialize_hyperparameters, deserialize_hyperparameters

@@ -8,8 +8,8 @@ struct ZBL <: EmpiricalPotential
     rcutoff
     species::AbstractVector
 end
-function Morse(Z_1::Integer, Z_2::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector)
-    Morse(Z_1, Z_2, austrip(e), austrip(rcutoff), species)
+function ZBL(Z_1::Integer, Z_2::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector)
+    ZBL(Z_1, Z_2, austrip(e), austrip(rcutoff), species)
 end
 
 get_parameters(zbl::ZBL) = Parameter{}(())
@@ -39,7 +39,3 @@ function force(R::AbstractFloat, r::SVector{3}, zbl::ZBL)
     d = R / (0.8854 * 0.529 / (zbl.Z_1^(0.23) + zbl.Z_2^(0.23)))
     (kₑ * zbl.Z_1 * zbl.Z_2 * zbl.e^2 * (ϕ(d) + d * dϕdr(d)) / R^3)r
 end
-
-###############################   Gradients  ###################################
-
-# TODO

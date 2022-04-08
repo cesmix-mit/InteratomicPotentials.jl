@@ -32,9 +32,3 @@ end
 function force(R::AbstractFloat, r::SVector{3}, c::Coulomb)
     (kₑ * c.q_1 * c.q_2 / R^3)r
 end
-
-# ##############################   Gradients  ###################################
-
-grad_potential_energy(R::AbstractFloat, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
-grad_force(R::AbstractFloat, r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")
-grad_virial(r::SVector{3}, p::Coulomb) = error("The Coulomb potential has no trainable parameters")

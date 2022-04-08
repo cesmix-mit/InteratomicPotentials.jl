@@ -34,7 +34,3 @@ function force(R::AbstractFloat, r::SVector{3}, p::Morse)
     e = exp(-p.α * (R - p.σ))
     (2 * p.D * p.α * (1 - e) * e / R)r
 end
-
-###############################   Gradients  ###################################
-
-# TODO
