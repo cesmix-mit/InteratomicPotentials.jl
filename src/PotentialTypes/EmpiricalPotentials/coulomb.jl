@@ -21,14 +21,5 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = Coulomb(c.q_1, c.q_
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, c::Coulomb) = Parameter{(:rcutoff,)}((p[1],))
 
-# ############################# Energies ##########################################
-
-function potential_energy(R::AbstractFloat, c::Coulomb)
-    kₑ * c.q_1 * c.q_2 / R
-end
-
-# ############################### Forces ##########################################
-
-function force(R::AbstractFloat, r::SVector{3}, c::Coulomb)
-    (kₑ * c.q_1 * c.q_2 / R^3)r
-end
+potential_energy(R::AbstractFloat, c::Coulomb) = kₑ * c.q_1 * c.q_2 / R
+force(R::AbstractFloat, r::SVector{3}, c::Coulomb) = (kₑ * c.q_1 * c.q_2 / R^3)r

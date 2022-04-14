@@ -21,14 +21,5 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, bm::BornMayer) = BornMayer(bm.A, 
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, bm::BornMayer) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, bm::BornMayer) = Parameter{(:rcutoff,)}((p[1],))
 
-# ##############################   Energy  ###################################
-
-function potential_energy(R::AbstractFloat, bm::BornMayer)
-    bm.A * exp(-R / bm.ρ)
-end
-
-# ##############################   Force   ###################################
-
-function force(R::AbstractFloat, r::SVector{3}, bm::BornMayer)
-    (bm.A * exp(-R / bm.ρ) / (bm.ρ * R))r
-end
+potential_energy(R::AbstractFloat, bm::BornMayer) = bm.A * exp(-R / bm.ρ)
+force(R::AbstractFloat, r::SVector{3}, bm::BornMayer) = (bm.A * exp(-R / bm.ρ) / (bm.ρ * R))r

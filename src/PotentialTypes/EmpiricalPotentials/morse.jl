@@ -1,4 +1,4 @@
-############################## Lennard Jones ###################################
+############################## Morse ###################################
 struct Morse <: EmpiricalPotential
     D
     α
@@ -22,15 +22,7 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = Morse(m.D, m.α, m.σ
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, m::Morse) = Parameter{(:rcutoff,)}((p[1],))
 
-############################# Energies ##########################################
+_morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
 
-function potential_energy(R::AbstractFloat, p::Morse)
-    p.D * (1 - exp(-p.α * (R - p.σ)))^2
-end
-
-############################### Forces ##########################################
-
-function force(R::AbstractFloat, r::SVector{3}, p::Morse)
-    e = exp(-p.α * (R - p.σ))
-    (2 * p.D * p.α * (1 - e) * e / R)r
-end
+potential_energy(R::AbstractFloat, m::Morse) = m.D * (1 - _morse_exp(R, m))^2
+force(R::AbstractFloat, r::SVector{3}, m::Morse) = (2 * m.D * m.α * (1 - _morse_exp(R, m)) * _morse_exp(R, m) / R)r

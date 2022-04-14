@@ -21,16 +21,5 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = LennardJones(
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, lj::LennardJones) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, lj::LennardJones) = Parameter{(:rcutoff,)}((p[1],))
 
-############################# Energies ##########################################
-
-function potential_energy(R::AbstractFloat, p::LennardJones)
-    d⁶ = (p.σ / R)^6
-    4p.ϵ * (d⁶^2 - d⁶)
-end
-
-############################### Forces ##########################################
-
-function force(R::AbstractFloat, r::SVector{3}, p::LennardJones)
-    d⁶ = (p.σ / R)^6
-    (24p.ϵ * (2d⁶^2 - d⁶) / R^2)r
-end
+potential_energy(R::AbstractFloat, lj::LennardJones) = 4lj.ϵ * ((lj.σ / R)^12 - (lj.σ / R)^6)
+force(R::AbstractFloat, r::SVector{3}, lj::LennardJones) = (24lj.ϵ * (2(lj.σ / R)^12 - (lj.σ / R)^6) / R^2)r
