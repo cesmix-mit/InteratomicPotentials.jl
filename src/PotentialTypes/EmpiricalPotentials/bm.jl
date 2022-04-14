@@ -5,6 +5,9 @@ struct BornMayer <: EmpiricalPotential
     rcutoff
     species::AbstractVector
 end
+function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+    BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), species)
+end
 
 get_parameters(bm::BornMayer) = Parameter{(:A, :ρ)}((bm.A, bm.ρ))
 set_parameters(p::Parameter{(:A, :ρ)}, bm::BornMayer) = BornMayer(p.A, p.ρ, bm.rcutoff, bm.species)
@@ -18,34 +21,5 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, bm::BornMayer) = BornMayer(bm.A, 
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, bm::BornMayer) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, bm::BornMayer) = Parameter{(:rcutoff,)}((p[1],))
 
-# ##############################   Energy  ###################################
-
-function potential_energy(R::AbstractFloat, bm::BornMayer)
-    bm.A * exp(-R / bm.ρ)
-end
-
-
-# ##############################   Force   ###################################
-
-function force(R::AbstractFloat, r::SVector{3}, bm::BornMayer)
-    SVector(bm.A / bm.ρ * exp(-R / bm.ρ) .* r ./ R)
-end
-
-# ##############################   Gradients  ###################################
-
-function grad_potential_energy(r::SVector{3}, bm::BornMayer)
-    d = norm(r)
-    (dpdA = exp(-d / bm.ρ),
-        dpdρ = bm.A * d * exp(-d / bm.ρ) / bm.ρ^2)
-end
-
-function grad_force(r::SVector{3}, bm::BornMayer)
-    d = norm(r)
-    (dfdA = 1.0 / bm.ρ * exp(-d / bm.ρ) .* r ./ d,
-        dfdρ = bm.A / bm.ρ^3 * exp(-d / bm.ρ) * (d - bm.ρ) .* r ./ d)
-end
-
-function grad_virial(r::SVector{3}, bm::BornMayer)
-    dfdA, dfdρ = grad_force(r, bm)
-    (dvdA = dfdA ⋅ r, dvdρ = dfdρ ⋅ r)
-end
+potential_energy(R::AbstractFloat, bm::BornMayer) = bm.A * exp(-R / bm.ρ)
+force(R::AbstractFloat, r::SVector{3}, bm::BornMayer) = (bm.A * exp(-R / bm.ρ) / (bm.ρ * R))r

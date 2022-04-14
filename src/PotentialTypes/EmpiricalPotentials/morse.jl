@@ -1,10 +1,13 @@
-############################## Lennard Jones ###################################
+############################## Morse ###################################
 struct Morse <: EmpiricalPotential
     D
     α
     σ
     rcutoff
     species::AbstractVector
+end
+function Morse(D::Unitful.Energy, α::Real, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+    Morse(austrip(D), α, austrip(σ), austrip(rcutoff), species)
 end
 
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))
@@ -19,14 +22,7 @@ set_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = Morse(m.D, m.α, m.σ
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, m::Morse) = Parameter{(:rcutoff,)}((p[1],))
 
-############################# Energies ##########################################
+_morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
 
-function potential_energy(R::AbstractFloat, p::Morse)
-    p.D * (1.0 - exp(-p.α * (R - p.σ)))^2
-end
-
-############################### Forces ##########################################
-
-function force(R::AbstractFloat, r::SVector{3}, p::Morse)
-    SVector(2 * p.D * p.α * (1.0 - exp(-p.α * (R - p.σ))) * exp(-p.α * (R - p.σ)) .* r ./ R)
-end
+potential_energy(R::AbstractFloat, m::Morse) = m.D * (1 - _morse_exp(R, m))^2
+force(R::AbstractFloat, r::SVector{3}, m::Morse) = (2 * m.D * m.α * (1 - _morse_exp(R, m)) * _morse_exp(R, m) / R)r

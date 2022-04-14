@@ -1,28 +1,20 @@
 ################################################################################
-#
-#    This file contains types for a variety of empirical atomic potentials
-#
-################################################################################
-
-abstract type ArbitraryPotential end
-abstract type EmpiricalPotential <: ArbitraryPotential end
-abstract type MixedPotential <: ArbitraryPotential end
-
-################################################################################
 # InteratomicPotentials API default generic implmentations
 ################################################################################
+abstract type ArbitraryPotential end
 include("ArbitraryPotential/arbitrary_potential.jl")
 export ArbitraryPotential
 
 ################################################################################
 # Empirical Potentials
 ################################################################################
+abstract type EmpiricalPotential <: ArbitraryPotential end
 include("EmpiricalPotentials/empirical_potentials.jl")
 export EmpiricalPotential
 
 ################################################################################
 # Mixed Potentials
 ################################################################################
+abstract type MixedPotential <: ArbitraryPotential end
 include("MixedPotentials/mixed_potentials.jl")
 export MixedPotential
-

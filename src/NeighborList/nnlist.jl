@@ -1,7 +1,3 @@
-using Distances
-using NearestNeighbors
-using StaticArrays
-
 export NeighborList, neighborlist
 
 struct NeighborList
@@ -13,23 +9,17 @@ Base.length(nn::NeighborList) = length(nn.j)
 
 # calculates displacement vector x - y with respect to the boundary conditions L
 function get_displacement(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
-    broadcast(L, x, y) do Li, xi, yi
-        if Li == Inf
-            xi - yi
-        else
-            d = mod(xi - yi, Li)
-            2d < Li ? d : d - Li
-        end
-    end
+    d = mod.(x - y, L)
+    @. ifelse(L == Inf, x - y, ifelse(2d < L, d, d - L))
 end
 
 function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
     # Convert Positions to Matrix for Ball tree
-    X = [SVector{3}(ustrip.(p)) for p ∈ position(A)]
+    X = [SVector{3}(austrip.(p)) for p ∈ position(A)]
 
     # Create Metric for Periodic Boundary Conditions
     periodic = periodicity(A)
-    L = @SVector [periodic[i] ? ustrip(bounding_box(A)[i][i]) : Inf for i = 1:3]
+    L = @SVector [periodic[i] ? austrip(bounding_box(A)[i][i]) : Inf for i ∈ 1:3]
     d = Distances.PeriodicEuclidean(L)
 
     # Build Ball tree
