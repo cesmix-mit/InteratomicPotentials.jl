@@ -4,9 +4,9 @@ struct Morse <: EmpiricalPotential
     α
     σ
     rcutoff
-    species::AbstractVector
+    species::AbstractVector{Symbol}
 end
-function Morse(D::Unitful.Energy, α::Real, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+function Morse(D::Unitful.Energy, α::Real, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
     Morse(austrip(D), α, austrip(σ), austrip(rcutoff), species)
 end
 

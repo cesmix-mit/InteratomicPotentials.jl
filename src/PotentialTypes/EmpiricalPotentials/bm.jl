@@ -3,9 +3,9 @@ struct BornMayer <: EmpiricalPotential
     A
     ρ
     rcutoff
-    species::AbstractVector
+    species::AbstractVector{Symbol}
 end
-function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
     BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), species)
 end
 

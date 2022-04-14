@@ -3,9 +3,9 @@ struct LennardJones <: EmpiricalPotential
     ϵ
     σ
     rcutoff
-    species::AbstractVector
+    species::AbstractVector{Symbol}
 end
-function LennardJones(ϵ::Unitful.Energy, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector)
+function LennardJones(ϵ::Unitful.Energy, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
     LennardJones(austrip(ϵ), austrip(σ), austrip(rcutoff), species)
 end
 

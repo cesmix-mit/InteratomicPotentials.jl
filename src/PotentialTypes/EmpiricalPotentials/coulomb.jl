@@ -3,9 +3,9 @@ struct Coulomb <: EmpiricalPotential
     q_1
     q_2
     rcutoff
-    species::AbstractVector
+    species::AbstractVector{Symbol}
 end
-function Coulomb(q_1::Unitful.Charge, q_2::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector)
+function Coulomb(q_1::Unitful.Charge, q_2::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
     Coulomb(austrip(q_1), austrip(q_2), austrip(rcutoff), species)
 end
 
