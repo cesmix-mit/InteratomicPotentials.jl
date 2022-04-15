@@ -3,10 +3,11 @@ struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential
     A::T
     ρ::T
     rcutoff::T
-    species::Vector{Symbol}
-end
-function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), collect(species))
+    species::Tuple
+    function BornMayer(A, ρ, rcutoff, species)
+        A, ρ, rcutoff = promote(austrip(A), austrip(ρ), austrip(rcutoff))
+        new{typeof(rcutoff)}(A, ρ, rcutoff, Tuple(species))
+    end
 end
 
 get_parameters(bm::BornMayer) = Parameter{(:A, :ρ)}((bm.A, bm.ρ))

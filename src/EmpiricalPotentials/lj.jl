@@ -3,10 +3,11 @@ struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential
     ϵ::T
     σ::T
     rcutoff::T
-    species::Vector{Symbol}
-end
-function LennardJones(ϵ::Unitful.Energy, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    LennardJones(austrip(ϵ), austrip(σ), austrip(rcutoff), collect(species))
+    species::Tuple
+    function LennardJones(ϵ, σ, rcutoff, species)
+        ϵ, σ, rcutoff = promote(austrip(ϵ), austrip(σ), austrip(rcutoff))
+        new{typeof(rcutoff)}(ϵ, σ, rcutoff, Tuple(species))
+    end
 end
 
 get_parameters(lj::LennardJones) = Parameter{(:ϵ, :σ)}((lj.ϵ, lj.σ))

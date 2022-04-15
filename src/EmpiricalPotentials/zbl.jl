@@ -7,19 +7,20 @@ struct ZBL{T<:AbstractFloat} <: EmpiricalPotential
     Z₂::Int
     e::T
     rcutoff::T
-    species::Vector{Symbol}
-end
-function ZBL(Z₁::Integer, Z₂::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    ZBL(Z₁, Z₂, austrip(e), austrip(rcutoff), collect(species))
+    species::Tuple
+    function ZBL(Z₁, Z₂, e, rcutoff, species)
+        Z₁, Z₂, e, rcutoff = promote(Z₁, Z₂, austrip(e), austrip(rcutoff))
+        new{typeof(rcutoff)}(Z₁, Z₂, e, rcutoff, Tuple(species))
+    end
 end
 
 get_parameters(::ZBL) = Parameter{}()
-set_parameters(zbl::ZBL, ::Parameter{}) = copy(zbl)
+set_parameters(zbl::ZBL, ::Parameter{}) = zbl
 
 serialize_parameters(zbl::ZBL) = collect(get_parameters(zbl))
 deserialize_parameters(zbl::ZBL, p::AbstractVector) = set_parameters(zbl, Parameter{}(p))
 
-get_hyperparameters(zbl::ZBL) = Parameter{:rcutoff}((zbl.rcutoff,))
+get_hyperparameters(zbl::ZBL) = Parameter{(:rcutoff,)}((zbl.rcutoff,))
 set_hyperparameters(zbl::ZBL, p::Parameter{(:rcutoff,)}) = ZBL(zbl.Z₁, zbl.Z₂, zbl.e, p.rcutoff, zbl.species)
 
 serialize_hyperparameters(zbl::ZBL) = collect(get_hyperparameters(zbl))

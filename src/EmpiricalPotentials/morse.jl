@@ -4,10 +4,11 @@ struct Morse{T<:AbstractFloat} <: EmpiricalPotential
     α::T
     σ::T
     rcutoff::T
-    species::Vector{Symbol}
-end
-function Morse(D::Unitful.Energy, α::AbstractFloat, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    Morse(austrip(D), α, austrip(σ), austrip(rcutoff), collect(species))
+    species::Tuple
+    function Morse(D, α, σ, rcutoff, species)
+        D, α, σ, rcutoff = promote(austrip(D), α, austrip(σ), austrip(rcutoff))
+        new{typeof(rcutoff)}(D, α, σ, rcutoff, Tuple(species))
+    end
 end
 
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))

@@ -3,13 +3,25 @@
     α = 2.0
     σ = 0.25u"bohr"
     rcutoff = 2.0u"Å"
-    p = Morse(D, α, σ, rcutoff, [:Ar, :H])
+    species = [:Ar, :H]
+    p = Morse(D, α, σ, rcutoff, species)
 
     @test p isa EmpiricalPotential
     @test p.D == austrip(D)
-    @test p.α == austrip(α)
+    @test p.α == α
     @test p.σ == austrip(σ)
     @test p.rcutoff == austrip(rcutoff)
+    @test p.species == (:Ar, :H)
+
+    @test get_parameters(p) == (; D=austrip(D), α, σ=austrip(σ))
+    @test set_parameters(p, (; D=2.0, α=1.0, σ=3.0)) == Morse(2.0, 1.0, 3.0, austrip(rcutoff), species)
+    @test serialize_parameters(p) == [austrip(D), α, austrip(σ)]
+    @test deserialize_parameters(p, [2.0, 1.0, 3.0]) == Morse(2.0, 1.0, 3.0, austrip(rcutoff), species)
+
+    @test get_hyperparameters(p) == (; rcutoff=austrip(rcutoff))
+    @test set_hyperparameters(p, (; rcutoff=1.0)) == Morse(austrip(D), α, austrip(σ), 1.0, species)
+    @test serialize_hyperparameters(p) == [austrip(rcutoff)]
+    @test deserialize_hyperparameters(p, [1.0]) == Morse(austrip(D), α, austrip(σ), 1.0, species)
 
     r = @SVector[1.0, 1.0, 1.0]
     R = norm(r)
