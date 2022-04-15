@@ -1,6 +1,7 @@
 using InteratomicPotentials
 
 using AtomsBase
+using LinearAlgebra
 using StaticArrays
 using Test
 using Unitful
@@ -14,9 +15,19 @@ const FORCE_TYPE = typeof(0.0u"hartree/bohr")
     # These tests collectively have high code coverage and test whether each module is structurally correct.
     # They do not validate the numeric results for scientific accuracy.
     @testset "Unit Tests" begin
+        include("unit/constants.jl")
+        include("unit/unit_convention.jl")
         include("unit/nnlist.jl")
+        @testset "Default Implementations" begin
+            include("unit/arbitrary_potential.jl")
+            include("unit/emperical_potential.jl")
+        end
         @testset "Emperical Potentials" begin
             include("unit/lj.jl")
+            include("unit/bm.jl")
+            include("unit/coulomb.jl")
+            include("unit/zbl.jl")
+            include("unit/morse.jl")
         end
         @testset "Mixed Potentials" begin
             include("unit/mixed_potentials.jl")

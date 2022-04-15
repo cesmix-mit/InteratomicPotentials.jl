@@ -30,7 +30,7 @@ function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
             end
         end
     end
-    (; e=e * u"hartree", f=f * u"hartree / bohr")
+    (; e=e * ENERGY_UNIT, f=f * FORCE_UNIT)
 end
 
 force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
@@ -45,5 +45,5 @@ function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
             v += @SVector [vi[1, 1], vi[2, 2], vi[3, 3], vi[3, 2], vi[3, 1], vi[2, 1]]
         end
     end
-    v * u"hartree"
+    v * ENERGY_UNIT
 end

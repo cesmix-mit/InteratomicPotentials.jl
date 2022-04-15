@@ -1,12 +1,12 @@
 ##############################   Coulomb  ###################################
 struct Coulomb <: EmpiricalPotential
-    q_1
-    q_2
+    q₁
+    q₂
     rcutoff
     species::AbstractVector{Symbol}
 end
-function Coulomb(q_1::Unitful.Charge, q_2::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    Coulomb(austrip(q_1), austrip(q_2), austrip(rcutoff), species)
+function Coulomb(q₁::Unitful.Charge, q₂::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
+    Coulomb(austrip(q₁), austrip(q₂), austrip(rcutoff), species)
 end
 
 get_parameters(c::Coulomb) = Parameter{}(())
@@ -16,10 +16,10 @@ deserialize_parameters(p::Parameter{()}, c::Coulomb) = []
 serialize_parameters(p::Vector, c::Coulomb) = Parameter{()}(())
 
 get_hyperparameters(c::Coulomb) = Parameter{:rcutoff}((c.rcutoff,))
-set_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = Coulomb(c.q_1, c.q_2, p.rcutoff, c.species)
+set_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = Coulomb(c.q₁, c.q₂, p.rcutoff, c.species)
 
 deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, c::Coulomb) = [p.rcutoff]
 serialize_hyperparameters(p::Vector, c::Coulomb) = Parameter{(:rcutoff,)}((p[1],))
 
-potential_energy(R::AbstractFloat, c::Coulomb) = kₑ * c.q_1 * c.q_2 / R
-force(R::AbstractFloat, r::SVector{3}, c::Coulomb) = (kₑ * c.q_1 * c.q_2 / R^3)r
+potential_energy(R::AbstractFloat, c::Coulomb) = kₑ * c.q₁ * c.q₂ / R
+force(R::AbstractFloat, r::SVector{3}, c::Coulomb) = (kₑ * c.q₁ * c.q₂ / R^3)r

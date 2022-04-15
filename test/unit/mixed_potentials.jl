@@ -1,53 +1,68 @@
-@testset "Mixed Potentials" begin
-    position = (@SVector [1.0, 0.0, 0.0])u"bohr"
+@testset "Mixed Potential Unit Tests" begin
     atoms = [
-        :Ar => 0.5 * position,
-        :Ar => 0.75 * position,
-        :H => 1.1 * position
+        :Ar => (@SVector [0.0, 0.0, 0.0])u"bohr",
+        :Ar => (@SVector [0.5, 0.0, 0.0])u"bohr",
+        :H => (@SVector [0.0, 0.5, 0.0])u"bohr",
+        :H => (@SVector [0.5, 0.5, 0.0])u"bohr"
     ]
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
     ϵ = 1.0
     σ = 0.25
-    rcutoff = 2.0
-    lj1 = LennardJones(ϵ * u"hartree", σ * u"bohr", rcutoff * u"bohr", [:Ar, :H])
+    rcutoff = 0.6
+    lj1 = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
     lj2 = LennardJones(2ϵ, 2σ, rcutoff, [:Ar, :H])
-
-    sum_lj = lj1 + lj2
-    mixed_potentials = [lj1 + lj2, lj1 - lj2, 2.0 * lj1, -2.0 * lj1, 2.0 * lj1 - 1.0 * lj2, lj2 / 2.0]
+    mixed_potentials = [
+        +lj1,
+        -lj1,
+        lj1 + lj2,
+        lj1 - lj2,
+        2.0 * lj1,
+        lj2 / 2.0,
+        2.0 * lj1 - 1.0 * lj2,
+        3.0 * (lj1 + lj2)
+    ]
 
     true_energies = [
+        potential_energy(system, lj1),
+        -potential_energy(system, lj1),
         potential_energy(system, lj1) + potential_energy(system, lj2),
         potential_energy(system, lj1) - potential_energy(system, lj2),
         2.0 * potential_energy(system, lj1),
-        -2.0 * potential_energy(system, lj1),
+        potential_energy(system, lj2) / 2.0,
         2.0 * potential_energy(system, lj1) - 1.0 * potential_energy(system, lj2),
-        potential_energy(system, lj2) / 2.0
+        3.0 * potential_energy(system, lj1) + 3.0 * potential_energy(system, lj2)
     ]
     true_forces = [
+        force(system, lj1),
+        -force(system, lj1),
         force(system, lj1) + force(system, lj2),
         force(system, lj1) - force(system, lj2),
         2.0 * force(system, lj1),
-        -2.0 * force(system, lj1),
+        force(system, lj2) / 2.0,
         2.0 * force(system, lj1) - 1.0 * force(system, lj2),
-        force(system, lj2) / 2.0
+        3.0 * force(system, lj1) + 3.0 * force(system, lj2)
     ]
     true_virials = [
+        virial(system, lj1),
+        -virial(system, lj1),
         virial(system, lj1) + virial(system, lj2),
         virial(system, lj1) - virial(system, lj2),
         2.0 * virial(system, lj1),
-        -2.0 * virial(system, lj1),
+        virial(system, lj2) / 2.0,
         2.0 * virial(system, lj1) - 1.0 * virial(system, lj2),
-        virial(system, lj2) / 2.0
+        3.0 * virial(system, lj1) + 3.0 * virial(system, lj2)
     ]
     true_virial_stresses = [
+        virial_stress(system, lj1),
+        -virial_stress(system, lj1),
         virial_stress(system, lj1) + virial_stress(system, lj2),
         virial_stress(system, lj1) - virial_stress(system, lj2),
         2.0 * virial_stress(system, lj1),
-        -2.0 * virial_stress(system, lj1),
+        virial_stress(system, lj2) / 2.0,
         2.0 * virial_stress(system, lj1) - 1.0 * virial_stress(system, lj2),
-        virial_stress(system, lj2) / 2.0
+        3.0 * virial_stress(system, lj1) + 3.0 * virial_stress(system, lj2)
     ]
 
     for (result_lj, te, tf, tv, tvs) in zip(mixed_potentials, true_energies, true_forces, true_virials, true_virial_stresses)

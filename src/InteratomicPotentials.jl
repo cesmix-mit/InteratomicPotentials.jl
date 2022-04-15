@@ -10,6 +10,7 @@ using Distances
 using NearestNeighbors
 
 # Import files
+include("unit_convention.jl")
 include("constants.jl")
 include("NeighborList/nnlist.jl")
 include("Parameters/param.jl")

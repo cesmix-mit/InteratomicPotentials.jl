@@ -1,12 +1,12 @@
-@testset "Lennard-Jones Unit Tests" begin
-    ϵ = 1.0u"eV"
-    σ = 0.25u"bohr"
+@testset "Coulomb Unit Tests" begin
+    q₁ = 1.0u"C"
+    q₂ = 1.0u"C"
     rcutoff = 2.0u"Å"
-    p = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
+    p = Coulomb(q₁, q₂, rcutoff, [:Ar, :H])
 
     @test p isa EmpiricalPotential
-    @test p.ϵ == austrip(ϵ)
-    @test p.σ == austrip(σ)
+    @test p.q₁ == austrip(q₁)
+    @test p.q₂ == austrip(q₂)
     @test p.rcutoff == austrip(rcutoff)
 
     r = @SVector[1.0, 1.0, 1.0]

@@ -1,12 +1,12 @@
-@testset "Lennard-Jones Unit Tests" begin
-    ϵ = 1.0u"eV"
-    σ = 0.25u"bohr"
+@testset "Born-Mayer Unit Tests" begin
+    A = 1.0u"eV"
+    ρ = 0.25u"bohr"
     rcutoff = 2.0u"Å"
-    p = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
+    p = BornMayer(A, ρ, rcutoff, [:Ar, :H])
 
     @test p isa EmpiricalPotential
-    @test p.ϵ == austrip(ϵ)
-    @test p.σ == austrip(σ)
+    @test p.A == austrip(A)
+    @test p.ρ == austrip(ρ)
     @test p.rcutoff == austrip(rcutoff)
 
     r = @SVector[1.0, 1.0, 1.0]

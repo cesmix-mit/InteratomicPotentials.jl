@@ -1,12 +1,14 @@
-@testset "Lennard-Jones Unit Tests" begin
-    ϵ = 1.0u"eV"
-    σ = 0.25u"bohr"
+@testset "ZBL Unit Tests" begin
+    Z₁ = 18
+    Z₂ = 18
+    e = 0.25u"C"
     rcutoff = 2.0u"Å"
-    p = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
+    p = ZBL(Z₁, Z₂, e, rcutoff, [:Ar, :H])
 
     @test p isa EmpiricalPotential
-    @test p.ϵ == austrip(ϵ)
-    @test p.σ == austrip(σ)
+    @test p.Z₁ == austrip(Z₁)
+    @test p.Z₂ == austrip(Z₂)
+    @test p.e == austrip(e)
     @test p.rcutoff == austrip(rcutoff)
 
     r = @SVector[1.0, 1.0, 1.0]

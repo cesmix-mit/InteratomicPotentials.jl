@@ -1,11 +1,13 @@
-@testset "Lennard-Jones Unit Tests" begin
-    ϵ = 1.0u"eV"
+@testset "Morse Unit Tests" begin
+    D = 1.0u"eV"
+    α = 2
     σ = 0.25u"bohr"
     rcutoff = 2.0u"Å"
-    p = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
+    p = Morse(D, α, σ, rcutoff, [:Ar, :H])
 
     @test p isa EmpiricalPotential
-    @test p.ϵ == austrip(ϵ)
+    @test p.D == austrip(D)
+    @test p.α == austrip(α)
     @test p.σ == austrip(σ)
     @test p.rcutoff == austrip(rcutoff)
 

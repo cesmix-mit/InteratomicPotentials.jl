@@ -1,26 +1,36 @@
 @testset "Neighbor List Unit Tests" begin
-    position = (@SVector [1.0, 0.0, 0.0])u"bohr"
     atoms = [
-        :Ar => 0.5 * position,
-        :Ar => 0.75 * position,
-        :H => 1.1 * position
+        Atom(:Ar, (@SVector [0.5, 0.1, 0.3])u"bohr"),
+        Atom(:Ar, (@SVector [0.7, 2.5, -2.1])u"bohr"),
+        Atom(:Ar, (@SVector [1.1, -3.1, 7.3])u"bohr")
     ]
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
-    system = periodic_system(atoms, box)
+    boundary_conditions = [Periodic(), DirichletZero(), Periodic()]
+    system = FlexibleSystem(atoms, box, boundary_conditions)
 
-    rcutoff = 2.0
+    rcutoff = 5.0
     nnlist = neighborlist(system, rcutoff)
 
-    nnlist_r = nnlist.r
-    true_r = [
-        [SVector{3}([0.25, 0.0, 0.0]), SVector{3}([-0.40, 0.0, 0.0])],
-        [SVector{3}([0.35, 0.0, 0.0])],
-        []
+    true_j = [
+        Int[2, 3],
+        Int[],
+        Int[]
     ]
 
-    for (ri, ri_true) in zip(nnlist_r, true_r)
-        for (rij, rij_true) in zip(ri, ri_true)
-            @test isapprox(sum(rij + rij_true), 0.0, atol=eps(2.0))
-        end
-    end
+    true_R = [
+        Float64[norm([-0.2, -2.4, 0.4]), norm([0.4, 3.2, 0.0])],
+        Float64[],
+        Float64[]
+    ]
+
+    true_r = [
+        Vector{Float64}[[-0.2, -2.4, 0.4], [0.4, 3.2, 0.0]],
+        Vector{Float64}[],
+        Vector{Float64}[]
+    ]
+
+    @test length(nnlist) == length(system)
+    @test nnlist.j == true_j
+    @test all(nnlist.R .≈ true_R)
+    @test all(all(ri .≈ true_ri) for (ri, true_ri) in zip(nnlist.r, true_r))
 end
