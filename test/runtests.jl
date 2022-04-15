@@ -29,7 +29,7 @@ include("mocks.jl")
             include("unit/morse.jl")
         end
         @testset "Mixed Potentials" begin
-            include("unit/mixed_potentials.jl")
+            include("unit/linear_combination_potential.jl")
         end
     end
 
