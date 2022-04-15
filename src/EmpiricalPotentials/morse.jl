@@ -11,16 +11,16 @@ function Morse(D::Unitful.Energy, α::AbstractFloat, σ::Unitful.Length, rcutoff
 end
 
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))
-set_parameters(p::Parameter{(:D, :α, :σ)}, m::Morse) = Morse(p.D, p.α, p.σ, m.rcutoff, m.species)
+set_parameters(m::Morse, p::Parameter{(:D, :α, :σ)}) = Morse(p.D, p.α, p.σ, m.rcutoff, m.species)
 
-deserialize_parameters(p::Parameter{(:D, :α, :σ)}, m::Morse) = [p.ϵ, p.σ]
-serialize_parameters(p::Vector, m::Morse) = Parameter{(:ϵ, :σ)}((p[1], p[2]))
+serialize_parameters(m::Morse) = collect(get_parameters(m))
+deserialize_parameters(m::Morse, p::AbstractVector) = set_parameters(m, Parameter{(:D, :α, :σ)}(p))
 
 get_hyperparameters(m::Morse) = Parameter{(:rcutoff,)}((m.rcutoff,))
-set_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = Morse(m.D, m.α, m.σ, p.rcutoff, m.species)
+set_hyperparameters(m::Morse, p::Parameter{(:rcutoff,)}) = Morse(m.D, m.α, m.σ, p.rcutoff, m.species)
 
-deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, m::Morse) = [p.rcutoff]
-serialize_hyperparameters(p::Vector, m::Morse) = Parameter{(:rcutoff,)}((p[1],))
+serialize_hyperparameters(m::Morse) = collect(get_hyperparameters(m))
+deserialize_hyperparameters(m::Morse, p::AbstractVector) = set_hyperparameters(m, Parameter{(:rcutoff,)}(p))
 
 _morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
 
