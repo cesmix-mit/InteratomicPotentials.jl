@@ -8,7 +8,7 @@
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
-    p = MockEmpiricalPotential(1.0, 0.5, [:Ar])
+    p = MockEmpiricalPotential(1.0, 0.5, (:Ar,))
 
     @test force(@SVector[1.0, 1.0, 1.0], p) ≈ @SVector[3.0, 3.0, 3.0]
 
