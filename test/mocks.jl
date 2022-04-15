@@ -1,6 +1,6 @@
 struct MockArbitraryPotential <: ArbitraryPotential
     seed::Float64
-    species::Vector{Symbol}
+    species::Tuple
 end
 function InteratomicPotentials.energy_and_force(A::AbstractSystem, p::MockArbitraryPotential)
     (
@@ -15,7 +15,7 @@ end
 struct MockEmpiricalPotential <: EmpiricalPotential
     seed::Float64
     rcutoff::Float64
-    species::Vector{Symbol}
+    species::Tuple
 end
 function InteratomicPotentials.potential_energy(R::AbstractFloat, p::MockEmpiricalPotential)
     R^2 * p.seed

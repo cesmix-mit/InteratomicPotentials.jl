@@ -7,23 +7,24 @@ struct ZBL{T<:AbstractFloat} <: EmpiricalPotential
     Z₂::Int
     e::T
     rcutoff::T
-    species::Vector{Symbol}
+    species::Tuple
+    function ZBL(Z₁, Z₂, e, rcutoff, species)
+        Z₁, Z₂, e, rcutoff = promote(Z₁, Z₂, austrip(e), austrip(rcutoff))
+        new{typeof(rcutoff)}(Z₁, Z₂, e, rcutoff, Tuple(species))
+    end
 end
-function ZBL(Z₁::Integer, Z₂::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    ZBL(Z₁, Z₂, austrip(e), austrip(rcutoff), collect(species))
-end
 
-get_parameters(zbl::ZBL) = Parameter{}(())
-set_parameters(p::Parameter{}, zbl::ZBL) = zbl
+get_parameters(::ZBL) = Parameter{}()
+set_parameters(zbl::ZBL, ::Parameter{}) = zbl
 
-deserialize_parameters(p::Parameter{()}, zbl::ZBL) = []
-serialize_parameters(p::Vector, zbl::ZBL) = Parameter{()}(())
+serialize_parameters(zbl::ZBL) = collect(get_parameters(zbl))
+deserialize_parameters(zbl::ZBL, p::AbstractVector) = set_parameters(zbl, Parameter{}(p))
 
-get_hyperparameters(zbl::ZBL) = Parameter{:rcutoff}((zbl.rcutoff,))
-set_hyperparameters(p::Parameter{(:rcutoff,)}, zbl::ZBL) = ZBL(zbl.Z₁, zbl.Z₂, zbl.e, p.rcutoff, zbl.species)
+get_hyperparameters(zbl::ZBL) = Parameter{(:rcutoff,)}((zbl.rcutoff,))
+set_hyperparameters(zbl::ZBL, p::Parameter{(:rcutoff,)}) = ZBL(zbl.Z₁, zbl.Z₂, zbl.e, p.rcutoff, zbl.species)
 
-deserialize_hyperparameters(p::Parameter{(:rcutoff,)}, zbl::ZBL) = [p.rcutoff]
-serialize_hyperparameters(p::Vector, zbl::ZBL) = Parameter{(:rzblutoff,)}((p[1],))
+serialize_hyperparameters(zbl::ZBL) = collect(get_hyperparameters(zbl))
+deserialize_hyperparameters(zbl::ZBL, p::AbstractVector) = set_hyperparameters(zbl, Parameter{(:rcutoff,)}(p))
 
 const _ϕ_coeffs = [0.18175, 0.50986, 0.28022, 0.02817]
 const _ϕ_exps = [3.19980, 0.94229, 0.40290, 0.20162]

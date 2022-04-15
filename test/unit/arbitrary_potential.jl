@@ -8,7 +8,7 @@
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
-    p = MockArbitraryPotential(0.0, [:Ar, :H])
+    p = MockArbitraryPotential(0.0, (:Ar, :H))
 
     @test potential_energy(system, p) == 0.0u"hartree"
     @test force(system, p) == fill((@SVector[1.0, 2.0, 3.0])u"hartree/bohr", 4)
