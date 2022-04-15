@@ -7,8 +7,7 @@ using Test
 using Unitful
 using UnitfulAtomic
 
-const ENERGY_TYPE = typeof(0.0u"hartree")
-const FORCE_TYPE = typeof(0.0u"hartree/bohr")
+include("mocks.jl")
 
 @testset "Potentials.jl" begin
     # The first set of tests are simple unit tests that generally test just one module at a time.
@@ -20,9 +19,9 @@ const FORCE_TYPE = typeof(0.0u"hartree/bohr")
         include("unit/nnlist.jl")
         @testset "Default Implementations" begin
             include("unit/arbitrary_potential.jl")
-            include("unit/emperical_potential.jl")
+            include("unit/empirical_potential.jl")
         end
-        @testset "Emperical Potentials" begin
+        @testset "Empirical Potentials" begin
             include("unit/lj.jl")
             include("unit/bm.jl")
             include("unit/coulomb.jl")

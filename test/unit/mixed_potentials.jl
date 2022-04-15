@@ -8,76 +8,69 @@
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
-    ϵ = 1.0
-    σ = 0.25
-    rcutoff = 0.6
-    lj1 = LennardJones(ϵ, σ, rcutoff, [:Ar, :H])
-    lj2 = LennardJones(2ϵ, 2σ, rcutoff, [:Ar, :H])
+    p1 = MockArbitraryPotential(1.0, [:Ar, :H])
+    p2 = MockArbitraryPotential(2.0, [:Ar, :H])
     mixed_potentials = [
-        +lj1,
-        -lj1,
-        lj1 + lj2,
-        lj1 - lj2,
-        2.0 * lj1,
-        lj2 / 2.0,
-        2.0 * lj1 - 1.0 * lj2,
-        3.0 * (lj1 + lj2)
+        +p1,
+        -p1,
+        p1 + p2,
+        p1 - p2,
+        2.0 * p1,
+        p2 / 2.0,
+        2.0 * p1 - 1.0 * p2,
+        3.0 * (p1 + p2)
     ]
 
     true_energies = [
-        potential_energy(system, lj1),
-        -potential_energy(system, lj1),
-        potential_energy(system, lj1) + potential_energy(system, lj2),
-        potential_energy(system, lj1) - potential_energy(system, lj2),
-        2.0 * potential_energy(system, lj1),
-        potential_energy(system, lj2) / 2.0,
-        2.0 * potential_energy(system, lj1) - 1.0 * potential_energy(system, lj2),
-        3.0 * potential_energy(system, lj1) + 3.0 * potential_energy(system, lj2)
-    ]
+        1.0,
+        -1.0,
+        3.0,
+        -1.0,
+        2.0,
+        1.0,
+        0.0,
+        9.0
+    ]u"hartree"
     true_forces = [
-        force(system, lj1),
-        -force(system, lj1),
-        force(system, lj1) + force(system, lj2),
-        force(system, lj1) - force(system, lj2),
-        2.0 * force(system, lj1),
-        force(system, lj2) / 2.0,
-        2.0 * force(system, lj1) - 1.0 * force(system, lj2),
-        3.0 * force(system, lj1) + 3.0 * force(system, lj2)
-    ]
+        SVector{3}.([[2.0, 3.0, 4.0], [2.0, 3.0, 4.0], [2.0, 3.0, 4.0], [2.0, 3.0, 4.0]]),
+        SVector{3}.([[-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0]]),
+        SVector{3}.([[5.0, 7.0, 9.0], [5.0, 7.0, 9.0], [5.0, 7.0, 9.0], [5.0, 7.0, 9.0]]),
+        SVector{3}.([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]]),
+        SVector{3}.([[4.0, 6.0, 8.0], [4.0, 6.0, 8.0], [4.0, 6.0, 8.0], [4.0, 6.0, 8.0]]),
+        SVector{3}.([[1.5, 2.0, 2.5], [1.5, 2.0, 2.5], [1.5, 2.0, 2.5], [1.5, 2.0, 2.5]]),
+        SVector{3}.([[1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]),
+        SVector{3}.([[15.0, 21.0, 27.0], [15.0, 21.0, 27.0], [15.0, 21.0, 27.0], [15.0, 21.0, 27.0]])
+    ]u"hartree/bohr"
     true_virials = [
-        virial(system, lj1),
-        -virial(system, lj1),
-        virial(system, lj1) + virial(system, lj2),
-        virial(system, lj1) - virial(system, lj2),
-        2.0 * virial(system, lj1),
-        virial(system, lj2) / 2.0,
-        2.0 * virial(system, lj1) - 1.0 * virial(system, lj2),
-        3.0 * virial(system, lj1) + 3.0 * virial(system, lj2)
-    ]
-    true_virial_stresses = [
-        virial_stress(system, lj1),
-        -virial_stress(system, lj1),
-        virial_stress(system, lj1) + virial_stress(system, lj2),
-        virial_stress(system, lj1) - virial_stress(system, lj2),
-        2.0 * virial_stress(system, lj1),
-        virial_stress(system, lj2) / 2.0,
-        2.0 * virial_stress(system, lj1) - 1.0 * virial_stress(system, lj2),
-        3.0 * virial_stress(system, lj1) + 3.0 * virial_stress(system, lj2)
-    ]
+        -3.0,
+        3.0,
+        -3.0,
+        -3.0,
+        -6.0,
+        0.0,
+        -6.0,
+        -9.0
+    ]u"hartree"
+    true_virial_stresses = SVector{6}.([
+        [0.0, -1.0, -2.0, -3.0, -4.0, -5.0],
+        [-0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+        [1.0, -1.0, -3.0, -5.0, -7.0, -9.0],
+        [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
+        [0.0, -2.0, -4.0, -6.0, -8.0, -10.0],
+        [0.5, 0.0, -0.5, -1.0, -1.5, -2.0],
+        [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0],
+        [3.0, -3.0, -9.0, -15.0, -21.0, -27.0]
+    ])u"hartree"
 
-    for (result_lj, te, tf, tv, tvs) in zip(mixed_potentials, true_energies, true_forces, true_virials, true_virial_stresses)
-        @test result_lj isa MixedPotential
-        @test potential_energy(system, result_lj) isa ENERGY_TYPE
-        @test potential_energy(system, result_lj) == te
-        @test force(system, result_lj) isa AbstractVector{SVector{3,FORCE_TYPE}}
-        @test force(system, result_lj) == tf
-        @test virial(system, result_lj) isa ENERGY_TYPE
-        @test virial(system, result_lj) == tv
-        @test virial_stress(system, result_lj) isa SVector{6,ENERGY_TYPE}
-        @test virial_stress(system, result_lj) == tvs
+    for (p, te, tf, tv, tvs) in zip(mixed_potentials, true_energies, true_forces, true_virials, true_virial_stresses)
+        @test p isa MixedPotential
 
-        e_f = energy_and_force(system, result_lj)
-        @test e_f.e == te
-        @test e_f.f == tf
+        @test potential_energy(system, p) == te
+        @test force(system, p) == tf
+        @test virial(system, p) == tv
+        @test virial_stress(system, p) == tvs
+
+        @test energy_and_force(system, p).e == te
+        @test energy_and_force(system, p).f == tf
     end
 end

@@ -8,15 +8,9 @@
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
-    ϵ = 1.0
-    σ = 0.25
-    rcutoff = 0.6
-    lj = LennardJones(ϵ * u"hartree", σ * u"bohr", rcutoff * u"bohr", [:Ar, :H])
+    p = MockArbitraryPotential(0.0, [:Ar, :H])
 
-    @test potential_energy(system, lj) isa ENERGY_TYPE
-    @test potential_energy(system, lj) == energy_and_force(system, lj).e
-    @test force(system, lj) isa AbstractVector{SVector{3,FORCE_TYPE}}
-    @test force(system, lj) == energy_and_force(system, lj).f
-    @test virial(system, lj) isa ENERGY_TYPE
-    @test virial(system, lj) == sum(virial_stress(system, lj)[1:3])
+    @test potential_energy(system, p) == 0.0u"hartree"
+    @test force(system, p) == fill((@SVector[1.0, 2.0, 3.0])u"hartree/bohr", 4)
+    @test virial(system, p) == -6u"hartree"
 end

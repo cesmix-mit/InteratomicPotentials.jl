@@ -11,8 +11,10 @@ include("morse.jl")
 export LennardJones, BornMayer, Coulomb, ZBL, Morse
 
 ################################################################################
-# InteratomicPotentials API implmentations for emperical potentials
+# InteratomicPotentials API implmentations for empirical potentials
 ################################################################################
+
+force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
 
 function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
     nnlist = neighborlist(A, p.rcutoff)
@@ -32,8 +34,6 @@ function energy_and_force(A::AbstractSystem, p::EmpiricalPotential)
     end
     (; e=e * ENERGY_UNIT, f=f * FORCE_UNIT)
 end
-
-force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)
 
 function virial_stress(A::AbstractSystem, p::EmpiricalPotential)
     nnlist = neighborlist(A, p.rcutoff)

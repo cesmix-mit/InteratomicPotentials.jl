@@ -1,12 +1,12 @@
 ############################## Lennard Jones ###################################
-struct LennardJones <: EmpiricalPotential
-    ϵ
-    σ
-    rcutoff
-    species::AbstractVector{Symbol}
+struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential
+    ϵ::T
+    σ::T
+    rcutoff::T
+    species::Vector{Symbol}
 end
 function LennardJones(ϵ::Unitful.Energy, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    LennardJones(austrip(ϵ), austrip(σ), austrip(rcutoff), species)
+    LennardJones(austrip(ϵ), austrip(σ), austrip(rcutoff), collect(species))
 end
 
 get_parameters(lj::LennardJones) = Parameter{(:ϵ, :σ)}((lj.ϵ, lj.σ))

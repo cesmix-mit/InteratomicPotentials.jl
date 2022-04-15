@@ -1,12 +1,12 @@
 ##############################   Born-Mayer  ###################################
-struct BornMayer <: EmpiricalPotential
-    A
-    ρ
-    rcutoff
-    species::AbstractVector{Symbol}
+struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential
+    A::T
+    ρ::T
+    rcutoff::T
+    species::Vector{Symbol}
 end
 function BornMayer(A::Unitful.Energy, ρ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), species)
+    BornMayer(austrip(A), austrip(ρ), austrip(rcutoff), collect(species))
 end
 
 get_parameters(bm::BornMayer) = Parameter{(:A, :ρ)}((bm.A, bm.ρ))

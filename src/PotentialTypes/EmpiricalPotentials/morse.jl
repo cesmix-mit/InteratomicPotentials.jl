@@ -1,13 +1,13 @@
 ############################## Morse ###################################
-struct Morse <: EmpiricalPotential
-    D
-    α
-    σ
-    rcutoff
-    species::AbstractVector{Symbol}
+struct Morse{T<:AbstractFloat} <: EmpiricalPotential
+    D::T
+    α::T
+    σ::T
+    rcutoff::T
+    species::Vector{Symbol}
 end
-function Morse(D::Unitful.Energy, α::Real, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    Morse(austrip(D), α, austrip(σ), austrip(rcutoff), species)
+function Morse(D::Unitful.Energy, α::AbstractFloat, σ::Unitful.Length, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
+    Morse(austrip(D), α, austrip(σ), austrip(rcutoff), collect(species))
 end
 
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))

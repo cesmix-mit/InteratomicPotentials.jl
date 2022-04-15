@@ -1,12 +1,12 @@
 ##############################   Coulomb  ###################################
-struct Coulomb <: EmpiricalPotential
-    q₁
-    q₂
-    rcutoff
-    species::AbstractVector{Symbol}
+struct Coulomb{T<:AbstractFloat} <: EmpiricalPotential
+    q₁::T
+    q₂::T
+    rcutoff::T
+    species::Vector{Symbol}
 end
 function Coulomb(q₁::Unitful.Charge, q₂::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    Coulomb(austrip(q₁), austrip(q₂), austrip(rcutoff), species)
+    Coulomb(austrip(q₁), austrip(q₂), austrip(rcutoff), collect(species))
 end
 
 get_parameters(c::Coulomb) = Parameter{}(())

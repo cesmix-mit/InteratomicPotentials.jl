@@ -2,15 +2,15 @@
 ## employed within LAMMPS.
 
 ############################## ZBL ###################################
-struct ZBL <: EmpiricalPotential
-    Z₁
-    Z₂
-    e
-    rcutoff
-    species::AbstractVector{Symbol}
+struct ZBL{T<:AbstractFloat} <: EmpiricalPotential
+    Z₁::Int
+    Z₂::Int
+    e::T
+    rcutoff::T
+    species::Vector{Symbol}
 end
 function ZBL(Z₁::Integer, Z₂::Integer, e::Unitful.Charge, rcutoff::Unitful.Length, species::AbstractVector{Symbol})
-    ZBL(Z₁, Z₂, austrip(e), austrip(rcutoff), species)
+    ZBL(Z₁, Z₂, austrip(e), austrip(rcutoff), collect(species))
 end
 
 get_parameters(zbl::ZBL) = Parameter{}(())

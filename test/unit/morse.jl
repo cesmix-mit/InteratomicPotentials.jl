@@ -1,6 +1,6 @@
 @testset "Morse Unit Tests" begin
     D = 1.0u"eV"
-    α = 2
+    α = 2.0
     σ = 0.25u"bohr"
     rcutoff = 2.0u"Å"
     p = Morse(D, α, σ, rcutoff, [:Ar, :H])
