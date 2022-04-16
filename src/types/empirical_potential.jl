@@ -2,11 +2,11 @@
 # Types of Empirical Potentials
 ################################################################################
 
-include("lj.jl")
-include("bm.jl")
-include("coulomb.jl")
-include("zbl.jl")
-include("morse.jl")
+include("../empirical/lj.jl")
+include("../empirical/bm.jl")
+include("../empirical/coulomb.jl")
+include("../empirical/zbl.jl")
+include("../empirical/morse.jl")
 
 export LennardJones, BornMayer, Coulomb, ZBL, Morse
 
