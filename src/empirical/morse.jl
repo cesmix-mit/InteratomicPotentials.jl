@@ -11,6 +11,9 @@ struct Morse{T<:AbstractFloat} <: EmpiricalPotential
     end
 end
 
+get_rcutoff(m::Morse) = m.rcutoff
+get_species(m::Morse) = m.species
+
 get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))
 set_parameters(m::Morse, p::Parameter{(:D, :α, :σ)}) = Morse(p.D, p.α, p.σ, m.rcutoff, m.species)
 

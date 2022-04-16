@@ -2,6 +2,9 @@
 # InteratomicPotentials API default generic implmentations
 ################################################################################
 
+get_rcutoff(::ArbitraryPotential) = Inf
+get_species(::ArbitraryPotential) = missing
+
 potential_energy(A::AbstractSystem, p::ArbitraryPotential) = energy_and_force(A, p).e
 force(A::AbstractSystem, p::ArbitraryPotential) = energy_and_force(A, p).f
 virial(A::AbstractSystem, p::ArbitraryPotential) = sum(virial_stress(A, p)[1:3])

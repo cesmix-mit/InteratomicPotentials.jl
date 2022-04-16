@@ -10,6 +10,9 @@ struct Coulomb{T<:AbstractFloat} <: EmpiricalPotential
     end
 end
 
+get_rcutoff(c::Coulomb) = c.rcutoff
+get_species(c::Coulomb) = c.species
+
 get_parameters(::Coulomb) = Parameter{}()
 set_parameters(c::Coulomb, ::Parameter{}) = c
 

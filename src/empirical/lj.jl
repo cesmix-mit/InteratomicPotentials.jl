@@ -10,6 +10,9 @@ struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential
     end
 end
 
+get_rcutoff(lj::LennardJones) = lj.rcutoff
+get_species(lj::LennardJones) = lj.species
+
 get_parameters(lj::LennardJones) = Parameter{(:ϵ, :σ)}((lj.ϵ, lj.σ))
 set_parameters(lj::LennardJones, p::Parameter{(:ϵ, :σ)}) = LennardJones(p.ϵ, p.σ, lj.rcutoff, lj.species)
 

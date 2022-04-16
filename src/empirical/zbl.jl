@@ -14,6 +14,9 @@ struct ZBL{T<:AbstractFloat} <: EmpiricalPotential
     end
 end
 
+get_rcutoff(zbl::ZBL) = zbl.rcutoff
+get_species(zbl::ZBL) = zbl.species
+
 get_parameters(::ZBL) = Parameter{}()
 set_parameters(zbl::ZBL, ::Parameter{}) = zbl
 

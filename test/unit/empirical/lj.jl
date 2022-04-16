@@ -8,8 +8,8 @@
     @test p isa EmpiricalPotential
     @test p.ϵ == austrip(ϵ)
     @test p.σ == austrip(σ)
-    @test p.rcutoff == austrip(rcutoff)
-    @test p.species == (:Ar, :H)
+    @test get_rcutoff(p) == austrip(rcutoff)
+    @test get_species(p) == (:Ar, :H)
 
     @test get_parameters(p) == (; ϵ=austrip(ϵ), σ=austrip(σ))
     @test set_parameters(p, (; ϵ=2.0, σ=3.0)) == LennardJones(2.0, 3.0, austrip(rcutoff), species)

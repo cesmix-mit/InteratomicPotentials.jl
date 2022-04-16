@@ -10,6 +10,9 @@ struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential
     end
 end
 
+get_rcutoff(bm::BornMayer) = bm.rcutoff
+get_species(bm::BornMayer) = bm.species
+
 get_parameters(bm::BornMayer) = Parameter{(:A, :ρ)}((bm.A, bm.ρ))
 set_parameters(bm::BornMayer, p::Parameter{(:A, :ρ)}) = BornMayer(p.A, p.ρ, bm.rcutoff, bm.species)
 

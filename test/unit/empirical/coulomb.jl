@@ -8,8 +8,8 @@
     @test p isa EmpiricalPotential
     @test p.q₁ == austrip(q₁)
     @test p.q₂ == austrip(q₂)
-    @test p.rcutoff == austrip(rcutoff)
-    @test p.species == (:Ar, :H)
+    @test get_rcutoff(p) == austrip(rcutoff)
+    @test get_species(p) == (:Ar, :H)
 
     @test get_parameters(p) == (;)
     @test set_parameters(p, (;)) === p

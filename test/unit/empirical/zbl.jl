@@ -10,8 +10,8 @@
     @test p.Z₁ == Z₁
     @test p.Z₂ == Z₂
     @test p.e == austrip(e)
-    @test p.rcutoff == austrip(rcutoff)
-    @test p.species == (:Ar, :H)
+    @test get_rcutoff(p) == austrip(rcutoff)
+    @test get_species(p) == (:Ar, :H)
 
     @test get_parameters(p) == (;)
     @test set_parameters(p, (;)) === p
