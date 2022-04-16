@@ -18,23 +18,24 @@ include("mocks.jl")
         include("unit/unit_convention.jl")
         include("unit/nnlist.jl")
         @testset "Default Implementations" begin
-            include("unit/arbitrary_potential.jl")
-            include("unit/empirical_potential.jl")
+            include("unit/types/arbitrary_potential.jl")
+            include("unit/types/empirical_potential.jl")
         end
         @testset "Empirical Potentials" begin
-            include("unit/lj.jl")
-            include("unit/bm.jl")
-            include("unit/coulomb.jl")
-            include("unit/zbl.jl")
-            include("unit/morse.jl")
+            include("unit/empirical/lj.jl")
+            include("unit/empirical/bm.jl")
+            include("unit/empirical/coulomb.jl")
+            include("unit/empirical/zbl.jl")
+            include("unit/empirical/morse.jl")
         end
         @testset "Mixed Potentials" begin
-            include("unit/linear_combination_potential.jl")
+            include("unit/mixed/linear_combination_potential.jl")
         end
     end
 
     # The second set of tests are integration tests which incorporate multiple modules.
-    # These tests validate the numeric results of calcuations to ensure that the modules are logically (scientifically) correct.
+    # These tests validate the numeric results of calcuations to ensure that the modules are logically correct.
+    # In other words, they test that the full system works together and produces scientifically accurate results.
     @testset "Integration Tests" begin
         # TODO: Dallas
     end

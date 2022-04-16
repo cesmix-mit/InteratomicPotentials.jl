@@ -2,4 +2,4 @@
 # Types of Mixed Potentials
 ################################################################################
 
-include("linear_combination_potential.jl")
+include("../mixed/linear_combination_potential.jl")
