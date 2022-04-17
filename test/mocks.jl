@@ -12,7 +12,7 @@ function InteratomicPotentials.virial_stress(A::AbstractSystem, p::MockArbitrary
     (@SVector [p.seed - 1, p.seed - 2, p.seed - 3, p.seed - 4, p.seed - 5, p.seed - 6])u"hartree"
 end
 
-struct MockEmpiricalPotential <: EmpiricalPotential
+struct MockEmpiricalPotential <: EmpiricalPotential{Parameter{},Parameter{}}
     seed::Float64
     rcutoff::Float64
     species::Tuple
