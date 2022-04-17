@@ -1,5 +1,5 @@
 ############################## Morse ###################################
-struct Morse{T<:AbstractFloat} <: EmpiricalPotential{Parameter{(:D, :α, :σ)},Parameter{(:rcutoff,)}}
+struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
     D::T
     α::T
     σ::T

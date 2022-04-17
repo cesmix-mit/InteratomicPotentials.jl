@@ -1,5 +1,5 @@
 ##############################   Born-Mayer  ###################################
-struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential{Parameter{(:A, :ρ)},Parameter{(:rcutoff,)}}
+struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:A, :ρ)},NamedTuple{(:rcutoff,)}}
     A::T
     ρ::T
     rcutoff::T

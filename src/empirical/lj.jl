@@ -1,5 +1,5 @@
 ############################## Lennard Jones ###################################
-struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential{Parameter{(:ϵ, :σ)},Parameter{(:rcutoff,)}}
+struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
     ϵ::T
     σ::T
     rcutoff::T

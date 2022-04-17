@@ -11,7 +11,7 @@ include("../empirical/morse.jl")
 export LennardJones, BornMayer, Coulomb, ZBL, Morse
 
 ################################################################################
-# InteratomicPotentials API implmentations for empirical potentials
+# InteratomicPotentials API implementations for empirical potentials
 ################################################################################
 
 force(r::SVector{3}, p::EmpiricalPotential) = force(norm(r), r, p)

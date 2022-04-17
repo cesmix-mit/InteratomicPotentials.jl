@@ -2,7 +2,7 @@
 ## employed within LAMMPS.
 
 ############################## ZBL ###################################
-struct ZBL{T<:AbstractFloat} <: EmpiricalPotential{Parameter{()},Parameter{(:rcutoff,)}}
+struct ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
     Z₁::Int
     Z₂::Int
     e::T

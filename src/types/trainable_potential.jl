@@ -1,8 +1,8 @@
 ################################################################################
-# InteratomicPotentials API implmentations for trainable potentials
+# InteratomicPotentials API implementations for trainable potentials
 ################################################################################
 
-function get_parameters(tp::TrainablePotential{P}) where {names,P<:Parameter{names}}
+function get_parameters(tp::TrainablePotential{P}) where {names,P<:NamedTuple{names}}
     P((getproperty(tp, name) for name ∈ names))
 end
 function set_parameters(tp::TP, p::P) where {P,TP<:TrainablePotential{P}}
@@ -16,7 +16,7 @@ function deserialize_parameters(tp::TrainablePotential{P}, p::AbstractVector) wh
     set_parameters(tp, P(p))
 end
 
-function get_hyperparameters(tp::TrainablePotential{P,HP}) where {P,names,HP<:Parameter{names}}
+function get_hyperparameters(tp::TrainablePotential{P,HP}) where {P,names,HP<:NamedTuple{names}}
     HP((getproperty(tp, name) for name ∈ names))
 end
 function set_hyperparameters(tp::TP, p::HP) where {P,HP,TP<:TrainablePotential{P,HP}}

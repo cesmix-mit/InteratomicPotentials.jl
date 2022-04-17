@@ -1,5 +1,5 @@
 ##############################   Coulomb  ###################################
-struct Coulomb{T<:AbstractFloat} <: EmpiricalPotential{Parameter{()},Parameter{(:rcutoff,)}}
+struct Coulomb{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
     q₁::T
     q₂::T
     rcutoff::T
