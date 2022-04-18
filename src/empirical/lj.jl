@@ -13,5 +13,8 @@ struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ
     end
 end
 
+get_rcutoff(lj::LennardJones) = lj.rcutoff
+get_species(lj::LennardJones) = lj.species
+
 potential_energy(R::AbstractFloat, lj::LennardJones) = 4lj.ϵ * ((lj.σ / R)^12 - (lj.σ / R)^6)
 force(R::AbstractFloat, r::SVector{3}, lj::LennardJones) = (24lj.ϵ * (2(lj.σ / R)^12 - (lj.σ / R)^6) / R^2)r

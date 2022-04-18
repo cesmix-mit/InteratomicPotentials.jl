@@ -5,9 +5,8 @@
     species = [:Ar, :H]
     p = LennardJones(ϵ, σ, rcutoff, species)
 
-    @test p isa EmpiricalPotential
-    @test p.ϵ == austrip(ϵ)
-    @test p.σ == austrip(σ)
+    @test p isa EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
+
     @test get_rcutoff(p) == austrip(rcutoff)
     @test get_species(p) == (:Ar, :H)
 

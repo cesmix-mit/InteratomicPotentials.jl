@@ -10,6 +10,7 @@ function set_parameters(tp::TP, p::P) where {P,TP<:TrainablePotential{P}}
 end
 
 function serialize_parameters(tp::TrainablePotential)
+    # default beharior assumes parameters are all scalar, should be overloaded if this in not the case
     collect(get_parameters(tp))
 end
 function deserialize_parameters(tp::TrainablePotential{P}, p::AbstractVector) where {P}
@@ -24,6 +25,7 @@ function set_hyperparameters(tp::TP, p::HP) where {P,HP,TP<:TrainablePotential{P
 end
 
 function serialize_hyperparameters(tp::TrainablePotential)
+    # default beharior assumes hyperparameters are all scalar, should be overloaded if this in not the case
     collect(get_hyperparameters(tp))
 end
 function deserialize_hyperparameters(tp::TrainablePotential{P,HP}, p::AbstractVector) where {P,HP}

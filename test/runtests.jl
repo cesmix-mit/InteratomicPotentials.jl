@@ -19,6 +19,8 @@ include("mocks.jl")
         include("unit/nnlist.jl")
         @testset "Default Implementations" begin
             include("unit/types/abstract_potential.jl")
+            include("unit/types/non_trainable_potential.jl")
+            include("unit/types/trainable_potential.jl")
             include("unit/types/empirical_potential.jl")
         end
         @testset "Empirical Potentials" begin

@@ -14,6 +14,9 @@ struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},
     end
 end
 
+get_rcutoff(m::Morse) = m.rcutoff
+get_species(m::Morse) = m.species
+
 _morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
 
 potential_energy(R::AbstractFloat, m::Morse) = m.D * (1 - _morse_exp(R, m))^2

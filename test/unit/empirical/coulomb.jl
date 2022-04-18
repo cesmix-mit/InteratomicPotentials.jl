@@ -5,9 +5,8 @@
     species = [:Ar, :H]
     p = Coulomb(q₁, q₂, rcutoff, species)
 
-    @test p isa EmpiricalPotential
-    @test p.q₁ == austrip(q₁)
-    @test p.q₂ == austrip(q₂)
+    @test p isa EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
+
     @test get_rcutoff(p) == austrip(rcutoff)
     @test get_species(p) == (:Ar, :H)
 
