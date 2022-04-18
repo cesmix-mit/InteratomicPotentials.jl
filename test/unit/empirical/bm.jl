@@ -8,8 +8,8 @@
     @test p isa EmpiricalPotential
     @test p.A == austrip(A)
     @test p.ρ == austrip(ρ)
-    @test p.rcutoff == austrip(rcutoff)
-    @test p.species == (:Ar, :H)
+    @test get_rcutoff(p) == austrip(rcutoff)
+    @test get_species(p) == (:Ar, :H)
 
     @test get_parameters(p) == (; A=austrip(A), ρ=austrip(ρ))
     @test set_parameters(p, (; A=2.0, ρ=3.0)) == BornMayer(2.0, 3.0, austrip(rcutoff), species)

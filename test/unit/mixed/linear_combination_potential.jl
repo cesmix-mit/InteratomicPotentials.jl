@@ -21,56 +21,69 @@
         3.0 * (p1 + p2)
     ]
 
+    true_rcutoffs = [
+        1.0,
+        1.0,
+        Inf,
+        Inf,
+        1.0,
+        Inf,
+        Inf,
+        Inf
+    ]
     true_energies = [
-        1.0,
-        -1.0,
-        3.0,
-        -1.0,
-        2.0,
-        1.0,
-        0.0,
-        9.0
-    ]u"hartree"
+        potential_energy(system, p1),
+        -potential_energy(system, p1),
+        potential_energy(system, p1) + potential_energy(system, p2),
+        potential_energy(system, p1) - potential_energy(system, p2),
+        2 * potential_energy(system, p1),
+        potential_energy(system, p2) / 2,
+        2 * potential_energy(system, p1) - potential_energy(system, p2),
+        3 * (potential_energy(system, p1) + potential_energy(system, p2))
+    ]
     true_forces = [
-        SVector{3}.([[2.0, 3.0, 4.0], [2.0, 3.0, 4.0], [2.0, 3.0, 4.0], [2.0, 3.0, 4.0]]),
-        SVector{3}.([[-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0], [-2.0, -3.0, -4.0]]),
-        SVector{3}.([[5.0, 7.0, 9.0], [5.0, 7.0, 9.0], [5.0, 7.0, 9.0], [5.0, 7.0, 9.0]]),
-        SVector{3}.([[-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, -1.0]]),
-        SVector{3}.([[4.0, 6.0, 8.0], [4.0, 6.0, 8.0], [4.0, 6.0, 8.0], [4.0, 6.0, 8.0]]),
-        SVector{3}.([[1.5, 2.0, 2.5], [1.5, 2.0, 2.5], [1.5, 2.0, 2.5], [1.5, 2.0, 2.5]]),
-        SVector{3}.([[1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]),
-        SVector{3}.([[15.0, 21.0, 27.0], [15.0, 21.0, 27.0], [15.0, 21.0, 27.0], [15.0, 21.0, 27.0]])
-    ]u"hartree/bohr"
+        force(system, p1),
+        -force(system, p1),
+        force(system, p1) + force(system, p2),
+        force(system, p1) - force(system, p2),
+        2 * force(system, p1),
+        force(system, p2) / 2,
+        2 * force(system, p1) - force(system, p2),
+        3 * (force(system, p1) + force(system, p2))
+    ]
     true_virials = [
-        -3.0,
-        3.0,
-        -3.0,
-        -3.0,
-        -6.0,
-        0.0,
-        -6.0,
-        -9.0
-    ]u"hartree"
-    true_virial_stresses = SVector{6}.([
-        [0.0, -1.0, -2.0, -3.0, -4.0, -5.0],
-        [-0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
-        [1.0, -1.0, -3.0, -5.0, -7.0, -9.0],
-        [-1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
-        [0.0, -2.0, -4.0, -6.0, -8.0, -10.0],
-        [0.5, 0.0, -0.5, -1.0, -1.5, -2.0],
-        [-1.0, -2.0, -3.0, -4.0, -5.0, -6.0],
-        [3.0, -3.0, -9.0, -15.0, -21.0, -27.0]
-    ])u"hartree"
+        virial(system, p1),
+        -virial(system, p1),
+        virial(system, p1) + virial(system, p2),
+        virial(system, p1) - virial(system, p2),
+        2 * virial(system, p1),
+        virial(system, p2) / 2,
+        2 * virial(system, p1) - virial(system, p2),
+        3 * (virial(system, p1) + virial(system, p2))
+    ]
+    true_virial_stresses = [
+        virial_stress(system, p1),
+        -virial_stress(system, p1),
+        virial_stress(system, p1) + virial_stress(system, p2),
+        virial_stress(system, p1) - virial_stress(system, p2),
+        2 * virial_stress(system, p1),
+        virial_stress(system, p2) / 2,
+        2 * virial_stress(system, p1) - virial_stress(system, p2),
+        3 * (virial_stress(system, p1) + virial_stress(system, p2))
+    ]
 
-    for (p, te, tf, tv, tvs) in zip(mixed_potentials, true_energies, true_forces, true_virials, true_virial_stresses)
+    for (p, trc, te, tf, tv, tvs) in zip(mixed_potentials, true_rcutoffs, true_energies, true_forces, true_virials, true_virial_stresses)
         @test p isa MixedPotential
+
+        @test get_rcutoff(p) == trc
+        @test ismissing(get_species(p))
+
+        @test energy_and_force(system, p).e == te
+        @test energy_and_force(system, p).f == tf
 
         @test potential_energy(system, p) == te
         @test force(system, p) == tf
         @test virial(system, p) == tv
         @test virial_stress(system, p) == tvs
-
-        @test energy_and_force(system, p).e == te
-        @test energy_and_force(system, p).f == tf
     end
 end

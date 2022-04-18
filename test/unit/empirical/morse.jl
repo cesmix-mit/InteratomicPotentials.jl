@@ -10,8 +10,8 @@
     @test p.D == austrip(D)
     @test p.α == α
     @test p.σ == austrip(σ)
-    @test p.rcutoff == austrip(rcutoff)
-    @test p.species == (:Ar, :H)
+    @test get_rcutoff(p) == austrip(rcutoff)
+    @test get_species(p) == (:Ar, :H)
 
     @test get_parameters(p) == (; D=austrip(D), α, σ=austrip(σ))
     @test set_parameters(p, (; D=2.0, α=1.0, σ=3.0)) == Morse(2.0, 1.0, 3.0, austrip(rcutoff), species)
