@@ -4,7 +4,8 @@
 """
     ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
 
-# TODO (Dallas): description of ZBL
+#TODO: DALLAS
+The Ziegler-Biersack-Littmark (ZBL) screened nuclear repulsion for describing high-energy collisions between atoms.
 """
 struct ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
     Z₁::Int

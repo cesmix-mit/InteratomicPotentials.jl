@@ -27,18 +27,17 @@ The default implementation uses the `:f` property of `energy_and_force(s,p)`.
 """
 function force end
 """
-    virial(s::AbstractSystem, p::AbstractPotential)::Unitful.Energy
-
-# TODO (Dallas): write a description for the virial function
-"""
-function virial end
-"""
     virial_stress(s::AbstractSystem, p::AbstractPotential)::SVector{6,Unitful.Energy}
 
-# TODO (Dallas): write a description for the virial_stress function
+Calculate the unit-annotated virial stress tensor of a system, officially calculated as the sum of radial-force outerproducts: `` \\sum r_{ij} \\bigotimes F_{ij}``, only returns the unique lower-diagonal components.
 """
 function virial_stress end
+"""
+    virial(s::AbstractSystem, p::AbstractPotential)::Unitful.Energy
 
+Calculate the unit-annotated virial of a system, officially calculated as the trace contraction of the sum of radial-force outerproducts: ``tr\\left( \\sum r_{ij} \\bigotimes F_{ij} \\right)``
+"""
+function virial end
 """
     get_rcutoff(p::AbstractPotential)::AbstractFloat
 

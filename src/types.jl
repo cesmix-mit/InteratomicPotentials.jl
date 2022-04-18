@@ -30,7 +30,8 @@ include("types/trainable_potential.jl")
 """
     EmpiricalPotential{P<:NamedTuple,HP<:NamedTuple} <: TrainablePotential{P,HP}
 
-# TODO (Dallas): describe what an empirical potential is
+Defines an empirical potential, a heuristic function used to describe the intermolecular potential energy of a configuration of atoms. Various potentials have been found to agree empirically with the experimentally obtained potential energy of a configuration of atoms for particular atoms in particular situations. This package implements a number of such popular potentials.
+
 `P` is a `NamedTuple` of parameter names and `HP`` is a `NamedTuple`` of hyperparameter names.
 """
 abstract type EmpiricalPotential{P<:NamedTuple,HP<:NamedTuple} <: TrainablePotential{P,HP} end

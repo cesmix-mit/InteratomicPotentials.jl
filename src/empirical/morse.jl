@@ -1,7 +1,19 @@
 """
     Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
 
-# TODO (Dallas): description of Morse
+The Morse potential is a simple two-body intermolecular potential with three typical parameters, primarily describing the interaction of neutral atoms with more complex bond interactions. Formally, the interaction between two atoms at a distance, ``r``, is given by 
+
+```math
+\begin{equation}
+V_{M}(r; D, \\alpha, \\sigma, rcutoff, species) =
+    \begin{cases} 
+    0 & r > rcutoff \\
+    D \\left( 1 - e^{\\alpha(r - \\sigma)}\right)^2 & r < rcutoff.
+    \end{cases}
+\end{equation}
+```
+
+Users must supply three parameters, ``D`` (units of energy), ``\\alpha`` (units of inverse distance), ''\\sigma'' (units of distance), and radial cutoff (units of distance).
 """
 struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
     D::T

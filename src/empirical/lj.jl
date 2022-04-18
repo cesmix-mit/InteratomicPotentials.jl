@@ -1,18 +1,19 @@
 """
     LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
 
-The Lennard-Jones potential is a simple two-body intermolecular potential, primarily describing the interaction of neutral atoms. Formally, the interaction between two atoms at a distance, ``r``, is given by 
+The Lennard-Jones potential is a simple two-body intermolecular potential with two typical parameters, primarily describing the interaction of neutral atoms. Formally, the interaction between two atoms at a distance, ``r``, is given by 
 
-``
-\\begin{equation}
-V_{LJ}(r; \\epsilon, \\sigma, rcutoff) =
-    \\begin{cases} 
-    0 & r > rcutoff \\\
-    4\\epsilon \\lbrack \\frac{\\sigma}{r})^{12} - (\\frac{\\sigma}{r})^6 \\rbrack.
-    \\end{cases}
-\\end{equation}
-''
+```math
+\begin{equation}
+V_{LJ}(r; \\epsilon, \\sigma, rcutoff, species) =
+    \begin{cases} 
+        0 & r > rcutoff \\
+        4\\epsilon \\lbrack \\frac{\\sigma}{r})^{12} - (\\frac{\\sigma}{r})^6 \\rbrack & r < rcutoff.
+    \end{cases}
+\end{equation}
+```
 
+Users must supply two parameters, ``\\epsilon`` (units of energy), ``\\sigma`` (units of distance), and radial cutoff (units of distance).
 """
 struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
     ϵ::T
