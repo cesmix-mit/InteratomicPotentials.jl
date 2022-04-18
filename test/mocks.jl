@@ -1,18 +1,18 @@
-struct MockArbitraryPotential <: ArbitraryPotential
+struct MockAbstractPotential <: AbstractPotential
     seed::Float64
     species::Tuple
 end
-function InteratomicPotentials.energy_and_force(A::AbstractSystem, p::MockArbitraryPotential)
+function InteratomicPotentials.energy_and_force(A::AbstractSystem, p::MockAbstractPotential)
     (
         e=(p.seed)u"hartree",
         f=fill((@SVector[p.seed + 1, p.seed + 2, p.seed + 3])u"hartree/bohr", length(A))
     )
 end
-function InteratomicPotentials.virial_stress(A::AbstractSystem, p::MockArbitraryPotential)
+function InteratomicPotentials.virial_stress(A::AbstractSystem, p::MockAbstractPotential)
     (@SVector [p.seed - 1, p.seed - 2, p.seed - 3, p.seed - 4, p.seed - 5, p.seed - 6])u"hartree"
 end
 
-struct MockEmpiricalPotential <: EmpiricalPotential
+struct MockEmpiricalPotential <: EmpiricalPotential{NamedTuple{},NamedTuple{}}
     seed::Float64
     rcutoff::Float64
     species::Tuple

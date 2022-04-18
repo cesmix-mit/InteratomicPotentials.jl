@@ -9,9 +9,6 @@ using UnitfulAtomic
 using Distances
 using NearestNeighbors
 
-import Base.NamedTuple as Parameter
-export Parameter
-
 include("unit_convention.jl")
 include("constants.jl")
 include("nnlist.jl")

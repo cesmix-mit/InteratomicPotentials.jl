@@ -1,5 +1,5 @@
 ############################## Morse ###################################
-struct Morse{T<:AbstractFloat} <: EmpiricalPotential
+struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
     D::T
     α::T
     σ::T
@@ -9,19 +9,10 @@ struct Morse{T<:AbstractFloat} <: EmpiricalPotential
         D, α, σ, rcutoff = promote(austrip(D), α, austrip(σ), austrip(rcutoff))
         new{typeof(rcutoff)}(D, α, σ, rcutoff, Tuple(species))
     end
+    function Morse{T}(; D::T, α::T, σ::T, rcutoff::T, species::Tuple) where {T}
+        new{T}(D, α, σ, rcutoff, species)
+    end
 end
-
-get_parameters(m::Morse) = Parameter{(:D, :α, :σ)}((m.D, m.α, m.σ))
-set_parameters(m::Morse, p::Parameter{(:D, :α, :σ)}) = Morse(p.D, p.α, p.σ, m.rcutoff, m.species)
-
-serialize_parameters(m::Morse) = collect(get_parameters(m))
-deserialize_parameters(m::Morse, p::AbstractVector) = set_parameters(m, Parameter{(:D, :α, :σ)}(p))
-
-get_hyperparameters(m::Morse) = Parameter{(:rcutoff,)}((m.rcutoff,))
-set_hyperparameters(m::Morse, p::Parameter{(:rcutoff,)}) = Morse(m.D, m.α, m.σ, p.rcutoff, m.species)
-
-serialize_hyperparameters(m::Morse) = collect(get_hyperparameters(m))
-deserialize_hyperparameters(m::Morse, p::AbstractVector) = set_hyperparameters(m, Parameter{(:rcutoff,)}(p))
 
 _morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
 

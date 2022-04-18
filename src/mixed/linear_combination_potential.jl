@@ -1,16 +1,16 @@
 struct LinearCombinationPotential <: MixedPotential
-    potentials::Vector{ArbitraryPotential}
+    potentials::Vector{AbstractPotential}
     coefficients::Vector{AbstractFloat}
 end
-LinearCombinationPotential(p::ArbitraryPotential) = LinearCombinationPotential([p], [1])
+LinearCombinationPotential(p::AbstractPotential) = LinearCombinationPotential([p], [1])
 LinearCombinationPotential(p::LinearCombinationPotential) = p
 
-Base.:+(p::ArbitraryPotential) = +1 * p
-Base.:-(p::ArbitraryPotential) = -1 * p
-Base.:+(p1::ArbitraryPotential, p2::ArbitraryPotential) = LinearCombinationPotential(p1) + LinearCombinationPotential(p2)
-Base.:-(p1::ArbitraryPotential, p2::ArbitraryPotential) = p1 + -p2
-Base.:*(a::Real, p::ArbitraryPotential) = a * LinearCombinationPotential(p)
-Base.:/(p::ArbitraryPotential, a::Real) = (1.0 / a) * p
+Base.:+(p::AbstractPotential) = +1 * p
+Base.:-(p::AbstractPotential) = -1 * p
+Base.:+(p1::AbstractPotential, p2::AbstractPotential) = LinearCombinationPotential(p1) + LinearCombinationPotential(p2)
+Base.:-(p1::AbstractPotential, p2::AbstractPotential) = p1 + -p2
+Base.:*(a::Real, p::AbstractPotential) = a * LinearCombinationPotential(p)
+Base.:/(p::AbstractPotential, a::Real) = (1.0 / a) * p
 
 Base.:+(mp1::LinearCombinationPotential, mp2::LinearCombinationPotential) = LinearCombinationPotential(vcat(mp1.potentials, mp2.potentials), vcat(mp1.coefficients, mp2.coefficients))
 Base.:*(a::Real, mp::LinearCombinationPotential) = LinearCombinationPotential(mp.potentials, a * mp.coefficients)
