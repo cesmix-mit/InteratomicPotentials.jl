@@ -1,3 +1,5 @@
+# ! The contents of this file will eventually be made obsolete by the creation of a general neighbor list package.
+
 export NeighborList, neighborlist
 
 struct NeighborList
@@ -13,13 +15,13 @@ function get_displacement(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:Abstract
     @. ifelse(isinf(L), x - y, ifelse(2d < L, d, d - L))
 end
 
-function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
+function neighborlist(s::AbstractSystem{3}, rcutoff::Float64)
     # Convert Positions to Matrix for Ball tree
-    X = [SVector{3}(austrip.(p)) for p ∈ position(A)]
+    X = [SVector{3}(austrip.(p)) for p ∈ position(s)]
 
     # Create Metric for Periodic Boundary Conditions
-    periodic = periodicity(A)
-    L = @SVector [periodic[i] ? austrip(bounding_box(A)[i][i]) : Inf for i ∈ 1:3]
+    periodic = periodicity(s)
+    L = @SVector [periodic[i] ? austrip(bounding_box(s)[i][i]) : Inf for i ∈ 1:3]
     d = Distances.PeriodicEuclidean(L)
 
     # Build Ball tree

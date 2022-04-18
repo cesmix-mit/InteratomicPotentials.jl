@@ -1,4 +1,8 @@
-##############################   Born-Mayer  ###################################
+"""
+    BornMayer{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:A, :ρ)},NamedTuple{(:rcutoff,)}}
+
+# TODO (Dallas): description of BornMayer
+"""
 struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:A, :ρ)},NamedTuple{(:rcutoff,)}}
     A::T
     ρ::T

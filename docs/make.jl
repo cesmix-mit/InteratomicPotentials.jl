@@ -32,12 +32,12 @@ makedocs(bib;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://cesmix-mit.github.io/InteratomicPotentials.jl",
         assets = String[],
-        mathengine = MathJax3()
     ),
     pages = [
         "Home" => "index.md",
+        "InteratomicPotentials Interface" => "interface.md",
         "Examples" => examples,
-        "API" => "api.md",
+        "API Reference" => "api.md",
     ],
     doctest = true,
     linkcheck = true,

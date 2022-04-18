@@ -1,13 +1,13 @@
 struct MockAbstractPotential <: AbstractPotential
     seed::Float64
 end
-function InteratomicPotentials.energy_and_force(A::AbstractSystem, p::MockAbstractPotential)
+function InteratomicPotentials.energy_and_force(s::AbstractSystem, p::MockAbstractPotential)
     (
         e=(p.seed)u"hartree",
-        f=fill((@SVector[p.seed + 1, p.seed + 2, p.seed + 3])u"hartree/bohr", length(A))
+        f=fill((@SVector[p.seed + 1, p.seed + 2, p.seed + 3])u"hartree/bohr", length(s))
     )
 end
-function InteratomicPotentials.virial_stress(A::AbstractSystem, p::MockAbstractPotential)
+function InteratomicPotentials.virial_stress(s::AbstractSystem, p::MockAbstractPotential)
     (@SVector [p.seed - 1, p.seed - 2, p.seed - 3, p.seed - 4, p.seed - 5, p.seed - 6])u"hartree"
 end
 

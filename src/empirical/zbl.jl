@@ -1,7 +1,11 @@
-## This page is a work in progress. In particular, need to implement switching function that is typically 
-## employed within LAMMPS.
+# This implementation is WIP. In particular, need to implement switching function that is typically employed within LAMMPS.
+# See https://github.com/cesmix-mit/InteratomicPotentials.jl/issues/11
 
-############################## ZBL ###################################
+"""
+    ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
+
+# TODO (Dallas): description of ZBL
+"""
 struct ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
     Z₁::Int
     Z₂::Int

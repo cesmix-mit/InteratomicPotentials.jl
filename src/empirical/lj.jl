@@ -1,4 +1,8 @@
-############################## Lennard Jones ###################################
+"""
+    LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
+
+# TODO (Dallas): description of LennardJones
+"""
 struct LennardJones{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:ϵ, :σ)},NamedTuple{(:rcutoff,)}}
     ϵ::T
     σ::T

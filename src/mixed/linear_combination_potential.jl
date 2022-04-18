@@ -1,3 +1,9 @@
+"""
+    LinearCombinationPotential <: MixedPotential
+
+A potential which represents the linear combination of multiple sub-potentials.
+Performing algebraic operations on any `AbstractPotential` will create a potential of this type.
+"""
 struct LinearCombinationPotential <: MixedPotential
     potentials::Vector{AbstractPotential}
     coefficients::Vector{AbstractFloat}

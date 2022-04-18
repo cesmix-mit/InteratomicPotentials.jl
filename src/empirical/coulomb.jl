@@ -1,4 +1,8 @@
-##############################   Coulomb  ###################################
+"""
+    Coulomb{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
+
+# TODO (Dallas): description of Coulomb
+"""
 struct Coulomb{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
     q₁::T
     q₂::T

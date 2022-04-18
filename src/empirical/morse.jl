@@ -1,4 +1,8 @@
-############################## Morse ###################################
+"""
+    Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
+
+# TODO (Dallas): description of Morse
+"""
 struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
     D::T
     α::T
