@@ -8,8 +8,8 @@
     box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]u"bohr"
     system = periodic_system(atoms, box)
 
-    p1 = MockAbstractPotential(1.0, (:Ar, :H))
-    p2 = MockAbstractPotential(2.0, (:Ar, :H))
+    p1 = MockEmpiricalPotential(1.0, 1.0, (:Ar,))
+    p2 = MockAbstractPotential(2.0)
     mixed_potentials = [
         +p1,
         -p1,

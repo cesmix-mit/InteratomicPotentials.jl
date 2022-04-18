@@ -13,5 +13,8 @@ struct BornMayer{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:A, :ρ)},N
     end
 end
 
+get_rcutoff(bm::BornMayer) = bm.rcutoff
+get_species(bm::BornMayer) = bm.species
+
 potential_energy(R::AbstractFloat, bm::BornMayer) = bm.A * exp(-R / bm.ρ)
 force(R::AbstractFloat, r::SVector{3}, bm::BornMayer) = (bm.A * exp(-R / bm.ρ) / (bm.ρ * R))r

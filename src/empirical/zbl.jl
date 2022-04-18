@@ -17,13 +17,16 @@ struct ZBL{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{()},NamedTuple{(:r
     end
 end
 
-const _ϕ_coeffs = [0.18175, 0.50986, 0.28022, 0.02817]
-const _ϕ_exps = [3.19980, 0.94229, 0.40290, 0.20162]
-_ϕ(d::AbstractFloat, e::AbstractFloat) = sum(coeff * e^(-exp * d) for (coeff, exp) ∈ zip(_ϕ_coeffs, _ϕ_exps))
-_dϕdr(d::AbstractFloat, e::AbstractFloat) = -sum(exp * coeff * e^(-exp * d) for (coeff, exp) ∈ zip(_ϕ_coeffs, _ϕ_exps))
+get_rcutoff(zbl::ZBL) = zbl.rcutoff
+get_species(zbl::ZBL) = zbl.species
+
+const ϕ_coeffs = [0.18175, 0.50986, 0.28022, 0.02817]
+const ϕ_exps = [3.19980, 0.94229, 0.40290, 0.20162]
+ϕ(d::AbstractFloat, e::AbstractFloat) = sum(coeff * e^(-exp * d) for (coeff, exp) ∈ zip(ϕ_coeffs, ϕ_exps))
+dϕdr(d::AbstractFloat, e::AbstractFloat) = -sum(exp * coeff * e^(-exp * d) for (coeff, exp) ∈ zip(ϕ_coeffs, ϕ_exps))
 
 _zbl_coeff(zbl::ZBL) = kₑ * zbl.Z₁ * zbl.Z₂ * zbl.e^2
 _zbl_d(R::AbstractFloat, zbl::ZBL) = R / (0.8854 * 0.529 / (zbl.Z₁^(0.23) + zbl.Z₂^(0.23)))
 
-potential_energy(R::AbstractFloat, zbl::ZBL) = _zbl_coeff(zbl) * _ϕ(_zbl_d(R, zbl), zbl.e) / R
-force(R::AbstractFloat, r::SVector{3}, zbl::ZBL) = (_zbl_coeff(zbl) * (_ϕ(_zbl_d(R, zbl), zbl.e) + _zbl_d(R, zbl) * _dϕdr(_zbl_d(R, zbl), zbl.e)) / R^3)r
+potential_energy(R::AbstractFloat, zbl::ZBL) = _zbl_coeff(zbl) * ϕ(_zbl_d(R, zbl), zbl.e) / R
+force(R::AbstractFloat, r::SVector{3}, zbl::ZBL) = (_zbl_coeff(zbl) * (ϕ(_zbl_d(R, zbl), zbl.e) + _zbl_d(R, zbl) * dϕdr(_zbl_d(R, zbl), zbl.e)) / R^3)r

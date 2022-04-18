@@ -10,7 +10,7 @@ Base.length(nn::NeighborList) = length(nn.j)
 # calculates displacement vector x - y with respect to the boundary conditions L
 function get_displacement(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
     d = mod.(x - y, L)
-    @. ifelse(L == Inf, x - y, ifelse(2d < L, d, d - L))
+    @. ifelse(isinf(L), x - y, ifelse(2d < L, d, d - L))
 end
 
 function neighborlist(A::AbstractSystem{3}, rcutoff::Float64)
