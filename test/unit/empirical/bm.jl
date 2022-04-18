@@ -5,9 +5,8 @@
     species = [:Ar, :H]
     p = BornMayer(A, ρ, rcutoff, species)
 
-    @test p isa EmpiricalPotential
-    @test p.A == austrip(A)
-    @test p.ρ == austrip(ρ)
+    @test p isa EmpiricalPotential{NamedTuple{(:A, :ρ)},NamedTuple{(:rcutoff,)}}
+
     @test get_rcutoff(p) == austrip(rcutoff)
     @test get_species(p) == (:Ar, :H)
 

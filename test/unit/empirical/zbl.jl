@@ -6,10 +6,8 @@
     species = [:Ar, :H]
     p = ZBL(Z₁, Z₂, e, rcutoff, species)
 
-    @test p isa EmpiricalPotential
-    @test p.Z₁ == Z₁
-    @test p.Z₂ == Z₂
-    @test p.e == austrip(e)
+    @test p isa EmpiricalPotential{NamedTuple{()},NamedTuple{(:rcutoff,)}}
+
     @test get_rcutoff(p) == austrip(rcutoff)
     @test get_species(p) == (:Ar, :H)
 

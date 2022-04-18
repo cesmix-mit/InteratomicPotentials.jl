@@ -11,6 +11,14 @@ function InteratomicPotentials.virial_stress(A::AbstractSystem, p::MockAbstractP
     (@SVector [p.seed - 1, p.seed - 2, p.seed - 3, p.seed - 4, p.seed - 5, p.seed - 6])u"hartree"
 end
 
+struct MockNonTrainablePotential <: NonTrainablePotential end
+
+Base.@kwdef struct MockTrainablePotential <: TrainablePotential{NamedTuple{(:A, :B)},NamedTuple{(:C,)}}
+    A::Float64
+    B::Float64
+    C::Float64
+end
+
 struct MockEmpiricalPotential <: EmpiricalPotential{NamedTuple{},NamedTuple{}}
     seed::Float64
     rcutoff::Float64

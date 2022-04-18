@@ -6,10 +6,8 @@
     species = [:Ar, :H]
     p = Morse(D, α, σ, rcutoff, species)
 
-    @test p isa EmpiricalPotential
-    @test p.D == austrip(D)
-    @test p.α == α
-    @test p.σ == austrip(σ)
+    @test p isa EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
+
     @test get_rcutoff(p) == austrip(rcutoff)
     @test get_species(p) == (:Ar, :H)
 
