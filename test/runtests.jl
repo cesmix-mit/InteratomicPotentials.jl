@@ -40,5 +40,8 @@ include("mocks.jl")
     # In other words, they test that the full system works together and produces scientifically accurate results.
     @testset "Integration Tests" begin
         # TODO: Dallas
+        include("integration/lj_clusters/lj_150.jl")
+        include("integration/lj_clusters/lj_1000.jl")
+
     end
 end
