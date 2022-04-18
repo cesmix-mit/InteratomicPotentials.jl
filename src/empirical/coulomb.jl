@@ -15,5 +15,6 @@ end
 
 get_rcutoff(c::Coulomb) = c.rcutoff
 get_species(c::Coulomb) = c.species
+
 potential_energy(R::AbstractFloat, c::Coulomb) = kₑ * c.q₁ * c.q₂ / R
 force(R::AbstractFloat, r::SVector{3}, c::Coulomb) = (kₑ * c.q₁ * c.q₂ / R^3)r

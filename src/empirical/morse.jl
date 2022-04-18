@@ -18,7 +18,6 @@ get_rcutoff(m::Morse) = m.rcutoff
 get_species(m::Morse) = m.species
 
 _morse_exp(R::AbstractFloat, m::Morse) = exp(-m.α * (R - m.σ))
-get_rcutoff(m::Morse) = m.rcutoff
-get_species(m::Morse) = m.species
+
 potential_energy(R::AbstractFloat, m::Morse) = m.D * (1 - _morse_exp(R, m))^2
 force(R::AbstractFloat, r::SVector{3}, m::Morse) = (2 * m.D * m.α * (1 - _morse_exp(R, m)) * _morse_exp(R, m) / R)r
