@@ -1,4 +1,4 @@
-# Implementing the InteratomicPotentials API
+# InteratomicPotentials Interface
 
 <!--
 TODO (Dallas): write explanation of how to create new potentials of various types
