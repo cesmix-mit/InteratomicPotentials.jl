@@ -1,10 +1,5 @@
 # InteratomicPotentials Interface
 
-<!--
-TODO (Dallas): write explanation of how to create new potentials of various types
-example: https://cesmix-mit.github.io/Atomistic.jl/dev/interface/
--->
-
 # Instantiating a Built-In Interatomic Potentials
 There are a number of built-in interatomic potentials that are available for users: Born-Mayer-Huggins, Lennard-Jones, Coulomb's Law, and Morse. These potentials are subtypes of `EmpiricalPotential`. There are additional basis potentials, the Spectral Neighbor Analysis Potential and Atomic Cluster Expansion, available in the related package `InteratomicBasisPotentials.jl`. In order to instantiate a potential, you need to provide the necessary potential parameters (see API documentation), radial cutoff, and species (i.e. elements) for which the potential is defined for.
 
