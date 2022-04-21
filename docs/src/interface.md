@@ -19,7 +19,7 @@ lj = LennardJones(ϵ, σ, rcutoff, species)
 
 In general, empirical potentials handles have the signature:
 ```julia
-MockPotential{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:a, :b, ..., :e)},NamedTuple{(:rcutoff,)}}
+CustomPotential{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:a, :b, ..., :e)},NamedTuple{(:rcutoff,)}}
 # where parameters are :a, :b, ..., :e
 ```
 
