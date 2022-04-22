@@ -3,15 +3,15 @@
 
 The Born-Mayer-Huggins potential is a two-body intermolecular potential with five typical parameters, primarily describing the interaction of neutral atoms. Formally, the interaction between two atoms at a distance, ``r``, is given by 
 
-```math
-\begin{aligned}
-V_{LJ}(r; \epsilon, \sigma, rcutoff, species) =
-    \begin{cases} 
-    0 & r > rcutoff \\
-    A e^{\frac{\sigma-r}{\rho}} + \left( \frac{C}{r} \right)^8 - \left( \frac{D}{r} \right) & r < rcutoff.
-    \end{cases}
-\end{aligned}
-```
+'''math
+\\begin{aligned}
+V_{LJ}(r; \\epsilon, \\sigma, rcutoff, species) =
+    \\begin{cases} 
+    0 & r > rcutoff \\\\
+    A e^{\\frac{\\sigma-r}{\\rho}} + \\left( \\frac{C}{r} \\right)^8 - \\left( \\frac{D}{r} \\right) & r < rcutoff.
+    \\end{cases}
+\\end{aligned}
+'''
 
 Users must supply five parameters, ``A`` (units of energy), ``\\sigma`` (units of distance), ``\\rho`` (units of distance), ``C`` ``\\&`` ``D`` (units of energy ``\\times`` units of distance), and radial cutoff (units of distance).
 """
