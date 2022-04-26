@@ -1,4 +1,4 @@
-abstract type BasisPotential <: ArbitraryPotential end
+abstract type BasisPotential <: AbstractPotential end
 abstract type BasisParameters end
 
 ################################################################################

@@ -6,28 +6,28 @@ struct SNAP <: BasisPotential
     basis_params :: SNAPParams
 end
 
-get_parameters(snap::SNAP) = Parameter{(:β,)}((snap.coefficients,))
-serialize_parameters(p::Vector, snap::SNAP) = Parameter{(:β,)}((p,))
-deserialize_parameters(p::Parameter{(:β,)}, snap::SNAP) = p.β
+# get_parameters(snap::SNAP) = Parameter{(:β,)}((snap.coefficients,))
+# serialize_parameters(p::Vector, snap::SNAP) = Parameter{(:β,)}((p,))
+# deserialize_parameters(p::Parameter{(:β,)}, snap::SNAP) = p.β
 
-get_hyperparameters(snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
-    snap.basis_params.twojmax, snap.basis_params.rcutfac, snap.basis_params.rmin0, snap.basis_params.rfac0, snap.basis_params.radii,
-    snap.basis_params.weight, snap.basis_params.chem_flag, snap.basis_params.bzero_flag, snap.basis_params.bnorm_flag,
-    snap.basis_params.switch_flag, snap.basis_params.wselfall_flag))
-set_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
-                                     :Radii, :Weights, :Chem, :Bzero, 
-                                     :Bnorm, :Switch, :Wself))}, 
-                        snap::SNAP) = SNAP(snap.coefficients, SNAPParams(snap.basis_params.n_atoms, 
-                            p.TwoJMax, snap.basis_params.species, p.Rcutfac, p.Rmin0, p.Rfac0,
-                            p.Radii, p.Weights, p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself))
-serialize_hyperparameters(p::Vector, snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
-    p[1], p[2], p[3], p[4], p[5:5+snap.basis_params.n_atoms],  
-    p[5+snap.basis_params.n_atoms:5+2*snap.basis_params.n_atoms], p[end-4], p[end-3], p[end-2],
-    p[end-1], p[end]))
-deserialize_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
-                            :Radii, :Weights, :Chem, :Bzero,  
-                            :Bnorm, :Switch, :Wself))}, 
-            snap::SNAP) = [p.TwoJMax, p.Rcutfac, p.Rmin0, p.Rfac0, p.Radii..., p.Weights..., p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself]
+# get_hyperparameters(snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
+#     snap.basis_params.twojmax, snap.basis_params.rcutfac, snap.basis_params.rmin0, snap.basis_params.rfac0, snap.basis_params.radii,
+#     snap.basis_params.weight, snap.basis_params.chem_flag, snap.basis_params.bzero_flag, snap.basis_params.bnorm_flag,
+#     snap.basis_params.switch_flag, snap.basis_params.wselfall_flag))
+# set_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
+#                                      :Radii, :Weights, :Chem, :Bzero, 
+#                                      :Bnorm, :Switch, :Wself))}, 
+#                         snap::SNAP) = SNAP(snap.coefficients, SNAPParams(snap.basis_params.n_atoms, 
+#                             p.TwoJMax, snap.basis_params.species, p.Rcutfac, p.Rmin0, p.Rfac0,
+#                             p.Radii, p.Weights, p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself))
+# serialize_hyperparameters(p::Vector, snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
+#     p[1], p[2], p[3], p[4], p[5:5+snap.basis_params.n_atoms],  
+#     p[5+snap.basis_params.n_atoms:5+2*snap.basis_params.n_atoms], p[end-4], p[end-3], p[end-2],
+#     p[end-1], p[end]))
+# deserialize_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
+#                             :Radii, :Weights, :Chem, :Bzero,  
+#                             :Bnorm, :Switch, :Wself))}, 
+#             snap::SNAP) = [p.TwoJMax, p.Rcutfac, p.Rmin0, p.Rfac0, p.Radii..., p.Weights..., p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself]
 
 
                                                         
