@@ -42,6 +42,6 @@ include("mocks.jl")
         # TODO: Dallas
         include("integration/lj_clusters/lj_150.jl")
         include("integration/lj_clusters/lj_1000.jl")
-
+        include("integration/lj_clusters/lj_10000.jl")
     end
 end

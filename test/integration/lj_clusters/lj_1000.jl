@@ -21,12 +21,12 @@
     @test sum(fs)[2] ≈ fi  atol=f_a_tol
     @test sum(fs)[3] ≈ fi  atol=f_a_tol
 
-    for ff in fs
-        for ffi in ff
-            @test ffi ≈ fi atol = f_a_tol
-        end
-        # break
-    end
+    # for ff in fs
+    #     for ffi in ff
+    #         @test ffi ≈ fi atol = f_a_tol
+    #     end
+    #     # break
+    # end
     # @test virial(system, p) ≈ auconvert(0.0 * 1u"eV") atol=e_a_tol
 
 end
