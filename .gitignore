@@ -1,0 +1,15 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# generated docs
+docs/build/
+docs/src/generated/
+
+Manifest.toml
+
+# LAMMPS artifacts
+log.lammps
+
+# macOS
+.DS_Store

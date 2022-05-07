@@ -83,5 +83,5 @@ end
 @test sum(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
 
 
-@test isa(potential_energy(system, SNAP(ones(num_coeffs), snap) ), Float64)
-@test isa(force(system, SNAP(ones(num_coeffs), snap)), AbstractVector{<:SVector{3,<:AbstractFloat}})
+@test isa(potential_energy(system, SNAP(ones(num_coeffs), snap)), Unitful.Energy)
+@test isa(force(system, SNAP(ones(num_coeffs), snap)), AbstractVector{<:SVector{3,<:Unitful.Force}})
