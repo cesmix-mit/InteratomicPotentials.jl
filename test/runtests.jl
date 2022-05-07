@@ -13,7 +13,7 @@ include("mocks.jl")
     # The first set of tests are simple unit tests that generally test just one module at a time.
     # These tests collectively have high code coverage and test whether each module is structurally correct.
     # They do not validate the numeric results for scientific accuracy.
-    @testset "Unit Tests" begin
+    @time @testset "Unit Tests" begin
         include("unit/constants.jl")
         include("unit/unit_convention.jl")
         include("unit/nnlist.jl")
@@ -38,10 +38,8 @@ include("mocks.jl")
     # The second set of tests are integration tests which incorporate multiple modules.
     # These tests validate the numeric results of calcuations to ensure that the modules are logically correct.
     # In other words, they test that the full system works together and produces scientifically accurate results.
-    @testset "Integration Tests" begin
-        # TODO: Dallas
+    @time @testset "Integration Tests" begin
         include("integration/lj_clusters/lj_150.jl")
         include("integration/lj_clusters/lj_1000.jl")
-        include("integration/lj_clusters/lj_10000.jl")
     end
 end
