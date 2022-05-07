@@ -13,3 +13,6 @@ log.lammps
 
 # macOS
 .DS_Store
+
+# PProf Outputs
+profile.pb.gz

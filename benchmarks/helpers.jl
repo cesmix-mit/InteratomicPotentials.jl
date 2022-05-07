@@ -1,5 +1,6 @@
 using AtomsBase
 using InteratomicPotentials
+using LinearAlgebra
 using Unitful
 using UnitfulAtomic
 
