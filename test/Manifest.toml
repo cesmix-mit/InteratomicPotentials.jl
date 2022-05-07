@@ -297,9 +297,9 @@ version = "0.1.0"
 
 [[LAMMPS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "MPItrampoline_jll", "MicrosoftMPI_jll", "Pkg"]
-git-tree-sha1 = "ecc23872bf20665a1bd94a490ba4178bb849a17c"
+git-tree-sha1 = "e250d92d24194b772bc0d07d813ab832e63273b8"
 uuid = "5b3ab26d-9607-527c-88ea-8fe5ba57cafe"
-version = "1.0.1+1"
+version = "1.0.1+2"
 
 [[LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]

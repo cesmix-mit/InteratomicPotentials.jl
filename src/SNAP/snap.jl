@@ -170,7 +170,7 @@ function evaluate_full(A::AbstractSystem, snap::SNAPParams)
     B = [zeros(num_coeff) for i = 1:number_of_particles]
     dB = [zeros(num_coeff*length(snap.species), 3) for i = 1:number_of_particles]
     W = [zeros(num_coeff*length(snap.species), 6) for i = 1:number_of_particles]
-
+    print(size(B), size(dB))
     for  (i, ai) in enumerate(A)
         i_element = findall(x->x==Symbol(ai.atomic_symbol), snap.species)[1]
 
@@ -195,7 +195,7 @@ function evaluate_full(A::AbstractSystem, snap::SNAPParams)
             ## Need to zero-out dulist and dblist each time
 
             # Now compute dulist for (i,j)
-            compute_duidrj(rij, wj, rcut, jj, snap, runtime_arrays)
+            compute_duidrj(rij, wj, rcut, ind+1, snap, runtime_arrays)
             compute_dbidrj(j_element, snap, runtime_arrays)
 
             dB[ii][(i_offset+1):(num_coeff+i_offset), :] += runtime_arrays.dblist

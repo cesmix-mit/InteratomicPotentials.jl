@@ -30,15 +30,15 @@ function compute_ui(
         r   = sqrt(rsq) 
         theta0 = (r - snap.rmin0) * snap.rfac0 * pi / (rcutij - snap.rmin0) 
         z0 = r / tan(theta0)
-        compute_uarray(x, y, z, z0, r, jj, 
+        compute_uarray(x, y, z, z0, r, ind+1, 
                 snap, 
                 runtime_arrays)
         
         if (snap.chem_flag)
             add_uarraytot(r, rcutij, wj,
-                    jj, elementj, snap, runtime_arrays)
+                    ind+1, elementj, snap, runtime_arrays)
         else
-            add_uarraytot(r, rcutij, wj, jj, 1, snap, runtime_arrays)
+            add_uarraytot(r, rcutij, wj, ind+1, 1, snap, runtime_arrays)
         end
     end
 end
