@@ -244,9 +244,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[InteratomicPotentials]]
 deps = ["AtomsBase", "Distances", "LinearAlgebra", "NearestNeighbors", "StaticArrays", "Unitful", "UnitfulAtomic"]
-git-tree-sha1 = "8cf1c48c7516d3956a1372ea6252f950ce6a3be0"
+git-tree-sha1 = "70882d6528e7ed4d76869dceb71fec79e57d6a77"
 uuid = "a9efe35a-c65d-452d-b8a8-82646cd5cb04"
-version = "0.1.13"
+version = "0.2.0"
 
 [[InverseFunctions]]
 deps = ["Test"]
@@ -417,9 +417,9 @@ version = "0.3.7"
 
 [[NearestNeighbors]]
 deps = ["Distances", "StaticArrays"]
-git-tree-sha1 = "16baacfdc8758bc374882566c9187e785e85c2f0"
+git-tree-sha1 = "ded92de95031d4a8c61dfb6ba9adb6f1d8016ddd"
 uuid = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
-version = "0.4.9"
+version = "0.4.10"
 
 [[NeighbourLists]]
 deps = ["LinearAlgebra", "StaticArrays"]
