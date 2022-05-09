@@ -1,6 +1,3 @@
-```@bibliography
- ```
-
 # InteratomicBasisPotentials
 
 Package that provides add-ons to the [InteratomicPotentials.jl](https://github.com/cesmix-mit/InteratomicPotentials.jl) package for interatomic potentials that are defined using basis functions, in particular we support the Spectral Neighbor Analysis Potential (SNAP) [Thompson2015](@cite) and the Atomic Cluster Expansion (ACE) [Drautz2019](@cite). Defines an API for abstract interatomic potentials (currently supporting 2-body interactions) and the atomic configuration interface defined by AtomsBase.jl.
