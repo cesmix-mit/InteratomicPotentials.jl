@@ -10,30 +10,11 @@ TODO (Dallas): The description here is very out of date.
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/stable)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/dev)
 
-This module implements methods (energies, forces, and virial tensors) for a variety of interatomic potentials, including the SNAP Potential (Thompson et al. 2014, see notes for current limitations).
+This repository implements some basic language and syntax for manipulating interatomic potentials in Julia. The primary purpose of this package is to design a flexible package for use with data-driven and parameter-fitted interatomic potentials. This package is also being designed in order to allow users to define custom potentials and forces for use in molecular dynamics.
 
-Project goals:
+This package is part of the CESMIX molecular modeling suite. This package is also intended to be used with Atomistic.jl (for molecular dynamics, with Molly.jl), InteratomicBasisPotentials.jl (for machine learning potentials like SNAP and ACE), and  PotentialLearning.jl (for fitting potentials from data).
 
-- Having a defined structure for each potential
-  - The potential structure will hold the trainable and nontrainable parameters
-  - The potential structure will naturally plug-and-play with fitting and uncertainty quantification codes (PotentialLearning.jl and PotentialUQ.jl)
-  - Todo: Develop a struct and interface for Interatomic Potentials that allows the creation of more complex potentials (i.e., sums of potentials or mixed type potentials for systems with multiple elements.)
-- Allow for easy use of automatic differentiation through framework.
-
-Right now, this module contains the framework for the following potentials
-
-- Lennard Jones
-- SNAP (explicit multi-element support (chem flag) is nominally supported but not currently tested.)
-
-To Dos:
-
-- Improve neighborlist framework for multi-element systems (i.e. allowing potentials to differentiate based on the element of atom i and atom j).
-- Finish testing SNAP potential for explicit multi-element flag.
-- Create a structure that allows for the complexification and combination of interatomic potentials.
-  - Ideally this would allow for the specification of which potential should be used in multi-element systems for each pair of elements.
-- Add zbl potential.
-- Interface with MDP.
-- See issues for more topics.
+This package is a work in progress. 
 
 ## Working Example
 
@@ -44,47 +25,73 @@ In order to compute the interatomic energy of a system, or the forces between at
 
 Once these two structures have ben instantiated, the quantity of interest can be computed using the signature `func(system, potential)`.
 
+First, let's create a configuration:
 ```julia
+using AtomsBase, Unitful, UnitfulAtomic
 # Define an atomic system
+element = :Ar
 atom1     = Atom(element, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
 atom2    = Atom(element, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
 box = [[1., 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]] * 1u"Å"
 bcs = [DirichletZero(), Periodic(), Periodic()]
 system   = FlexibleSystem(atoms, box , bcs)
-
-ϵ = 1.0
+```
+Now we can define the parameters of our interatomic potential:
+```julia
+ϵ = 1.0 * 1u"eV"
 σ = 0.25 * 1u"Å"
-rcutoff  = 2.0 * 1u"Å"
-lj       = LennardJones(ϵ, σ, rcutoff)           # <: EmpiricalPotential <: ArbitraryPotential
-pe       = potential_energy(system, lj)               # <: Float64
-f        = force(system, lj)                          # <: Vector{SVector{3, Float64}}
-v        = virial(system, lj)                         # <: Float64
-v_tensor = virial_stress(system, lj)                  # <: SVector{6, Float64}
+rcutoff  = 2.25 * 1u"Å"
+lj       = LennardJones(ϵ, σ, rcutoff, [element])           # <: EmpiricalPotential <: AbstractPotential
+```
+
+Now we can compute a variety of quantities of the system:
+```julia
+pe       = potential_energy(system, lj)               # <: Float64 (Hartree)
+f        = force(system, lj)                          # <: Vector{SVector{3, Float64}} (Hartree/Bohr)
+v        = virial(system, lj)                         # <: Float64 (Hartree)
+v_tensor = virial_stress(system, lj)                  # <: SVector{6, Float64} (Hartree)
+```
+
+When computing the force, the energy is already available. A convenience implementation that returns both quantities is given by:
+```julia 
+pe, f    = energy_and_force(system, lj)
 ```
 
 See "/test/" for further examples.
 
+## Utility functions
+There are a growing number of features designed to allow handle of potential parameter easier. For example, one can retrieve the parameters of a potential via:
+```julia
+get_rcutoff(lj) # Gets radial cutoff (here: 2.25 * 1u"Angstrom")
+get_species(lj) # Returns the species the potential is defined for (here: [:Ar])
+get_parameters(lj) # Returns the parameters (here: [ϵ, σ])
+set_parameters(lj, (ϵ = 2.0 * 1u"eV", σ = 1.0 * 1u"Å")) # Set parameters (returns a new potential)
+```
+
 ## Potential Types
 
-All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. At this point, as of v0.11, there are two branches of potentials: `EmpiricalPotential` and `BasisPotential`. `EmpiricalPotential`s include two-body potentials like `BornMayer`, `LennardJones`. `BasisPotential` require the expansion of the configration of atoms using some basis set of functions and a set of coefficients for each of the members of the expansion in order to calculate energies and forces (i.e. `SNAP`).
+All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. At this point, as of v2.0, there are two branches of potentials: `EmpiricalPotential` and `MixedPotentials`. A sister package, ```julia InteratomicBasisPotentials.jl``` defines a potential called `BasisPotential`, see that package for additional details.
+
+`EmpiricalPotential`s include two-body potentials like `BornMayer`, `LennardJones`. `MixedPotential` is a convenience type for allowing the linear combination of potentials. An example would be:
+```julia
+lj1 = LennardJones(1.0 * u"eV", 1.0 * u"Angstrom", 2.5 * u"Angstrom", [:Ar]) # Ar-Ar Interactions
+lj2 = LennardJones(1.0 * u"eV", 1.5 * u"Angstrom", 3.0 * u"Angstrom", [:Xe]) # Xe-Xe Interactions
+lj3 = LennardJones(1.5 * u"eV", 1.3 * u"Angstrom", 2.5 * u"Angstrom", [:Ar, :Xe]) # Ar-Xe Interactions
+lj = lj1 + lj2 + lj3# Potential defined for all interactions in an Ar-Xe system.
+```
 
 ```julia
-EmpiricalPotential <: ArbitraryPotential
+EmpiricalPotential <: AbstractPotential
 BornMayer <: EmpiricalPotential
 LennardJones <: EmpiricalPotential
 Coulomb     <: EmpiricalPotential
 ZBL         <: EmpiricalPotential
 
-BasisPotential <: ArbitraryPotential
+LinearCombinationPotential <: MixedPotential
+
+# See InteratomicBasisPotentials.jl
+BasisPotential <: AbstractPotential
 SNAP           <: BasisPotential
+ACE            <: BasisPotential
 ```
 
-`BasisPotential` are associated with the functions that evaluate the basis set with parameters necessary for the particular basis expansion used. For example,
-
-```julia
-SNAP_parameters = SNAPParams(...)
-basis_evaluation = evaluate(system, SNAP_parameters)
-gradient_basis_evaulation = evaluate_d(system, SNAP_parameters)
-```
-
-For linear basis expansions, the energies and forces are dot products between the potential coefficients and the results of `evaulate` and `evalulate_d`, respectively.
