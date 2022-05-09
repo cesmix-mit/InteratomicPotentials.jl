@@ -21,6 +21,7 @@ jobs:
             using Pkg
             Pkg.Registry.add("General")
             Pkg.Registry.add(RegistrySpec(url = "https://github.com/cesmix-mit/CESMIX.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaMolSim/MolSim.git"))
           '
         shell: bash
       - name: instantiate docs
