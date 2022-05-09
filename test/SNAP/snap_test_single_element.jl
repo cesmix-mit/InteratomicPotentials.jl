@@ -16,7 +16,9 @@ weight = [1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-num_coeffs = get_num_snap_coeffs(twojmax, num_elements, chem_flag)
+snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
+
+num_coeffs = length(snap)
 
 print_flag = false
 
@@ -33,7 +35,6 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Ar,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
-snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
 
 B, dB, vB = evaluate_full(system, snap)
 

@@ -17,7 +17,6 @@ function compute_zi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
                 nb = snap.prebuilt_arrays.idxz[jjz].nb;
 
                 cgblock = snap.prebuilt_arrays.cglist[snap.prebuilt_arrays.idxcg_block[j1+1, j2+1, j+1]+1:end];
-                # println("cgblock $cgblock")
                 runtime_arrays.zlist_r[idouble*snap.prebuilt_arrays.idxz_max + jjz] = 0.0;
                 runtime_arrays.zlist_i[idouble*snap.prebuilt_arrays.idxz_max + jjz] = 0.0;
 
@@ -44,7 +43,6 @@ function compute_zi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
                         ma2-=1;
                         icga += j2;
                     end # loop over ia
-                    # println("suma1_r $suma1_r, suma1_i $suma1_i, cgblock[icgb] $(cgblock[icgb+1])")
                     runtime_arrays.zlist_r[jjz] += cgblock[icgb+1] * suma1_r;
                     runtime_arrays.zlist_i[jjz] += cgblock[icgb+1] * suma1_i;
 
