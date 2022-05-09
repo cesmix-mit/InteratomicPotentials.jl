@@ -7,7 +7,7 @@ using Literate
 
 DocMeta.setdocmeta!(InteratomicBasisPotentials, :DocTestSetup, :(using InteratomicBasisPotentials); recursive = true)
 
-bib = CitationBibliography(joinpath(@__DIR__, "citations.bib"))
+bib = CitationBibliography(joinpath(@__DIR__, "citation.bib"))
 
 # Generate examples
 
@@ -23,8 +23,8 @@ end
 
 examples = [title => joinpath("generated", string(name, ".md")) for (title, name) in examples]
 
-makedocs(bib;
-    modules = [InteratomicPotentials],
+makedocs(bib,
+    modules = [InteratomicBasisPotentials],
     authors = "CESMIX-MIT",
     repo = "https://github.com/cesmix-mit/InteratomicBasisPotentials.jl/blob/{commit}{path}#{line}",
     sitename = "InteratomicBasisPotentials.jl",

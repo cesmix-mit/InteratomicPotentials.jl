@@ -274,7 +274,6 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
                             idxcg_count+=1;
                             continue
                         else
-                            # println("j $j")
                             sum = 0.0;
                             min_z = maximum([0, maximum([-(j-j2+aa2) ÷ 2, -(j-j1-bb2) ÷ 2])])
                             max_z = minimum([ (j1 + j2 - j) ÷ 2, minimum([ (j1-aa2) ÷ 2, (j2+bb2) ÷ 2 ])])
@@ -299,13 +298,8 @@ function init_clebsch_gordan(twojmax::Int, cglist::Vector{T}) where T<: Abstract
                                         factorial( (j  - cc2) ÷ 2) *
                                         (j + 1));
                             
-                            # println("j1 $j1, j2 $j2, m1 $m1, m2 $m2, j $j, m, $m")
                         
-                            #     println("dcg $dcg, sfaccg $sfaccg")
-                            # cg = float(CG(j1, j2, j, m1, m2, m))
-                            # println("cg $cg")
                             cglist[idxcg_count+1] = sum * dcg * sfaccg;
-                            # cglist[idxcg_count+1] = cg
                             idxcg_count+=1;
                         end
                     end
