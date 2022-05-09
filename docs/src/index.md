@@ -1,6 +1,6 @@
 # InteratomicBasisPotentials
 
-Package that provides add-ons to the [InteratomicPotentials.jl](https://github.com/cesmix-mit/InteratomicPotentials.jl) package for interatomic potentials that are defined using basis functions, in particular we support the Spectral Neighbor Analysis Potential (SNAP) [Thompson2015](@cite) and the Atomic Cluster Expansion (ACE) [Drautz2019](@cite). Defines an API for abstract interatomic potentials (currently supporting 2-body interactions) and the atomic configuration interface defined by AtomsBase.jl.
+Package that provides add-ons to the [InteratomicPotentials.jl](https://github.com/cesmix-mit/InteratomicPotentials.jl) package for interatomic potentials that are defined using basis functions, in particular we support the Spectral Neighbor Analysis Potential (SNAP) (Thompson, 2015) and the Atomic Cluster Expansion (ACE) (Drautz, 2019). Defines an API for abstract interatomic potentials (currently supporting 2-body interactions) and the atomic configuration interface defined by AtomsBase.jl.
 
 Developed as part of the CESMIX Julia package suite. See also ComposableWorkflows, InteratomicPotentials.jl, and PotentialLearning.jl.
 
@@ -16,5 +16,7 @@ If you would like to use the InteratomicPotentials suite in a molecular dynamics
 
 If you would like to fit your potential parameters to data, see our project at [PotentialLearning.jl](https://github.com/cesmix-mit/PotentialLearning.jl), a work in progress, that aims to provide support for a variety of learning and inference tasks.
 
-```@bibliography
-```
+
+## References
+Thompson, A.P., et al.: Spectral neighbor analysis method for automated generation of quantum-accurate interatomic potentials, Journal of Computational Physics, 285, 2015.
+Drautz, R.: Atomic cluster expansion for accurate and transferable interatomic potentials. Phys. Rev. B Condens. Matter. 99, 014104 (2019).

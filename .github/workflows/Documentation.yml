@@ -35,6 +35,7 @@ jobs:
         run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
+            using DocumenterCitations
             using InteratomicBasisPotentials
             DocMeta.setdocmeta!(InteratomicBasisPotentials, :DocTestSetup, :(using InteratomicBasisPotentials); recursive=true)
             doctest(InteratomicBasisPotentials)
