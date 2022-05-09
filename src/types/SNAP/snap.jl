@@ -6,31 +6,8 @@ struct SNAP <: BasisPotential
     basis_params :: SNAPParams
 end
 
-# get_parameters(snap::SNAP) = Parameter{(:β,)}((snap.coefficients,))
-# serialize_parameters(p::Vector, snap::SNAP) = Parameter{(:β,)}((p,))
-# deserialize_parameters(p::Parameter{(:β,)}, snap::SNAP) = p.β
-
-# get_hyperparameters(snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
-#     snap.basis_params.twojmax, snap.basis_params.rcutfac, snap.basis_params.rmin0, snap.basis_params.rfac0, snap.basis_params.radii,
-#     snap.basis_params.weight, snap.basis_params.chem_flag, snap.basis_params.bzero_flag, snap.basis_params.bnorm_flag,
-#     snap.basis_params.switch_flag, snap.basis_params.wselfall_flag))
-# set_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
-#                                      :Radii, :Weights, :Chem, :Bzero, 
-#                                      :Bnorm, :Switch, :Wself))}, 
-#                         snap::SNAP) = SNAP(snap.coefficients, SNAPParams(snap.basis_params.n_atoms, 
-#                             p.TwoJMax, snap.basis_params.species, p.Rcutfac, p.Rmin0, p.Rfac0,
-#                             p.Radii, p.Weights, p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself))
-# serialize_hyperparameters(p::Vector, snap::SNAP) = Parameter{(:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, :Radii, :Weights, :Chem, :Bzero, :Bnorm, :Switch, :Wself) }((
-#     p[1], p[2], p[3], p[4], p[5:5+snap.basis_params.n_atoms],  
-#     p[5+snap.basis_params.n_atoms:5+2*snap.basis_params.n_atoms], p[end-4], p[end-3], p[end-2],
-#     p[end-1], p[end]))
-# deserialize_hyperparameters(p::Parameter{((:TwoJMax, :Rcutfac, :Rmin0, :Rfac0, 
-#                             :Radii, :Weights, :Chem, :Bzero,  
-#                             :Bnorm, :Switch, :Wself))}, 
-#             snap::SNAP) = [p.TwoJMax, p.Rcutfac, p.Rmin0, p.Rfac0, p.Radii..., p.Weights..., p.Chem, p.Bzero, p.Bnorm, p.Switch, p.Wself]
-
-
-                                                        
+get_rcutoff(snap::SNAP) = snap.basis_params.rcutoff
+get_species(snap::SNAP) = snap.basis_params.species
 
 function evaluate_basis(A::AbstractSystem, snap::SNAPParams)
     # Produce NeighborList
@@ -64,7 +41,6 @@ function evaluate_basis_d(A::AbstractSystem, snap::SNAPParams)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
     dB = [zeros(num_coeff*length(snap.species), 3) for i = 1:number_of_particles]
-    W = [zeros(num_coeff*length(snap.species), 6) for i = 1:number_of_particles]
 
     for  (i, ai) in enumerate(A.particles)
         i_element = findall(x->x==atomic_symbol(A, i), snap.species)[1]
@@ -170,7 +146,6 @@ function evaluate_full(A::AbstractSystem, snap::SNAPParams)
     B = [zeros(num_coeff) for i = 1:number_of_particles]
     dB = [zeros(num_coeff*length(snap.species), 3) for i = 1:number_of_particles]
     W = [zeros(num_coeff*length(snap.species), 6) for i = 1:number_of_particles]
-    print(size(B), size(dB))
     for  (i, ai) in enumerate(A)
         i_element = findall(x->x==Symbol(ai.atomic_symbol), snap.species)[1]
 

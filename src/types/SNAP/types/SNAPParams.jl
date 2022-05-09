@@ -17,6 +17,8 @@ struct SNAPParams{S<:Integer, T<:AbstractFloat} <: BasisParameters
     prebuilt_arrays :: PrebuiltArrays{T}
 end
 
+length(snap::SNAPParams) = get_num_snap_coeffs(snap.twojmax, size(snap.species, 1), snap.chem_flag)
+
 function SNAPParams(n_atoms::S, twojmax::S, species::Vector{Symbol}, 
     rcutfac::T, rmin0::T, rfac0::T, radii::Vector{T}, weight ::Vector{T},
     chem_flag::Bool, bzero_flag::Bool, bnorm_flag::Bool,
@@ -45,7 +47,7 @@ function SNAPParams(n_atoms::S, twojmax::S, species::Vector{Symbol},
         return SNAPParams{S, T}(n_atoms, twojmax, species, 
         rcutfac, rmin0, rfac0, radii, weight, chem_flag, bzero_flag, 
         bnorm_flag, switch_flag, wselfall_flag, true, 
-        initialize_prebuilt_arrays(twojmax, length(species), chem_flag, bzero_flag, bnorm_flag))
+        initialize_prebuilt_arrays(twojmax, size(species, 1), chem_flag, bzero_flag, bnorm_flag))
     end
 end
 

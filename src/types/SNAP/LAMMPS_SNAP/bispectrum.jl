@@ -42,7 +42,6 @@ function get_bispectrum(c::Configuration, snap::SNAP; dim = 3)
             command(lmp, "create_box $(c.num_atom_types) mybox")
 
             # Create atoms
-            println(c.atom_names)
             for j = 1:length(c.Atoms)
                 atom_id = findall(c.atom_names .== c.Atoms[j].Type)[1]
                 command(lmp, "create_atoms $atom_id single $(c.Atoms[j].Position[1]) $(c.Atoms[j].Position[2]) $(c.Atoms[j].Position[3])")

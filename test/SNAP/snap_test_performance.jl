@@ -19,7 +19,9 @@ weight = [1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-num_coeffs = get_num_snap_coeffs(twojmax, num_elements, chem_flag)
+snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
+
+num_coeffs = length(snap)
 
 print_flag = false
 
@@ -63,9 +65,6 @@ bcs = [DirichletZero(), DirichletZero(), DirichletZero()]
 
 ## This is the julia form of the configuration
 system = FlexibleSystem(atoms, box, bcs)
-
-# Initialize SNAP
-snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
 
 # Compute SNAP descriptors
 @timed B = evaluate_basis(system, snap)
