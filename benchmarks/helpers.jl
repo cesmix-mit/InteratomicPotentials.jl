@@ -4,8 +4,6 @@ using LinearAlgebra
 using Unitful
 using UnitfulAtomic
 
-const test_potential = LennardJones(1.0u"eV", 1.0u"Å", 100.0u"Å", [:Ar])
-
 function load_configuration(filename::String)
     box = [[8.0, 0.0, 0.0], [0.0, 8.0, 0.0], [0.0, 0.0, 8.0]] * 1u"Å"
     bcs = [DirichletZero(), DirichletZero(), DirichletZero()]
@@ -29,7 +27,7 @@ function generate_lj_cluster(N::Integer)
             z = ri * cos(ϕi)
             rj = sqrt(ri^2 - z^2)
             θ_min = θ(rj)
-            θ_grid = θ_min:2θ_min:(2*pi-θ_min)
+            θ_grid = θ_min:2θ_min:(2π-θ_min)
             for θi in θ_grid
                 x = ri * sin(ϕi) * cos(θi)
                 y = ri * sin(ϕi) * sin(θi)
