@@ -36,7 +36,7 @@ function neighborlist(s::AbstractSystem{3}, rcutoff::Float64)
     nl = NeighborList(length(X))
 
     # Fill vectors
-    @inbounds for n in 1:length(X)
+    @inbounds @threads for n in 1:length(X)
         nl.j[n] = filter(m -> m > n, inrange(tree, X[n], rcutoff))
         nl.r[n] = map(nl.j[n]) do m
             get_displacement(L, X[n], X[m])
