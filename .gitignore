@@ -16,3 +16,6 @@ log.lammps
 
 # PProf Outputs
 profile.pb.gz
+
+# Benchmarking results
+benchmarks/results
