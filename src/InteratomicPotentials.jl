@@ -1,6 +1,7 @@
 module InteratomicPotentials
 
 using AtomsBase
+using Base.Threads
 using LinearAlgebra
 using StaticArrays
 using Unitful

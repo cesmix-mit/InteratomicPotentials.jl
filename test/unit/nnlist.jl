@@ -17,12 +17,6 @@
         Int[]
     ]
 
-    true_R = [
-        Float64[norm([-0.2, -2.4, 0.4]), norm([0.4, 3.2, 0.0])],
-        Float64[],
-        Float64[]
-    ]
-
     true_r = [
         Vector{Float64}[[-0.2, -2.4, 0.4], [0.4, 3.2, 0.0]],
         Vector{Float64}[],
@@ -31,6 +25,5 @@
 
     @test length(nnlist) == length(system)
     @test nnlist.j == true_j
-    @test all(nnlist.R .≈ true_R)
     @test all(all(ri .≈ true_ri) for (ri, true_ri) in zip(nnlist.r, true_r))
 end

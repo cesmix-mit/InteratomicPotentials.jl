@@ -3,21 +3,26 @@
 export NeighborList, neighborlist
 
 struct NeighborList
-    j::Vector{Vector{Int}}
-    R::Vector{Vector{Float64}}
-    r::Vector{Vector{SVector{3,Float64}}}
+    j::Vector{Vector{Int}}                 # Neighbors
+    r::Vector{Vector{SVector{3,Float64}}}  # Displacements
+    function NeighborList(n)
+        new(
+            Vector{Vector{Int64}}(undef, n),
+            Vector{Vector{SVector{3,Float64}}}(undef, n)
+        )
+    end
 end
 Base.length(nn::NeighborList) = length(nn.j)
 
 # calculates displacement vector x - y with respect to the boundary conditions L
-function get_displacement(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloat}, y::SVector{3,<:AbstractFloat})
+function get_displacement(L::SVector{3,F}, x::SVector{3,F}, y::SVector{3,F}) where {F<:AbstractFloat}
     d = mod.(x - y, L)
     @. ifelse(isinf(L), x - y, ifelse(2d < L, d, d - L))
 end
 
 function neighborlist(s::AbstractSystem{3}, rcutoff::Float64)
     # Convert Positions to Matrix for Ball tree
-    X = [SVector{3}(austrip.(p)) for p ∈ position(s)]
+    X = [SVector{3}(austrip.(p)) for p ∈ position(s)]::Vector{SVector{3,Float64}}
 
     # Create Metric for Periodic Boundary Conditions
     periodic = periodicity(s)
@@ -28,22 +33,14 @@ function neighborlist(s::AbstractSystem{3}, rcutoff::Float64)
     tree = BallTree(X, d)
 
     # Intialize empty vectors
-    j = Vector{Vector{Int64}}(undef, length(X))              # Neighbors
-    R = Vector{Vector{Float64}}(undef, length(X))            # Distances
-    r = Vector{Vector{SVector{3,Float64}}}(undef, length(X)) # Positions
+    nl = NeighborList(length(X))
 
     # Fill vectors
-    for n in 1:length(X)
-        neighbors = filter(m -> m > n, inrange(tree, X[n], rcutoff, true))
-        j[n] = zeros(Int64, length(neighbors))
-        R[n] = zeros(Float64, length(neighbors))
-        r[n] = zeros(SVector{3,Float64}, length(neighbors))
-        for (i, m) in enumerate(neighbors)
-            rr = get_displacement(L, X[n], X[m])
-            j[n][i] = m
-            R[n][i] = norm(rr)
-            r[n][i] = rr
+    @inbounds @threads for n in 1:length(X)
+        nl.j[n] = filter(m -> m > n, inrange(tree, X[n], rcutoff))
+        nl.r[n] = map(nl.j[n]) do m
+            get_displacement(L, X[n], X[m])
         end
     end
-    NeighborList(j, R, r)
+    nl
 end
