@@ -29,12 +29,12 @@ end
 
 function evaluate_basis_d(A::AbstractSystem, ace_params::ACEParams)
     ftemp = ACE1.forces(get_rpi(ace_params), convert_system_to_atoms(A))
-    f = [zeros(3, length(ace_params)) for i = 1:length(A)]
+    f = [zeros(length(ace_params), 3) for i = 1:length(A)]
 
     for i = 1:length(A)
         for j = 1:3 
             for k = 1:length(ace_params)
-                f[i][j, k] = ftemp[k][i][j]
+                f[i][k, j] = ftemp[k][i][j]
             end
         end
     end
@@ -56,8 +56,8 @@ function evaluate_basis_v(A::AbstractSystem, ace_params::ACEParams)
 end
 
 function evaluate_full(A::AbstractSystem, ace_params::ACEParams)
-    B = hcat([site_energy(get_rpi(ace_params), convert_system_to_atoms(A), i) for i = 1:length(A)]...)'
-    dB = reshape(hcat(evaluate_basis_d(A, ace_params)...), :, length(ace_params))
+    B = [site_energy(get_rpi(ace_params), convert_system_to_atoms(A), i) for i = 1:length(A)]
+    dB = evaluate_basis_d(A, ace_params)
     W = evaluate_basis_v(A, ace_params)
     return B, dB, W
 end

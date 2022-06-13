@@ -1,7 +1,7 @@
 name = "InteratomicBasisPotentials"
 uuid = "37c59853-c2ad-4e3a-930c-a41b2395fb19"
 authors = ["Dallas Foster <fostdall@mit.edu>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
