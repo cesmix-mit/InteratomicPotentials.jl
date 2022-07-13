@@ -30,27 +30,7 @@ num_c_tilde_max=8
 num_ms_combinations_max=1
 total_basis_size_rank1: 8
 ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 5 )
-l=( 0 )
-num_ms=1
-< 0 >:  0.28209479177387814
-ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 8 )
-l=( 0 )
-num_ms=1
-< 0 >:  0.28209479177387814
-ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
 n=( 2 )
-l=( 0 )
-num_ms=1
-< 0 >:  0.28209479177387814
-ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 6 )
-l=( 0 )
-num_ms=1
-< 0 >:  0.28209479177387814
-ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 4 )
 l=( 0 )
 num_ms=1
 < 0 >:  0.28209479177387814
@@ -60,12 +40,32 @@ l=( 0 )
 num_ms=1
 < 0 >:  0.28209479177387814
 ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 3 )
+n=( 7 )
 l=( 0 )
 num_ms=1
 < 0 >:  0.28209479177387814
 ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
-n=( 7 )
+n=( 4 )
+l=( 0 )
+num_ms=1
+< 0 >:  0.28209479177387814
+ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
+n=( 5 )
+l=( 0 )
+num_ms=1
+< 0 >:  0.28209479177387814
+ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
+n=( 6 )
+l=( 0 )
+num_ms=1
+< 0 >:  0.28209479177387814
+ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
+n=( 8 )
+l=( 0 )
+num_ms=1
+< 0 >:  0.28209479177387814
+ctilde_basis_func: rank=1 ndens=1 mu0=0 mu=( 0 )
+n=( 3 )
 l=( 0 )
 num_ms=1
 < 0 >:  0.28209479177387814
