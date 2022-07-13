@@ -35,7 +35,24 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Ar,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
+B = evaluate_basis(system, snap)
 
+println("B")
+show(stdout, "text/plain", B)
+println("length of B", length(B))
+println("length of B[1]", length(B[1]))
+
+
+dB = evaluate_basis_d(system, snap)
+print("dB")
+show(stdout, "text/plain", dB)
+println("\n")
+println("length of dB", length(dB))
+println("length of dB[1]", length(dB[1]))
+
+println("vcat dB")
+show(stdout, "text/plain", reduce(hcat, dB))
+println("\n")
 B, dB, vB = evaluate_full(system, snap)
 
 if print_flag
