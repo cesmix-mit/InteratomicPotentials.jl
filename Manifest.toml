@@ -321,9 +321,9 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[deps.InteratomicPotentials]]
 deps = ["AtomsBase", "Distances", "LinearAlgebra", "NearestNeighbors", "StaticArrays", "Unitful", "UnitfulAtomic"]
-git-tree-sha1 = "5c283632b6b1d4bedc43276d4459c2e6917cd133"
+git-tree-sha1 = "369b3cd9daa140ad609db0a457f97aea0b1b766f"
 uuid = "a9efe35a-c65d-452d-b8a8-82646cd5cb04"
-version = "0.2.3"
+version = "0.2.4"
 
 [[deps.InverseFunctions]]
 deps = ["Test"]

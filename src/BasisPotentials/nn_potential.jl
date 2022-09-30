@@ -1,10 +1,10 @@
 """
-NNBasisPotential
+    NNBasisPotential <: NeuralNetworkBasisPotential
 
 Definition of the neural network basis potential composed type.
 """
-struct NNBasisPotential <: BasisPotential{NamedTuple{(:params, )}, NamedTuple{()}}
-    nn :: Union{Flux.Chain, Flux.Dense}
+struct NNBasisPotential <: NeuralNetworkBasisPotential{NamedTuple{(:params, )}, NamedTuple{()}}
+    nn :: Union{Chain, Dense}
     basis :: BasisSystem
 end
 
