@@ -1,9 +1,5 @@
 # InteratomicPotentials.jl
 
-<!--
-TODO (Dallas): The description here is very out of date.
--->
-
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square")](https://mit-license.org)
 [![Build Status](https://github.com/cesmix-mit/InteratomicPotentials.jl/workflows/CI/badge.svg)](https://github.com/cesmix-mit/InteratomicPotentials.jl/actions)
 [![codecov](https://codecov.io/gh/cesmix-mit/InteratomicPotentials.jl/branch/main/graph/badge.svg?token=IF6zvl50j9)](https://codecov.io/gh/cesmix-mit/InteratomicPotentials.jl)
