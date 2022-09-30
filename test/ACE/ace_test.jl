@@ -32,7 +32,7 @@ v = get_virial_descriptors(system, ace)
 @test isa(v, AbstractArray)
 
 print(ace)
-lbp = LinearBasisPotential(ace)
+lbp = LBasisPotential(ace)
 @test isa(lbp, BasisPotential)
 
 basis = get_rpi(ace);
