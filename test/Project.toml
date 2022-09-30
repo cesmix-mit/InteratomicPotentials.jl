@@ -1,5 +1,6 @@
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
+ACE1pack = "8c4e8d19-0bd6-4234-8309-7210652e3178"
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
 InteratomicPotentials = "a9efe35a-c65d-452d-b8a8-82646cd5cb04"
 JuLIP = "945c410c-986d-556a-acb1-167a618e0462"
@@ -9,3 +10,10 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
+
+[compat]
+ACE1 = "0.9.0 - 0.9.2"
+AtomsBase = "0.2"
+InteratomicPotentials = "0.2.3"
+JuLIP = "0.11.0 - 0.11.5"
+julia = "1.7"

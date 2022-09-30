@@ -35,7 +35,7 @@ function get_distance(L::SVector{3,<:AbstractFloat}, x::SVector{3,<:AbstractFloa
     end
 end
 
-function neighborlist(A::AbstractSystem, snap::SNAPParams)
+function neighborlist(A::AbstractSystem, snap::SNAP)
 
     # Construct cutoff
     num_elements = length(snap.species) 
@@ -74,7 +74,7 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
     j = Vector{Int64}[] # j 
     R = Vector{Float64}[] # Distances
     r = Vector{SVector{3, Float64}}[] # Positions
-
+    
     # Fill vectors
     for n = 1:length(X)
         n_element = findall(x->x==atomic_symbol(A, n), elements)[1]
@@ -97,5 +97,5 @@ function neighborlist(A::AbstractSystem, snap::SNAPParams)
         push!(R, Rtemp)
         push!(r, rtemp)
     end
-    return NeighborList(j, R, r)
+    return NeighborListSNAP(j, R, r)
 end

@@ -29,7 +29,7 @@ struct RuntimeArrays{T}
     dblist      :: Matrix{<:T} 
 end
 
-function initialize_runtime_arrays(i::Int, nnlist::NeighborList, A::AbstractSystem, snap :: SNAPParams)
+function initialize_runtime_arrays(i::Int, nnlist::NeighborListSNAP, A::AbstractSystem, snap :: SNAP)
     # Initialize Arrays
     ind_ij  = SVector{2, Int}[]  # Contains (i,j) pairs 
     rcut_ij = AbstractFloat[]   # Contains rcut between (i,j)

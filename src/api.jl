@@ -2,9 +2,11 @@
 import InteratomicPotentials: energy_and_force, virial_stress, ENERGY_UNIT, FORCE_UNIT
 import InteratomicPotentials: get_rcutoff, get_species 
 import InteratomicPotentials: potential_energy, force, virial
+import InteratomicPotentials: get_local_descriptors, get_force_descriptors, get_virial_descriptors, get_all_descriptors
 export energy_and_force, potential_energy, force, virial, virial_stress
 export get_rcutoff, get_species, get_rpi
-export evaluate_basis, evaluate_basis_d, evaluate_basis_v, evaluate_full
+export get_local_descriptors, get_force_descriptors, get_virial_descriptors, get_all_descriptors
+
 import Base.length
 export length
 """
@@ -59,35 +61,11 @@ which is the default behavior if a potential type does not implement a custom me
 """
 function get_species end
 """
-    get_rpi(ace_params::ACEParams)::ACE1.RPI
+    get_rpi(ace_params::ACE)::ACE1.RPI
 
 Retrive the underlying RPI parameter type from ACE1. This is a convience function for exporting ACE parameters to file.
 """
-
-"""
-    evaluate_basis(A::AbstractSystem, params::BasisParameters)::Vector{Float64}
-
-Retrieve the descriptors for a Basis Potential.
-"""
-function evaluate_basis end 
-"""
-    evaluate_basis_d(A::AbstractSystem, params::BasisParameters)::Vector{Matrix{Float64}}
-
-Retrieve the gradient of the descriptors (used for force calulations) for a Basis Potential.
-"""
-function evaluate_basis_d end
-"""
-    evaluate_basis_v(A::AbstractSystem, params::BasisParameters)::Matrix{Float64}
-
-Retrieve the descriptor vectors corresponding to the virial stress tensor of a configuration, for a Basis Potential.
-"""
-function evaluate_basis_v end 
-"""
-    evaluate_full(A::AbstractSystem, params::BasisParameters)::Tuple(Vector{Vector}, Vector{Matrix}, Vector{Matrix})
-
-Retrieve the local descriptors (descriptors, gradients, and virials) for a Basis Potential
-"""
-function evaluate_basis end 
+function get_rpi end
 """
     length(params::BasisParameters) :: Int 
 
