@@ -4,7 +4,7 @@ export energy_and_force, potential_energy, force, virial, virial_stress
 export get_rcutoff, get_species
 export get_parameters, set_parameters, serialize_parameters, deserialize_parameters
 export get_hyperparameters, set_hyperparameters, serialize_hyperparameters, deserialize_hyperparameters
-
+export get_local_descriptors, get_force_descriptors
 """
     energy_and_force(s::AbstractSystem, p::AbstractPotential)::NamedTuple{(:e, :f), Tuple{Unitful.Energy,Vector{SVector{3, Unitful.Force}}}}
 
@@ -136,3 +136,19 @@ Note that this behavior should be overloaded for a potential type that has any n
 For a `NonTrainablePotential`, the function returns the original potential, unchanged.
 """
 function deserialize_hyperparameters end
+"""
+    get_local_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector}
+
+Compute the local descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+
+For a system s with n_atom number of atoms this method get_local_descriptors returns a Vector{Vector{T<:Real}}, containing n_atom vectors each of dimension d as defined by the basis system.
+"""
+function get_local_descriptors end 
+"""
+    get_force_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
+
+Compute the force descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+
+For a system s with n_atom number of atoms this method get_force_descriptors returns a Vector{Vector{Vector{T<:Real}}}, containing n_atom vectors each containing (x,y,z) components of dimension d as defined by the basis system.
+"""
+function get_force_desriptors end

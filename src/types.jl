@@ -1,7 +1,7 @@
 # The abstract types provided by InteratomicPotentials.jl
 
 export AbstractPotential, NonTrainablePotential, TrainablePotential, EmpiricalPotential, MixedPotential
-
+export BasisPotential, BasisSystem
 """
     AbstractPotential
 
@@ -44,3 +44,16 @@ Abstract type for potentials that are the combination of multiple sub-potentials
 """
 abstract type MixedPotential <: AbstractPotential end
 include("types/mixed_potential.jl")
+
+"""
+    BasisPotential <: AbstractPotential
+
+Abstract type for potentials that are functions of descriptors of atomic environments, instead of the raw positions themselves. This is primary for use with the package InteratomicBasisPotentials.jl, but is defined here for completeness.
+"""
+abstract type BasisPotential{P<:NamedTuple, HP<:NamedTuple} <: TrainablePotential{P, HP} end 
+"""
+    BasisSystem
+
+Abstract type to define methods for producing a set of local and force descriptors for a given configuration. Examples include the Atomic Cluster Expansion, SOAP descriptors, and SNAP descriptors. See the package InteratomicBasisPotentials.jl for implementation.
+"""
+abstract type BasisSystem end 
