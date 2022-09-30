@@ -1,4 +1,4 @@
-function compute_zi(snap::SNAPParams, runtime_arrays::RuntimeArrays)
+function compute_zi(snap::SNAP, runtime_arrays::RuntimeArrays)
     idouble = 0;
     num_elements = snap.prebuilt_arrays.num_elements
     # n_elements = length(snap.elements)

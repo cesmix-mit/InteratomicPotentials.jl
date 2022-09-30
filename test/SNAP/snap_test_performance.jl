@@ -19,7 +19,7 @@ weight = [1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
+snap = SNAP(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
 
 num_coeffs = length(snap)
 
@@ -67,4 +67,4 @@ bcs = [DirichletZero(), DirichletZero(), DirichletZero()]
 system = FlexibleSystem(atoms, box, bcs)
 
 # Compute SNAP descriptors
-@timed B = evaluate_basis(system, snap)
+@timed B = get_local_descriptors(system, snap)

@@ -3,7 +3,7 @@
 #    compute Yi from Ui without storing Zi, looping over zlist indices
 # ------------------------------------------------------------------------- */
 
-function compute_yi(beta::AbstractFloat, snap::SNAPParams, runtime_arrays::RuntimeArrays)
+function compute_yi(beta::AbstractFloat, snap::SNAP, runtime_arrays::RuntimeArrays)
 
     for ielem1 = 0:(snap.n_elements-1) 
         for j = 0:snap.twojmax
