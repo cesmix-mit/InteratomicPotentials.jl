@@ -1,7 +1,7 @@
 # The abstract types provided by InteratomicPotentials.jl
 
 export AbstractPotential, NonTrainablePotential, TrainablePotential, EmpiricalPotential, MixedPotential
-export BasisPotential, BasisSystem
+export BasisPotential, NeuralNetworkBasisPotential, LinearBasisPotential, BasisSystem
 """
     AbstractPotential
 
@@ -51,6 +51,18 @@ include("types/mixed_potential.jl")
 Abstract type for potentials that are functions of descriptors of atomic environments, instead of the raw positions themselves. This is primary for use with the package InteratomicBasisPotentials.jl, but is defined here for completeness.
 """
 abstract type BasisPotential{P<:NamedTuple, HP<:NamedTuple} <: TrainablePotential{P, HP} end 
+"""
+    NeuralNetworkBasisPotential <: AbstractPotential
+
+Abstract type for potentials that produce results as neural network functions of descriptors of atomic environments, instead of the raw positions themselves. This is primary for use with the package InteratomicBasisPotentials.jl, but is defined here for completeness.
+"""
+abstract type NeuralNetworkBasisPotential{P<:NamedTuple, HP<:NamedTuple} <: BasisPotential{P, HP} end
+"""
+    LinearBasisPotential <: AbstractPotential
+
+Abstract type for potentials that are linear functions of descriptors of atomic environments, instead of the raw positions themselves. This is primary for use with the package InteratomicBasisPotentials.jl, but is defined here for completeness.
+"""
+abstract type LinearBasisPotential{P<:NamedTuple, HP<:NamedTuple} <: BasisPotential{P, HP} end
 """
     BasisSystem
 
