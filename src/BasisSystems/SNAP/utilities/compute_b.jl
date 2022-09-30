@@ -2,7 +2,7 @@
 #    compute Bi by summing conj(Ui)*Zi
 # ------------------------------------------------------------------------- */
 
-function compute_bi(snap::SNAPParams, runtime_arrays::RuntimeArrays) 
+function compute_bi(snap::SNAP, runtime_arrays::RuntimeArrays) 
     #   // for j1 = 0,...,twojmax
     #   //   for j2 = 0,twojmax
     #   //     for j = |j1-j2|,Min(twojmax,j1+j2),2
@@ -101,7 +101,7 @@ end
 #    variant using symmetry relation
 # ------------------------------------------------------------------------- */
 
-function compute_dbidrj(jelem::Int, snap::SNAPParams, runtime_arrays::RuntimeArrays)
+function compute_dbidrj(jelem::Int, snap::SNAP, runtime_arrays::RuntimeArrays)
 
     # // for j1 = 0,...,twojmax
     # //   for j2 = 0,twojmax

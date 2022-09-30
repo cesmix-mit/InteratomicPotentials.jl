@@ -4,7 +4,7 @@ using Unitful
 using UnitfulAtomic
 using InteratomicPotentials
 using InteratomicBasisPotentials
-using ACE1
+using ACE1, ACE1pack
 
 r0 = 2.0
 position0 = @SVector [1.0, 0.0, 0.0]
@@ -21,25 +21,23 @@ box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 bcs = [Periodic(), Periodic(), Periodic()]
 system = FlexibleSystem(atoms, box * u"Å", bcs)
 
-ace_params = ACEParams([:Ar], 2, 8, 1.0, 1.0, 0.4, 2.0)
-@test isa(ace_params, ACEParams)
-e = evaluate_basis(system, ace_params)
+ace = ACE([:Ar], 2, 8, 1.0, 1.0, 0.4, 2.0)
+@test isa(ace, BasisSystem)
+e = sum(get_local_descriptors(system, ace))
 @test isa(e, AbstractVector)
-f = evaluate_basis_d(system, ace_params)
-@test isa(e, AbstractVector)
+f = get_local_descriptors(system, ace)
+@test all(isa.(f, (AbstractVector,)))
 
-v = evaluate_basis_v(system, ace_params)
-@test isa(e, AbstractVector)
+v = get_virial_descriptors(system, ace)
+@test isa(v, AbstractArray)
 
-B, dB, W = evaluate_full(system, ace_params)
+print(ace)
+lbp = LinearBasisPotential(ace)
+@test isa(lbp, BasisPotential)
 
-c = ones(length(ace_params))
-ace = ACE(c, ace_params)
-@test isa(ace, BasisPotential)
-
-basis = get_rpi(ace_params)
-IP = JuLIP.MLIPs.combine(basis, c)
-ACE1.Export.export_ace("test.ace", IP)
+basis = get_rpi(ace);
+# IP = JuLIP.MLIPs.combine(basis, lbp.β)
+# ACE1pack.Export.export_ace("ACE/test.ace", IP)
 
 
 

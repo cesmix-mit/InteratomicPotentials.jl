@@ -16,7 +16,7 @@ weight = [1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-snap = SNAPParams(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
+snap = SNAP(num_atoms, twojmax, [:Ar], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag, bnorm_flag)
 
 num_coeffs = length(snap)
 
@@ -35,25 +35,26 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Ar,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
-B = evaluate_basis(system, snap)
+B = get_local_descriptors(system, snap)
 
-println("B")
-show(stdout, "text/plain", B)
-println("length of B", length(B))
-println("length of B[1]", length(B[1]))
+if print_flag
+    println("B")
+    show(stdout, "text/plain", B)
+    println("\n")
+    println("length of B", length(B))
+    println("length of B[1]", length(B[1]))
+end
 
+dB = get_force_descriptors(system, snap)
+if print_flag
+    println("dB")
+    show(stdout, "text/plain", dB)
+    println("\n")
+    println("length of dB", length(dB))
+    println("length of dB[1]", size(dB[1]))
+end
 
-dB = evaluate_basis_d(system, snap)
-print("dB")
-show(stdout, "text/plain", dB)
-println("\n")
-println("length of dB", length(dB))
-println("length of dB[1]", length(dB[1]))
-
-println("vcat dB")
-show(stdout, "text/plain", reduce(hcat, dB))
-println("\n")
-B, dB, vB = evaluate_full(system, snap)
+B, dB, vB = get_all_descriptors(system, snap)
 
 if print_flag
     println("B")
@@ -81,9 +82,9 @@ if print_flag
     println(" \n ")
 end
 
-@test sum(dB[1] - reshape(dA[:, 1], :, 3)) < 1e-5
-@test sum(dB[2] - reshape(dA[:, 2], :, 3)) < 1e-5
-@test sum(dB[3] - reshape(dA[:, 3], :, 3)) < 1e-5
+@test sum(dB[1]' - reshape(dA[:, 1], :, 3)) < 1e-5
+@test sum(dB[2]' - reshape(dA[:, 2], :, 3)) < 1e-5
+@test sum(dB[3]' - reshape(dA[:, 3], :, 3)) < 1e-5
 
 
 if print_flag
@@ -95,11 +96,6 @@ if print_flag
     show(stdout, "text/plain", vB[2])
     println("\n")
 end
+vA = sum(vA[:, i] for i = 1:3)
+@test sum(vB' - reshape(vA, :, 6)) < 1e-5
 
-@test sum(vB[1] - reshape(vA[:, 1], :, 6)) < 1e-5
-@test sum(vB[2] - reshape(vA[:, 2], :, 6)) < 1e-5
-@test sum(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
-
-
-@test isa(potential_energy(system, SNAP(ones(num_coeffs), snap)), Unitful.Energy)
-@test isa(force(system, SNAP(ones(num_coeffs), snap)), AbstractVector{<:SVector{3,<:Unitful.Force}})

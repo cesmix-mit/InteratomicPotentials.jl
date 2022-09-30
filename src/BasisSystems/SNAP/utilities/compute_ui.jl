@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------- */
 function compute_ui(
     ielem::Int,
-    snap::SNAPParams, 
+    snap::SNAP, 
     runtime_arrays :: RuntimeArrays)
 
     if ~snap.chem_flag
@@ -49,7 +49,7 @@ end
 
 function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     z0::AbstractFloat, r::AbstractFloat, jj::Int, 
-    snap::SNAPParams, runtime_arrays::RuntimeArrays)
+    snap::SNAP, runtime_arrays::RuntimeArrays)
 
     # compute Cayley-Klein parameters for unit quaternion
     r0inv = 1.0 / sqrt(r * r + z0 * z0);
@@ -128,7 +128,7 @@ function compute_uarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
     runtime_arrays.ulist_i_ij[jj, :] = ulist_i
 end
 
-function zero_uarraytot(ielem::Int, snap::SNAPParams, runtime_arrays::RuntimeArrays)
+function zero_uarraytot(ielem::Int, snap::SNAP, runtime_arrays::RuntimeArrays)
     num_elements = snap.prebuilt_arrays.num_elements
     for jelem = 0:(num_elements-1)
         for j = 0:snap.twojmax 
@@ -154,7 +154,7 @@ end
 
 function add_uarraytot(r::AbstractFloat, rcut::AbstractFloat, wj::AbstractFloat,
         jj::Int, jelem :: Int,
-        snap::SNAPParams,
+        snap::SNAP,
         runtime_arrays::RuntimeArrays)
     sfac = compute_sfac(snap, r, rcut);
     sfac *= wj;
@@ -186,7 +186,7 @@ end
 function compute_duarray(x::AbstractFloat, y::AbstractFloat, z::AbstractFloat,
      z0::AbstractFloat, r::AbstractFloat, dz0dr::AbstractFloat,
      wj::AbstractFloat, rcut::AbstractFloat, jj::Int,
-     snap::SNAPParams, runtime_arrays::RuntimeArrays)
+     snap::SNAP, runtime_arrays::RuntimeArrays)
 
     rinv = 1.0/r;
     ux   = x * rinv;
@@ -327,7 +327,7 @@ end
 
 function compute_duidrj(rij::SVector{3, <:AbstractFloat}, wj::AbstractFloat, 
         rcut::AbstractFloat, jj::Int, 
-        snap::SNAPParams, runtime_arrays::RuntimeArrays)
+        snap::SNAP, runtime_arrays::RuntimeArrays)
     x = rij[1];
     y = rij[2];
     z = rij[3];
@@ -347,7 +347,7 @@ function compute_duidrj(rij::SVector{3, <:AbstractFloat}, wj::AbstractFloat,
 end
 
 
-function compute_sfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
+function compute_sfac(snap::SNAP, r::AbstractFloat, rcut::AbstractFloat)
     if ~snap.switch_flag
         sfac = 1.0 
     else
@@ -363,7 +363,7 @@ function compute_sfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
     return sfac
 end
 
-function compute_dsfac(snap::SNAPParams, r::AbstractFloat, rcut::AbstractFloat)
+function compute_dsfac(snap::SNAP, r::AbstractFloat, rcut::AbstractFloat)
     if ~snap.switch_flag
         dsfac = 0.0
     else

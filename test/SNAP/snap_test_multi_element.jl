@@ -16,7 +16,7 @@ weight = [1.0, 1.0]
 chem_flag = false
 bzero_flag = false
 bnorm_flag = false
-snap = SNAPParams(num_atoms, twojmax, [:Ar, :Xe], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag)
+snap = SNAP(num_atoms, twojmax, [:Ar, :Xe], rcutfac, 0.00, rcut0, radii, weight, chem_flag, bzero_flag)
 
 num_coeffs = length(snap)
 
@@ -35,7 +35,7 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Xe,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
-B, dB, vB = evaluate_full(system, snap)
+B, dB, vB = get_all_descriptors(system, snap)
 
 if print_flag
     println("B")
@@ -75,9 +75,9 @@ if print_flag
     println(" \n ")
 end
 
-@test sum(dB[1] - reshape(dA[:, 1], :, 3)) < 1e-5
-@test sum(dB[2] - reshape(dA[:, 2], :, 3)) < 1e-5
-@test sum(dB[3] - reshape(dA[:, 3], :, 3)) < 1e-5
+@test sum(dB[1]' - reshape(dA[:, 1], :, 3)) < 1e-5
+@test sum(dB[2]' - reshape(dA[:, 2], :, 3)) < 1e-5
+@test sum(dB[3]' - reshape(dA[:, 3], :, 3)) < 1e-5
 
 
 if print_flag
@@ -102,7 +102,7 @@ if print_flag
     println("\n")
 end
 
-@test sum(vB[1] - reshape(vA[:, 1], :, 6)) < 1e-5
-@test sum(vB[2] - reshape(vA[:, 2], :, 6)) < 1e-5
-@test sum(vB[3] - reshape(vA[:, 3], :, 6)) < 1e-5
+vA = sum(vA[:, i] for i = 1:3)
+@test sum(vB' - reshape(vA, :, 6)) < 1e-5
+
 

@@ -4,8 +4,9 @@ using InteratomicPotentials
 using StaticArrays
 using LinearAlgebra
 using AtomsBase
-using Unitful
-using UnitfulAtomic
+using Unitful, UnitfulAtomic
+import Flux: gradient
+import Zygote: withgradient
 
 include("api.jl")
 include("types.jl")
