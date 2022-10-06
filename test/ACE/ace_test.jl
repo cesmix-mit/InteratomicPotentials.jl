@@ -4,7 +4,6 @@ using Unitful
 using UnitfulAtomic
 using InteratomicPotentials
 using InteratomicBasisPotentials
-using ACE1, ACE1pack
 
 r0 = 2.0
 position0 = @SVector [1.0, 0.0, 0.0]
@@ -23,12 +22,12 @@ system = FlexibleSystem(atoms, box * u"Å", bcs)
 
 ace = ACE([:Ar], 2, 8, 1.0, 1.0, 0.4, 2.0)
 @test isa(ace, BasisSystem)
-e = sum(get_local_descriptors(system, ace))
+e = sum(compute_local_descriptors(system, ace))
 @test isa(e, AbstractVector)
-f = get_local_descriptors(system, ace)
+f = compute_local_descriptors(system, ace)
 @test all(isa.(f, (AbstractVector,)))
 
-v = get_virial_descriptors(system, ace)
+v = compute_virial_descriptors(system, ace)
 @test isa(v, AbstractArray)
 
 print(ace)
@@ -36,8 +35,5 @@ lbp = LBasisPotential(ace)
 @test isa(lbp, BasisPotential)
 
 basis = get_rpi(ace);
-# IP = JuLIP.MLIPs.combine(basis, lbp.β)
-# ACE1pack.Export.export_ace("ACE/test.ace", IP)
-
 
 

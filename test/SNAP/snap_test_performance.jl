@@ -67,4 +67,4 @@ bcs = [DirichletZero(), DirichletZero(), DirichletZero()]
 system = FlexibleSystem(atoms, box, bcs)
 
 # Compute SNAP descriptors
-@timed B = get_local_descriptors(system, snap)
+@timed B = compute_local_descriptors(system, snap)

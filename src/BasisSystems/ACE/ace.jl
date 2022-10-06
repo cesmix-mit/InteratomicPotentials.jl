@@ -45,11 +45,11 @@ function convert_system_to_atoms(system::AbstractSystem)
     Atoms(X = positions, P = velocities, M = masses, Z = atomic_number, cell = cell, pbc = pbc)
 end
 
-function get_local_descriptors(A::AbstractSystem, ace::ACE)
+function compute_local_descriptors(A::AbstractSystem, ace::ACE)
     [site_energy(get_rpi(ace), convert_system_to_atoms(A), i) for i = 1:length(A)]
 end
 
-function get_force_descriptors(A::AbstractSystem, ace::ACE)
+function compute_force_descriptors(A::AbstractSystem, ace::ACE)
     ftemp = ACE1.forces(get_rpi(ace), convert_system_to_atoms(A))
     f = [zeros(3, length(ace)) for i = 1:length(A)]
 
@@ -63,7 +63,7 @@ function get_force_descriptors(A::AbstractSystem, ace::ACE)
     f
 end
 
-function get_virial_descriptors(A::AbstractSystem, ace::ACE)
+function compute_virial_descriptors(A::AbstractSystem, ace::ACE)
     Wtemp = ACE1.virial(get_rpi(ace), convert_system_to_atoms(A))
     W = zeros(6, length(ace))
 
@@ -77,6 +77,6 @@ function get_virial_descriptors(A::AbstractSystem, ace::ACE)
     W
 end
 
-function get_all_descriptors(A::AbstractSystem, ace::ACE)
-    get_local_descriptors(A, ace), get_force_descriptors(A, ace), get_virial_descriptors(A, ace)
+function compute_all_descriptors(A::AbstractSystem, ace::ACE)
+    compute_local_descriptors(A, ace), compute_force_descriptors(A, ace), compute_virial_descriptors(A, ace)
 end

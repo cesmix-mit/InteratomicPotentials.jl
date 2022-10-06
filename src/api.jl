@@ -2,10 +2,10 @@
 import InteratomicPotentials: energy_and_force, virial_stress, ENERGY_UNIT, FORCE_UNIT
 import InteratomicPotentials: get_rcutoff, get_species 
 import InteratomicPotentials: potential_energy, force, virial
-import InteratomicPotentials: get_local_descriptors, get_force_descriptors, get_virial_descriptors, get_all_descriptors
+import InteratomicPotentials: compute_local_descriptors, compute_force_descriptors, compute_virial_descriptors, compute_all_descriptors
 export energy_and_force, potential_energy, force, virial, virial_stress
 export get_rcutoff, get_species, get_rpi
-export get_local_descriptors, get_force_descriptors, get_virial_descriptors, get_all_descriptors
+export compute_local_descriptors, compute_force_descriptors, compute_virial_descriptors, compute_all_descriptors
 
 import Base.length
 export length

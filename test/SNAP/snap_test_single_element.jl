@@ -35,7 +35,7 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Ar,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
-B = get_local_descriptors(system, snap)
+B = compute_local_descriptors(system, snap)
 
 if print_flag
     println("B")
@@ -45,7 +45,7 @@ if print_flag
     println("length of B[1]", length(B[1]))
 end
 
-dB = get_force_descriptors(system, snap)
+dB = compute_force_descriptors(system, snap)
 if print_flag
     println("dB")
     show(stdout, "text/plain", dB)
@@ -54,7 +54,7 @@ if print_flag
     println("length of dB[1]", size(dB[1]))
 end
 
-B, dB, vB = get_all_descriptors(system, snap)
+B, dB, vB = compute_all_descriptors(system, snap)
 
 if print_flag
     println("B")

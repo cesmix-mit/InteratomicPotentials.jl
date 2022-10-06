@@ -100,7 +100,7 @@ end
 get_rcutoff(snap::SNAP) = snap.rcutoff
 get_species(snap::SNAP) = snap.species
 
-function get_local_descriptors(A::AbstractSystem, snap::SNAP)
+function compute_local_descriptors(A::AbstractSystem, snap::SNAP)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
     # Get number of coefficients
@@ -123,7 +123,7 @@ function get_local_descriptors(A::AbstractSystem, snap::SNAP)
     return B
 end
 
-function get_force_descriptors(A::AbstractSystem, snap::SNAP)
+function compute_force_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -166,7 +166,7 @@ function get_force_descriptors(A::AbstractSystem, snap::SNAP)
     return dB
 end
 
-function get_virial_descriptors(A::AbstractSystem, snap::SNAP)
+function compute_virial_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -223,7 +223,7 @@ function get_virial_descriptors(A::AbstractSystem, snap::SNAP)
     return sum(W)
 end
 
-function get_all_descriptors(A::AbstractSystem, snap::SNAP)
+function compute_all_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)

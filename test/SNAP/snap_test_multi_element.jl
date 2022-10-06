@@ -35,7 +35,7 @@ atoms = [Atom(:Ar, position1 * u"Å"), Atom(:Ar, position2 * u"Å"), Atom(:Xe,
 box = [[5.0, 0.0, 0.0], [0.0, 5.0, 0.0], [0.0, 0.0, 5.0]]
 system = FlexibleSystem(atoms, box * u"Å", [DirichletZero(), DirichletZero(), DirichletZero()])
 
-B, dB, vB = get_all_descriptors(system, snap)
+B, dB, vB = compute_all_descriptors(system, snap)
 
 if print_flag
     println("B")
