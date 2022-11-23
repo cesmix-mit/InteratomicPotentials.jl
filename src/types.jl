@@ -22,7 +22,7 @@ include("types/non_trainable_potential.jl")
     TrainablePotential{P<:NamedTuple,HP<:NamedTuple} <: AbstractPotential
 
 Abstract type for potentials that are trainable.
-`P` is a `NamedTuple` of parameter names and `HP`` is a `NamedTuple`` of hyperparameter names.
+`P` is a `NamedTuple` of parameter names and `HP` is a `NamedTuple` of hyperparameter names.
 """
 abstract type TrainablePotential{P<:NamedTuple,HP<:NamedTuple} <: AbstractPotential end
 include("types/trainable_potential.jl")
@@ -32,7 +32,7 @@ include("types/trainable_potential.jl")
 
 Defines an empirical potential, a heuristic function used to describe the intermolecular potential energy of a configuration of atoms. Various potentials have been found to agree empirically with the experimentally obtained potential energy of a configuration of atoms for particular atoms in particular situations. This package implements a number of such popular potentials.
 
-`P` is a `NamedTuple` of parameter names and `HP`` is a `NamedTuple`` of hyperparameter names.
+`P` is a `NamedTuple` of parameter names and `HP` is a `NamedTuple` of hyperparameter names.
 """
 abstract type EmpiricalPotential{P<:NamedTuple,HP<:NamedTuple} <: TrainablePotential{P,HP} end
 include("types/empirical_potential.jl")

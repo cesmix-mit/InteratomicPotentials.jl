@@ -139,31 +139,31 @@ function deserialize_hyperparameters end
 """
     get_local_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector}
 
-Compute the local descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+Compute the local descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
 
-For a system s with n_atom number of atoms this method get_local_descriptors returns a Vector{Vector{T<:Real}}, containing n_atom vectors each of dimension d as defined by the basis system.
+For a system `s` with `n_atom` number of atoms this method `get_local_descriptors` returns a `Vector{Vector{T<:Real}}`, containing `n_atom` vectors each of dimension `d` as defined by the basis system.
 """
 function compute_local_descriptors end 
 """
     compute_force_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
 
-Compute the force descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+Compute the force descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
 
-For a system s with n_atom number of atoms this method compute_force_descriptors returns a Vector{Matrix{T<:Real}}}, containing n_atom vectors each containing a matrix with rows corresponding to x-, y-, and z-components of dimension d as defined by the basis system.
+For a system `s` with `n_atom` number of atoms this method `compute_force_descriptors` returns a `Vector{Matrix{T<:Real}}}`, containing `n_atom` vectors each containing a matrix with rows corresponding to x-, y-, and z-components of dimension `d` as defined by the basis system.
 """
 function compute_force_descriptors end
 """
     compute_virial_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
 
-Compute the virial descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+Compute the virial descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
 
-For a system s with n_atom number of atoms this method compute_virial_descriptors returns a Matrix{T<:Real}, containing 6 rows corresponding to entries of the stress tensor and columns of dimension d as defined by the basis system.
+For a system `s` with `n_atom` number of atoms this method `compute_virial_descriptors` returns a `Matrix{T<:Real}`, containing 6 rows corresponding to entries of the stress tensor and columns of dimension `d` as defined by the basis system.
 """
 function compute_virial_descriptors end
 """
     compute_all_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
 
-Compute the local, force, and virial descriptors for an abstract system s using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
+Compute the local, force, and virial descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package, but the primary use is in the InteratomicBasisPotentials.jl package, where the individual basis systems are defined. 
 """
 function compute_all_descriptors end
 
