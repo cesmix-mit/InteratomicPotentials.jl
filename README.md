@@ -28,6 +28,7 @@ using AtomsBase, Unitful, UnitfulAtomic
 element = :Ar
 atom1     = Atom(element, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
 atom2    = Atom(element, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
+atoms = [atom1,atom2]
 box = [[1., 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]] * 1u"Å"
 bcs = [DirichletZero(), Periodic(), Periodic()]
 system   = FlexibleSystem(atoms, box , bcs)
