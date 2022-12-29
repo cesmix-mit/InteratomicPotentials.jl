@@ -23,11 +23,12 @@ Once these two structures have ben instantiated, the quantity of interest can be
 
 First, let's create a configuration:
 ```julia
+using InteratomicPotentials, StaticArrays
 using AtomsBase, Unitful, UnitfulAtomic
 # Define an atomic system
-element = :Ar
-atom1     = Atom(element, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
-atom2    = Atom(element, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
+elem = :Ar
+atom1     = Atom(elem, ( @SVector [1.0, 0.0, 0.0] ) * 1u"Å")
+atom2    = Atom(elem, ( @SVector [1.0, 0.25, 0.0] ) * 1u"Å")
 atoms = [atom1,atom2]
 box = [[1., 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]] * 1u"Å"
 bcs = [DirichletZero(), Periodic(), Periodic()]
@@ -38,7 +39,7 @@ Now we can define the parameters of our interatomic potential:
 ϵ = 1.0 * 1u"eV"
 σ = 0.25 * 1u"Å"
 rcutoff  = 2.25 * 1u"Å"
-lj       = LennardJones(ϵ, σ, rcutoff, [element])           # <: EmpiricalPotential <: AbstractPotential
+lj       = LennardJones(ϵ, σ, rcutoff, [elem])           # <: EmpiricalPotential <: AbstractPotential
 ```
 
 Now we can compute a variety of quantities of the system:
