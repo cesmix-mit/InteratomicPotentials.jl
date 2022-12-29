@@ -8,12 +8,12 @@ The Morse potential is a simple two-body intermolecular potential with three typ
 V_{M}(r; D, \\alpha, \\sigma, rcutoff, species) =
     \\begin{cases} 
     0 & r > rcutoff \\\\
-    D \\left( 1 - e^{\\alpha(r - \\sigma)}\right)^2 & r < rcutoff.
+    D \\left( 1 - e^{\\alpha(r - \\sigma)}\\right)^2 & r < rcutoff.
     \\end{cases}
 \\end{equation}
 ```
 
-Users must supply three parameters, ``D`` (units of energy), ``\\alpha`` (units of inverse distance), ''\\sigma'' (units of distance), and radial cutoff (units of distance).
+Users must supply three parameters, ``D`` (units of energy), ``\\alpha`` (units of inverse distance), ``\\sigma`` (units of distance), and radial cutoff (units of distance).
 """
 struct Morse{T<:AbstractFloat} <: EmpiricalPotential{NamedTuple{(:D, :α, :σ)},NamedTuple{(:rcutoff,)}}
     D::T
