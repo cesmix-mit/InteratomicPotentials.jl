@@ -20,7 +20,8 @@ box = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 bcs = [Periodic(), Periodic(), Periodic()]
 system = FlexibleSystem(atoms, box * u"Å", bcs)
 
-ace = ACE([:Ar], 2, 8, 1.0, 1.0, 0.4, 2.0)
+ace = ACE( species = [:Ar], body_order = 2, polynomial_degree = 8, 
+           wL = 1.0, csp = 1.0, r0 = 0.4, rcutoff = 2.0)
 @test isa(ace, BasisSystem)
 e = sum(compute_local_descriptors(system, ace))
 @test isa(e, AbstractVector)
