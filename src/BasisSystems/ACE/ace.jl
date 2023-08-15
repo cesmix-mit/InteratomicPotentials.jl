@@ -48,7 +48,7 @@ function convert_system_to_atoms(system::AbstractSystem)
     velocities = [ustrip.(v) for v in AtomsBase.velocity(system)]
     masses = ustrip.(AtomsBase.atomic_mass(system))
     atomic_number = AtomicNumber.(AtomsBase.atomic_number(system))
-    cell = JMat(ustrip.(vcat(AtomsBase.bounding_box(system)...)))
+    cell = JMat(ustrip.(transpose(hcat(AtomsBase.bounding_box(system)...))))
     pbc = JVec([pbc == Periodic() ? true : false for pbc in AtomsBase.boundary_conditions(system)]...)
     return Atoms(X = positions, P = velocities, M = masses, Z = atomic_number, cell = cell, pbc = pbc)
 end
