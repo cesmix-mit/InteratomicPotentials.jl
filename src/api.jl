@@ -1,10 +1,15 @@
 # The InteratomicPotentials.jl API specification.
 
+import Base.length
+export length
 export energy_and_force, potential_energy, force, virial, virial_stress
 export get_rcutoff, get_species
 export get_parameters, set_parameters, serialize_parameters, deserialize_parameters
 export get_hyperparameters, set_hyperparameters, serialize_hyperparameters, deserialize_hyperparameters
 export compute_local_descriptors, compute_force_descriptors, compute_virial_descriptors, compute_all_descriptors
+export get_rcutoff, get_species, get_rpi
+
+
 """
     energy_and_force(s::AbstractSystem, p::AbstractPotential)::NamedTuple{(:e, :f), Tuple{Unitful.Energy,Vector{SVector{3, Unitful.Force}}}}
 
@@ -167,3 +172,15 @@ Compute the local, force, and virial descriptors for an abstract system `s` usin
 """
 function compute_all_descriptors end
 
+"""
+    get_rpi(ace_params::ACE)::ACE1.RPI
+
+Retrive the underlying RPI parameter type from ACE1. This is a convience function for exporting ACE parameters to file.
+"""
+function get_rpi end
+"""
+    length(params::BasisParameters) :: Int 
+
+Retrieve the length of the descriptor vector, the number of descriptors used in the basis potential.
+"""
+function length end

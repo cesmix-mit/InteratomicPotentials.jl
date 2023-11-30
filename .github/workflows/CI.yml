@@ -13,8 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "1.6"
-          - "nightly"
+          - "1.8.5"
         os:
           - ubuntu-latest
           - macOS-latest
@@ -43,6 +42,8 @@ jobs:
             using Pkg
             Pkg.Registry.add("General")
             Pkg.Registry.add(RegistrySpec(url = "https://github.com/cesmix-mit/CESMIX.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaMolSim/MolSim.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/ACEsuit/ACEregistry"))
           '
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1

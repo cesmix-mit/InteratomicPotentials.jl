@@ -38,6 +38,7 @@ makedocs(bib;
         "InteratomicPotentials Interface" => "interface.md",
         "Examples" => examples,
         "API Reference" => "api.md",
+        "References" => "bibliography.md"
     ],
     doctest = true,
     linkcheck = true,

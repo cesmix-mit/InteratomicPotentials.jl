@@ -6,9 +6,9 @@
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/stable)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/dev)
 
-This repository implements some basic language and syntax for manipulating interatomic potentials in Julia. The primary purpose of this package is to design a flexible package for use with data-driven and parameter-fitted interatomic potentials. This package is also being designed in order to allow users to define custom potentials and forces for use in molecular dynamics.
+This repository implements some basic language and syntax for manipulating interatomic potentials in Julia. The primary purpose of this package is to design a flexible package for use with data-driven and parameter-fitted interatomic potentials. This package is also being designed in order to allow users to define custom potentials and forces for use in molecular dynamics. This package also supports the Spectral Neighbor Analysis Potential (SNAP) potential of Thompson et al. 2015 (see documentation for bibliography) and a naive hacking of the Atomic Cluster Expansion of Drautz 2019 through the [ACE1.jl](https://github.com/ACEsuit/ACE1.jl/) julia package. We are working toward more complete implementation of these machine learning or data-driven potentials in the context of the CESMIX julia suite that seeks to fit and run these potentials for molecular dynamics. For additional details, see the [CESMIX](https://github.com/cesmix-mit) ecosystem.
 
-This package is part of the CESMIX molecular modeling suite. This package is also intended to be used with Atomistic.jl (for molecular dynamics, with Molly.jl), InteratomicBasisPotentials.jl (for machine learning potentials like SNAP and ACE), and  PotentialLearning.jl (for fitting potentials from data).
+This package is part of the CESMIX molecular modeling suite. This package is also intended to be used with Atomistic.jl (for molecular dynamics, with Molly.jl), and  PotentialLearning.jl (for fitting potentials from data).
 
 This package is a work in progress. 
 

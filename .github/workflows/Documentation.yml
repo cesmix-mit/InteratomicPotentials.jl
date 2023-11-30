@@ -21,6 +21,8 @@ jobs:
             using Pkg
             Pkg.Registry.add("General")
             Pkg.Registry.add(RegistrySpec(url = "https://github.com/cesmix-mit/CESMIX.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaMolSim/MolSim.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/ACEsuit/ACEregistry"))
           '
         shell: bash
       - name: instantiate docs
@@ -34,9 +36,7 @@ jobs:
         run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using InteratomicPotentials
-            DocMeta.setdocmeta!(InteratomicPotentials, :DocTestSetup, :(using InteratomicPotentials); recursive=true)
-            doctest(InteratomicPotentials)
+            using DocumenterCitations
           '
       - name: generate docs
         run: DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs docs/make.jl

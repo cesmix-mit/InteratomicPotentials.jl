@@ -2,6 +2,11 @@
 
 export AbstractPotential, NonTrainablePotential, TrainablePotential, EmpiricalPotential, MixedPotential
 export BasisPotential, NeuralNetworkBasisPotential, LinearBasisPotential, BasisSystem
+export ACE, SNAP, LBasisPotential, NNBasisPotential
+
+include("BasisPotentials/basis_potentials.jl")
+include("BasisSystems/basis_systems.jl")
+
 """
     AbstractPotential
 
