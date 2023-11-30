@@ -1,7 +1,14 @@
-include("helpers.jl")
+push!(Base.LOAD_PATH, "../../")
 
+using AtomsBase
+using InteratomicPotentials
+using LinearAlgebra
+using Unitful
+using UnitfulAtomic
 using BenchmarkTools
 using PProf
+
+include("utils.jl")
 
 @show N, NUM_ITER = parse.(Int, ARGS)
 

@@ -1,9 +1,3 @@
-using AtomsBase
-using InteratomicPotentials
-using LinearAlgebra
-using Unitful
-using UnitfulAtomic
-
 function load_configuration(filename::String)
     box = [[8.0, 0.0, 0.0], [0.0, 8.0, 0.0], [0.0, 0.0, 8.0]] * 1u"Å"
     bcs = [DirichletZero(), DirichletZero(), DirichletZero()]

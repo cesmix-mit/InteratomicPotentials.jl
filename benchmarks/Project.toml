@@ -1,0 +1,19 @@
+[deps]
+ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
+AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
+JuLIP = "945c410c-986d-556a-acb1-167a618e0462"
+LAMMPS = "ee2e13b9-eee9-4449-aafa-cfa6a2dbe14d"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
+PProf = "e4faabce-9ead-11e9-39d9-4379958e3056"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
+[compat]
+julia = "1.9"
