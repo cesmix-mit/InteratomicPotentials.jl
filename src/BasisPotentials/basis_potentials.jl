@@ -1,4 +1,4 @@
-export LinearBasisPotential, NNBasisPotential
+#export LinearBasisPotential, NNBasisPotential
 include("linear_potential.jl")
 include("nn_potential.jl")
 

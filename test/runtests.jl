@@ -41,16 +41,15 @@ include("mocks.jl")
     @time @testset "Integration Tests" begin
         include("integration/lj_clusters/lj_150.jl")
         include("integration/lj_clusters/lj_1000.jl")
+    end
 
-@testset "InteratomicBasisPotentials.jl" begin
-
-    @testset "SNAP" begin
+    @time @testset "SNAP" begin
         include("SNAP/snap_test_single_element.jl")
         include("SNAP/snap_test_multi_element.jl")
         # include("SNAP/snap_test_performance.jl")
     end
 
-    @testset "ACE" begin
+    @time @testset "ACE" begin
         include("ACE/ace_test.jl")
     end
 end

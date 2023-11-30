@@ -3,7 +3,6 @@ using StaticArrays
 using Unitful
 using UnitfulAtomic
 using InteratomicPotentials
-using InteratomicBasisPotentials
 
 r0 = 2.0
 position0 = @SVector [1.0, 0.0, 0.0]

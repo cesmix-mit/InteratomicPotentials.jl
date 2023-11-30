@@ -68,7 +68,7 @@ set_parameters(lj, (ϵ = 2.0 * 1u"eV", σ = 1.0 * 1u"Å")) # Set parameters (re
 
 ## Potential Types
 
-All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. At this point, as of v2.0, there are two branches of potentials: `EmpiricalPotential` and `MixedPotentials`. A sister package, ```julia InteratomicBasisPotentials.jl``` defines a potential called `BasisPotential`, see that package for additional details.
+All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. At this point, as of v2.0, there are two branches of potentials: `EmpiricalPotential` and `MixedPotentials`. A potential called `BasisPotential` is also defined.
 
 `EmpiricalPotential`s include two-body potentials like `BornMayer`, `LennardJones`. `MixedPotential` is a convenience type for allowing the linear combination of potentials. An example would be:
 ```julia
@@ -87,7 +87,6 @@ ZBL         <: EmpiricalPotential
 
 LinearCombinationPotential <: MixedPotential
 
-# See InteratomicBasisPotentials.jl
 BasisPotential <: AbstractPotential
 SNAP           <: BasisPotential
 ACE            <: BasisPotential

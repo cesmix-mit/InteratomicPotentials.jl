@@ -1,6 +1,5 @@
 using AtomsBase
 using InteratomicPotentials
-using InteratomicBasisPotentials
 using StaticArrays
 using Unitful
 using UnitfulAtomic
