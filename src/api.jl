@@ -142,11 +142,11 @@ For a `NonTrainablePotential`, the function returns the original potential, unch
 """
 function deserialize_hyperparameters end
 """
-    get_local_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector}
+    compute_local_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector}
 
 Compute the local descriptors for an abstract system `s` using the basis system defined in b.
 
-For a system `s` with `n_atom` number of atoms this method `get_local_descriptors` returns a `Vector{Vector{T<:Real}}`, containing `n_atom` vectors each of dimension `d` as defined by the basis system.
+For a system `s` with `n_atom` number of atoms this method `compute_local_descriptors` returns a `Vector{Vector{T<:Real}}`, containing `n_atom` vectors each of dimension `d` as defined by the basis system.
 """
 function compute_local_descriptors end 
 """
