@@ -11,7 +11,7 @@ using BenchmarkTools
 
 include("utils.jl")
 
-T, = parse.(Int, ARGS)
+T = parse.(Int, ARGS) # E.g. 10
 
 potential = LennardJones(1.0u"eV", 1.0u"Å", 100.0u"Å", [:Ar])
 

@@ -10,7 +10,7 @@ using PProf
 
 include("utils.jl")
 
-@show N, NUM_ITER = parse.(Int, ARGS)
+@show N, NUM_ITER = parse.(Int, ARGS) # E.g. 100, 100
 
 potential = LennardJones(1.0u"eV", 1.0u"Å", 100.0u"Å", [:Ar])
 
