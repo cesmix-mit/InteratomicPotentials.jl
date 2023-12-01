@@ -21,6 +21,10 @@ jobs:
         arch:
           - x64
     steps:
+      - name: Windows git setup
+        if: runner.os == 'Windows'
+        run:
+          git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
