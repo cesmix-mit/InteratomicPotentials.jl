@@ -20,16 +20,20 @@ const EXAMPLES_DIR = joinpath(@__DIR__, "..", "examples")
 const OUTPUT_DIR = joinpath(@__DIR__, "src/generated")
 
 examples = [
-    "LJCluster" => "LJCluster/feature_exploration"
+    "Lennard Jones Cluster" => "LJCluster/feature_exploration.jl"
 ]
 
-for (_, name) in examples
-    example_filepath = joinpath(EXAMPLES_DIR, string(name, ".jl"))
-    Literate.markdown(example_filepath, OUTPUT_DIR, documenter = true)
+for (_, example_path) in examples
+    s = split(example_path, "/")
+    sub_path, file_name = string(s[1:end-1]...), s[end]
+    example_filepath = joinpath(EXAMPLES_DIR, example_path)
+    Literate.markdown(example_filepath,
+                      joinpath(OUTPUT_DIR, sub_path),
+                      documenter = true)
 end
 
-examples = [title => joinpath("generated", string(name, ".md"))
-            for (title, name) in examples]
+examples = [title => joinpath("generated", replace(example_path, ".jl" => ".md"))
+            for (title, example_path) in examples]
 
 makedocs(
       root    =  joinpath(dirname(pathof(InteratomicPotentials)), "..", "docs"),
