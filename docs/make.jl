@@ -20,7 +20,7 @@ const EXAMPLES_DIR = joinpath(@__DIR__, "..", "examples")
 const OUTPUT_DIR = joinpath(@__DIR__, "src/generated")
 
 examples = [
-    "LJCluster" => "LJCluster"
+    "LJCluster" => "LJCluster/feature_exploration"
 ]
 
 for (_, name) in examples
@@ -32,7 +32,7 @@ examples = [title => joinpath("generated", string(name, ".md"))
             for (title, name) in examples]
 
 makedocs(
-      root    =  joinpath(dirname(pathof(PotentialLearning)), "..", "docs"),
+      root    =  joinpath(dirname(pathof(InteratomicPotentials)), "..", "docs"),
       source  = "src",
       build   = "build",
       clean   = true,
