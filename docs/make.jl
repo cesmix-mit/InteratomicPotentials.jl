@@ -16,18 +16,17 @@ bib = CitationBibliography(joinpath(@__DIR__, "citation.bib"))
 
 # Generate examples
 
-#const EXAMPLES_DIR = joinpath(@__DIR__, "..", "examples")
-#const OUTPUT_DIR = joinpath(@__DIR__, "src/generated")
+const EXAMPLES_DIR = joinpath(@__DIR__, "..", "examples")
+const OUTPUT_DIR = joinpath(@__DIR__, "src/generated")
 
-##examples = Pair{String,String}[]
-#examples = [
-#    "LJCluster" => "LJCluster"
-#]
+examples = [
+    "LJCluster" => "LJCluster"
+]
 
-#for (_, name) in examples
-#    example_filepath = joinpath(EXAMPLES_DIR, string(name, ".jl"))
-#    Literate.markdown(example_filepath, OUTPUT_DIR, documenter = true)
-#end
+for (_, name) in examples
+    example_filepath = joinpath(EXAMPLES_DIR, string(name, ".jl"))
+    Literate.markdown(example_filepath, OUTPUT_DIR, documenter = true)
+end
 
 examples = [title => joinpath("generated", string(name, ".md"))
             for (title, name) in examples]
