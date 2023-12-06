@@ -142,7 +142,7 @@ For a `NonTrainablePotential`, the function returns the original potential, unch
 """
 function deserialize_hyperparameters end
 """
-    compute_local_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector}
+    compute_local_descriptors(s::AbstractSystem, b::BasisSystem; T = Float64)::Vector{Vector}
 
 Compute the local descriptors for an abstract system `s` using the basis system defined in b.
 
@@ -150,7 +150,7 @@ For a system `s` with `n_atom` number of atoms this method `compute_local_descri
 """
 function compute_local_descriptors end 
 """
-    compute_force_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
+    compute_force_descriptors(s::AbstractSystem, b::BasisSystem; T = Float64)::Vector{Vector{Vector}}
 
 Compute the force descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package.
 
@@ -158,7 +158,7 @@ For a system `s` with `n_atom` number of atoms this method `compute_force_descri
 """
 function compute_force_descriptors end
 """
-    compute_virial_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
+    compute_virial_descriptors(s::AbstractSystem, b::BasisSystem; T = Float64)::Vector{Vector{Vector}}
 
 Compute the virial descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package.
 
@@ -166,7 +166,7 @@ For a system `s` with `n_atom` number of atoms this method `compute_virial_descr
 """
 function compute_virial_descriptors end
 """
-    compute_all_descriptors(s::AbstractSystem, b::BasisSystem)::Vector{Vector{Vector}}
+    compute_all_descriptors(s::AbstractSystem, b::BasisSystem; T = Float64)::Vector{Vector{Vector}}
 
 Compute the local, force, and virial descriptors for an abstract system `s` using the basis system defined in b. These types are defined in this package.
 """

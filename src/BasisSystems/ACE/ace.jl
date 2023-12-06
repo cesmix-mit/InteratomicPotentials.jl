@@ -53,36 +53,39 @@ function convert_system_to_atoms(system::AbstractSystem)
     return Atoms(X = positions, P = velocities, M = masses, Z = atomic_number, cell = cell, pbc = pbc)
 end
 
-function compute_local_descriptors(A::AbstractSystem, ace::ACE)
-    return [site_energy(ace.rpib, convert_system_to_atoms(A), i) for i = 1:length(A)]
+function compute_local_descriptors(A::AbstractSystem, ace::ACE; T = Float64)
+    return [ T.(site_energy(ace.rpib, convert_system_to_atoms(A), i))
+             for i = 1:length(A)]
 end
 
-function compute_force_descriptors(A::AbstractSystem, ace::ACE)
+function compute_force_descriptors(A::AbstractSystem, ace::ACE; T = Float64)
     ftemp = ACE1.forces(ace.rpib, convert_system_to_atoms(A))
-    f = [zeros(3, length(ace)) for i = 1:length(A)]
+    f = [zeros(T, 3, length(ace)) for i = 1:length(A)]
     for i = 1:length(A)
         for j = 1:3 
             for k = 1:length(ace)
-                f[i][j, k] = ftemp[k][i][j]
+                f[i][j, k] = T.(ftemp[k][i][j])
             end
         end
     end
     return f
 end
 
-function compute_virial_descriptors(A::AbstractSystem, ace::ACE)
+function compute_virial_descriptors(A::AbstractSystem, ace::ACE; T = Float64)
     Wtemp = ACE1.virial(ace.rpib, convert_system_to_atoms(A))
-    W = zeros(6, length(ace))
+    W = zeros(T, 6, length(ace))
     for k = 1:length(ace)
         count = 1
         for (i, j) in zip( [1, 2, 3, 3, 3, 2], [1, 2, 3, 2, 1, 1])
-            W[count, k] = Wtemp[k][i, j]
+            W[count, k] = T.(Wtemp[k][i, j])
             count +=1
         end
     end
     return W
 end
 
-function compute_all_descriptors(A::AbstractSystem, ace::ACE)
-    return compute_local_descriptors(A, ace), compute_force_descriptors(A, ace), compute_virial_descriptors(A, ace)
+function compute_all_descriptors(A::AbstractSystem, ace::ACE; T = Float64)
+    return compute_local_descriptors(A, ace; T = T),
+           compute_force_descriptors(A, ace; T = T),
+           compute_virial_descriptors(A, ace; T = T)
 end
