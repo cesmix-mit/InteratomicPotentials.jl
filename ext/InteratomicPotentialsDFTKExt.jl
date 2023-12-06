@@ -1,12 +1,21 @@
 module InteratomicPotentialsDFTKExt
-using AtomsBase
-using DFTK
-using InteratomicPotentials
-using Unitful
-using UnitfulAtomic
 
-function InteratomicPotentials.energy_and_force(system::AbstractSystem,
-                                                potential::DFTKPotential)
+# Extension module compatibility
+if isdefined(Base, :get_extension)
+    using AtomsBase
+    using DFTK
+    using InteratomicPotentials: energy_and_force
+    using Unitful
+    using UnitfulAtomic
+else
+    using ..AtomsBase
+    using ..DFTK
+    using ..InteratomicPotentials: energy_and_force
+    using ..Unitful
+    using ..UnitfulAtomic
+end
+
+function energy_and_force(system::AbstractSystem, potential::DFTKPotential)
     model = model_DFT(system, potential.functionals; potential.model_kwargs...)
     basis = PlaneWaveBasis(model; potential.basis_kwargs...)
 
