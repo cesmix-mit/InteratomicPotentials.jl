@@ -21,7 +21,7 @@ function potential_energy(
     A::AbstractSystem,
     nnbp::NNBasisPotential
 )
-    local_descr = get_values(get_local_descriptors(A, nnbp))
+    local_descr = compute_local_descriptors(A, nnbp.basis)
     species = atomic_symbol.(A.particles)
     return sum([nnbp.nns[s](d) for (s, d) in zip(species, local_descr)])[1]
 end

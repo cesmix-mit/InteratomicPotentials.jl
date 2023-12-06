@@ -7,8 +7,8 @@ include("nn_potential.jl")
 ################################################################################
 
 function energy_and_force(A::AbstractSystem, p::LinearBasisPotential)
-    B = get_local_descriptors(A, p)
-    dB = get_force_descriptors(A, p)
+    B = compute_local_descriptors(A, p)
+    dB = compute_force_descriptors(A, p)
     e = sum(B) ⋅ p.coefficients # * ENERGY_UNIT
     f = [SVector{3}(di * p.coefficients) for di in dB] # * FORCE_UNIT
     (; e, f)
