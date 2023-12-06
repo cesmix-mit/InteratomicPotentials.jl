@@ -69,3 +69,5 @@ abstract type LinearBasisPotential{P<:NamedTuple, HP<:NamedTuple} <: BasisPotent
 Abstract type to define methods for producing a set of local and force descriptors for a given configuration. Examples include the Atomic Cluster Expansion, SOAP descriptors, and SNAP descriptors. See the package InteratomicBasisPotentials.jl for implementation.
 """
 abstract type BasisSystem end 
+
+include("types/dftk_potential.jl")

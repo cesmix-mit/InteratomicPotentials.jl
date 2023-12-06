@@ -41,5 +41,6 @@ include("mocks.jl")
     @time @testset "Integration Tests" begin
         include("integration/lj_clusters/lj_150.jl")
         include("integration/lj_clusters/lj_1000.jl")
+        include("integration/dftk.jl")
     end
 end
