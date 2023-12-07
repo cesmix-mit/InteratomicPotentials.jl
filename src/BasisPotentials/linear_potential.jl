@@ -3,13 +3,14 @@
 
 Type covering interatomic potentials that produce energies and forces as a linear function of the basis descriptors. Typical examples include vanilla ACE/SNAP. Each struct contains the parameters of the potential, `β', and the basis system being used, `basis'.
 """
-struct LBasisPotential{T} <: LinearBasisPotential{NamedTuple{(:β, )}, NamedTuple{()}}
-    β :: Vector{T}
-    basis :: BasisSystem
+struct LBasisPotential{T} <: LinearBasisPotential{NamedTuple{(:β, :β0)}, NamedTuple{()}}
+    β
+    β0
+    basis
 end
 
-function LBasisPotential(basis :: BasisSystem)
-    LBasisPotential(zeros(length(basis)), basis)
+function LBasisPotential(basis :: BasisSystem; T = Float64)
+    return LBasisPotential{T}(zeros(T, length(basis)), zeros(T, 1), basis)
 end
 
 get_rcutoff(lbp::LBasisPotential) = get_rcutoff(lbp.basis)
