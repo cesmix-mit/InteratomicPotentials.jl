@@ -14,6 +14,20 @@ struct ACE <: BasisSystem
     rpib              :: ACE1.RPIBasis
 end 
 
+function ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff)
+    rpib = ACE1.rpi_basis(;
+                species = species,
+                N       = body_order - 1,
+                maxdeg  = polynomial_degree,
+                D       = ACE1.SparsePSHDegree(; wL = wL, csp = csp),
+                r0      = r0, 
+                rin     = 0.65*r0,
+                rcut    = rcutoff,
+                pin     = 0,
+           )
+    return ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff, rpib)
+end
+
 function ACE(; species = [:X], body_order = 4, polynomial_degree = 6, 
                wL = 1.5, csp = 1.0, r0 = 2.5, rcutoff = 5.0)
     rpib = ACE1.rpi_basis(;
