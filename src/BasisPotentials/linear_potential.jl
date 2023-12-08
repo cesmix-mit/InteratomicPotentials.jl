@@ -9,7 +9,10 @@ struct LBasisPotential{T} <: LinearBasisPotential{NamedTuple{(:β, :β0)}, Named
     basis
 end
 
-function LBasisPotential(basis :: BasisSystem; T = Float64)
+function LBasisPotential(
+    basis :: BasisSystem;
+    T = Float64
+)
     return LBasisPotential{T}(zeros(T, length(basis)), zeros(T, 1), basis)
 end
 
@@ -17,7 +20,7 @@ end
 
 function potential_energy(
     B::Vector{Vector{T}},
-    lbp::LBasisPotential
+    lbp::LBasisPotential{T}
 ) where T<: Real
     G = compute_global_descriptors(B, lbp)
     return lbp.β0[1] + dot(G, lbp.β)
@@ -25,9 +28,9 @@ end
 
 function force(
     dB::Vector{Matrix{T}},
-    lbp::LBasisPotential
+    lbp::LBasisPotential{T}
 ) where T<: Real
-
+    # TODO
 #    force_descriptors = [reduce(vcat, get_values(get_force_descriptors(dsi)) ) for dsi in ds]
 #    return vcat([lb.β0[1] .+  dB' * lb.β
 #                 for dB in [reduce(hcat, fi)
@@ -41,14 +44,14 @@ end
 
 function virial_stress(
     W::Matrix{T},
-    lbp::LBasisPotential
+    lbp::LBasisPotential{T}
 ) where T <: Real 
     return SVector{6}(W * lbp.β)
 end
 
 function virial(
     W::Matrix{T},
-    lbp::LBasisPotential
+    lbp::LBasisPotential{T}
 ) where T<:Real
     return sum(W * lbp.β)
 end
@@ -56,20 +59,20 @@ end
 # Other useful function
 
 function get_rcutoff(
-    lbp::LBasisPotential
-)
+    lbp::LBasisPotential{T}
+) where T<:Real
     return get_rcutoff(lbp.basis)
 end
 
 function get_species(
-    lbp::LBasisPotential
-)
+    lbp::LBasisPotential{T}
+) where T<:Real
     return get_species(lbp.basis)
 end
 
 function get_parameters(
-    lbp::LBasisPotential
-)
+    lbp::LBasisPotential{T}
+) where T<:Real
     return (lbp.β0, lbp.β)
 end
 
