@@ -20,7 +20,7 @@ function potential_energy(
     lbp::LBasisPotential
 ) where T<: Real
     G = compute_global_descriptors(B, lbp)
-    return lbp.β0[1] + dot(G, [lbp.β])
+    return lbp.β0[1] + dot(G, lbp.β)
 end
 
 function force(
