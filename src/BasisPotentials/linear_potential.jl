@@ -23,23 +23,16 @@ function potential_energy(
     lbp::LBasisPotential{T}
 ) where T<: Real
     G = compute_global_descriptors(B, lbp)
-    return lbp.β0[1] + dot(G, lbp.β)
+    return lbp.β0[1] + G ⋅ lbp.β)
 end
 
 function force(
-    dB::Vector{Matrix{T}},
+    dB::Vector{Vector{Vector{T}}},
     lbp::LBasisPotential{T}
 ) where T<: Real
-    # TODO
-#    force_descriptors = [reduce(vcat, get_values(get_force_descriptors(dsi)) ) for dsi in ds]
-#    return vcat([lb.β0[1] .+  dB' * lb.β
-#                 for dB in [reduce(hcat, fi)
-#                 for fi in force_descriptors]]...)
-
-#    G = compute_global_descriptors(B, lbp)
-#    return vcat([lb.β0[1] .+  dB' * lb.β for dB in [reduce(hcat, fi) for fi in force_descriptors]]...)
-#    
-    #force(B::Vector{Matrix{T}}, lbp::LBasisPotential) where T <: Real = SVector{3}.([ b * lbp.β for b in B])
+    f = [[dB_atom_comp' ⋅ lb.β for dB_atom_comp in dB_atom]
+         for dB_atom in dB]
+    return f
 end
 
 function virial_stress(

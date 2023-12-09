@@ -17,7 +17,7 @@ function potential_energy(
 end
 
 function force(
-    dB::Vector{Matrix{T}},
+    dB::Vector{Vector{Vector{Vector{T}}}},
     nnbp::NNBasisPotential
 ) where T<: Real
     # TODO
