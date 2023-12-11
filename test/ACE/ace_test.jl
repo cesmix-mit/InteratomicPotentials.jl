@@ -26,7 +26,6 @@ e = sum(compute_local_descriptors(system, ace))
 @test isa(e, AbstractVector)
 f = compute_local_descriptors(system, ace)
 @test all(isa.(f, (AbstractVector,)))
-
 v = compute_virial_descriptors(system, ace)
 @test isa(v, AbstractArray)
 
