@@ -10,10 +10,9 @@ struct LBasisPotential{T} <: LinearBasisPotential{NamedTuple{(:β, :β0)}, Named
 end
 
 function LBasisPotential(
-    basis :: BasisSystem;
-    T = Float64
+    basis :: BasisSystem
 )
-    return LBasisPotential{T}(zeros(T, length(basis)), zeros(T, 1)[1], basis)
+    return LBasisPotential(zeros(length(basis)), zeros(1)[1], basis)
 end
 
 # Get all energies and forces for basis potential

@@ -107,7 +107,7 @@ function compute_local_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.species), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
-    B = [zeros(T, num_coeff) for i = 1:length(A)]
+    B = [zeros(num_coeff) for i = 1:length(A)]
 
     for  (i, ai) in enumerate(A)
         i_element = findall(x->x==Symbol(atomic_symbol(ai)), snap.species)[1]
@@ -118,7 +118,7 @@ function compute_local_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
         compute_zi(snap, runtime_arrays)
         compute_bi(snap, runtime_arrays)
 
-        B[i] = T.(runtime_arrays.blist)
+        B[i] = runtime_arrays.blist
     end
     return B
 end
@@ -158,8 +158,8 @@ function compute_force_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
             compute_duidrj(rij, wj, rcut, jj, snap, runtime_arrays)
             compute_dbidrj(j_element, snap, runtime_arrays)
 
-            dB[ii][:, (i_offset+1):(num_coeff+i_offset)] += T.(runtime_arrays.dblist')
-            dB[jj][:, (i_offset+1):(num_coeff+i_offset)] -= T.(runtime_arrays.dblist')
+            dB[ii][:, (i_offset+1):(num_coeff+i_offset)] += runtime_arrays.dblist'
+            dB[jj][:, (i_offset+1):(num_coeff+i_offset)] -= runtime_arrays.dblist'
 
         end
     end
@@ -206,24 +206,24 @@ function compute_virial_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
             xi, yi, zi = ustrip.(A.particles[ii].position)
             xj, yj, zj = ustrip.(A.particles[jj].position)
 
-            W[ii][:, (i_offset+1):(num_coeff+i_offset)] += T.(reshape([runtime_arrays.dblist[:, 1]*xi; 
+            W[ii][:, (i_offset+1):(num_coeff+i_offset)] += reshape([runtime_arrays.dblist[:, 1]*xi; 
                          runtime_arrays.dblist[:, 2]*yi;
                          runtime_arrays.dblist[:, 3]*zi;
                          runtime_arrays.dblist[:, 2]*zi;
                          runtime_arrays.dblist[:, 1]*zi;
-                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6))
-            W[jj][:, (i_offset+1):(num_coeff+i_offset)] -= T.(reshape([runtime_arrays.dblist[:, 1]*xj; 
+                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6)
+            W[jj][:, (i_offset+1):(num_coeff+i_offset)] -= reshape([runtime_arrays.dblist[:, 1]*xj; 
                          runtime_arrays.dblist[:, 2]*yj;
                          runtime_arrays.dblist[:, 3]*zj;
                          runtime_arrays.dblist[:, 2]*zj;
                          runtime_arrays.dblist[:, 1]*zj;
-                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6))
+                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6)
         end
     end
     return sum(W)
 end
 
-function compute_all_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
+function compute_all_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -231,9 +231,9 @@ function compute_all_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.species), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
-    B = [zeros(T, num_coeff) for i = 1:number_of_particles]
-    dB = [zeros(T, 3, num_coeff*length(snap.species)) for i = 1:number_of_particles]
-    W = [zeros(T, 6, num_coeff*length(snap.species)) for i = 1:number_of_particles]
+    B = [zeros(num_coeff) for i = 1:number_of_particles]
+    dB = [zeros(3, num_coeff*length(snap.species)) for i = 1:number_of_particles]
+    W = [zeros(6, num_coeff*length(snap.species)) for i = 1:number_of_particles]
     for  (i, ai) in enumerate(A)
         i_element = findall(x->x==Symbol(ai.atomic_symbol), snap.species)[1]
 
@@ -243,7 +243,7 @@ function compute_all_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
         compute_zi(snap, runtime_arrays)
         compute_bi(snap, runtime_arrays)
 
-        B[i] = T.(runtime_arrays.blist)
+        B[i] = runtime_arrays.blist
 
         i_offset = num_coeff * (i_element - 1)
         # Compute Forces and Stresses
@@ -261,24 +261,24 @@ function compute_all_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
             compute_duidrj(rij, wj, rcut, ind+1, snap, runtime_arrays)
             compute_dbidrj(j_element, snap, runtime_arrays)
 
-            dB[ii][:, (i_offset+1):(num_coeff+i_offset)] += T.(runtime_arrays.dblist')
-            dB[jj][:, (i_offset+1):(num_coeff+i_offset)] -= T.(runtime_arrays.dblist')
+            dB[ii][:, (i_offset+1):(num_coeff+i_offset)] += runtime_arrays.dblist'
+            dB[jj][:, (i_offset+1):(num_coeff+i_offset)] -= runtime_arrays.dblist'
 
             xi, yi, zi = ustrip.(position(A[ii]))
             xj, yj, zj = ustrip.(position(A[jj]))
 
-            W[ii][:, (i_offset+1):(num_coeff+i_offset)] += T.(reshape([runtime_arrays.dblist[:, 1]*xi; 
+            W[ii][:, (i_offset+1):(num_coeff+i_offset)] += reshape([runtime_arrays.dblist[:, 1]*xi; 
                          runtime_arrays.dblist[:, 2]*yi;
                          runtime_arrays.dblist[:, 3]*zi;
                          runtime_arrays.dblist[:, 2]*zi;
                          runtime_arrays.dblist[:, 1]*zi;
-                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6)')
-            W[jj][:, (i_offset+1):(num_coeff+i_offset)] -= T.(reshape([runtime_arrays.dblist[:, 1]*xj; 
+                         runtime_arrays.dblist[:, 1]*yi], num_coeff, 6)'
+            W[jj][:, (i_offset+1):(num_coeff+i_offset)] -= reshape([runtime_arrays.dblist[:, 1]*xj; 
                          runtime_arrays.dblist[:, 2]*yj;
                          runtime_arrays.dblist[:, 3]*zj;
                          runtime_arrays.dblist[:, 2]*zj;
                          runtime_arrays.dblist[:, 1]*zj;
-                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6)')
+                         runtime_arrays.dblist[:, 1]*yj], num_coeff, 6)'
         end
     end
     return B, dB, sum(W)

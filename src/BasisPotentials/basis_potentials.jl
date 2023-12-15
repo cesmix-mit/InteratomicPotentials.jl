@@ -13,52 +13,47 @@ end
 
 function potential_energy(
     s::AbstractSystem,
-    bp::BasisPotential;
-    T = Float64
+    bp::BasisPotential
 )
-    B = compute_local_descriptors(s, bp.basis, T = T)
+    B = compute_local_descriptors(s, bp.basis)
     e = potential_energy(B, bp)
     return e
 end
 
 function force(
     s::AbstractSystem,
-    bp::BasisPotential;
-    T = Float64
+    bp::BasisPotential
 )
-    dB = compute_force_descriptors(s, bp.basis, T = T)
+    dB = compute_force_descriptors(s, bp.basis)
     f = force(dB, bp) # * FORCE_UNIT
     return f
 end
 
 function energy_and_force(
     s::AbstractSystem,
-    bp::BasisPotential;
-    T = Float64
+    bp::BasisPotential
 )
-    B = compute_local_descriptors(s, bp.basis, T = T)
+    B = compute_local_descriptors(s, bp.basis)
     e = potential_energy(B, bp) # * ENERGY_UNIT
-    dB = compute_force_descriptors(s, bp.basis, T = T)
+    dB = compute_force_descriptors(s, bp.basis)
     f = force(dB, bp) # * FORCE_UNIT
     (; e, f)
 end
 
 function virial_stress(
     s::AbstractSystem,
-    bp::BasisPotential;
-    T = Float64
+    bp::BasisPotential
 )
-    W = compute_virial_descriptors(s, bp, T = T)
+    W = compute_virial_descriptors(s, bp)
     v = virial_stress(W, bp)
     return v
 end
 
 function virial(
     s::AbstractSystem,
-    lbp::BasisPotential;
-    T = Float64
+    lbp::BasisPotential
 )
-    return sum(virial_stress(s, lbp, T = T))
+    return sum(virial_stress(s, lbp))
 end
 
 # Specific basis potential functions for computing energy, forces, and virials
