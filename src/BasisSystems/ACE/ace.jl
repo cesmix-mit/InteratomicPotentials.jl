@@ -7,14 +7,15 @@ struct ACE <: BasisSystem
     species           :: Vector{Symbol}
     body_order        :: Int   
     polynomial_degree :: Int
+    rcutoff           :: Real
     wL                :: Real
     csp               :: Real
     r0                :: Real 
-    rcutoff           :: Real
     rpib              :: ACE1.RPIBasis
 end 
 
-function ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff)
+function ACE(species, body_order, polynomial_degree, rcutoff;
+             wL = 1.5, csp = 1.0, r0 = 2.5)
     rpib = ACE1.rpi_basis(;
                 species = species,
                 N       = body_order - 1,
@@ -25,11 +26,12 @@ function ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff)
                 rcut    = rcutoff,
                 pin     = 0,
            )
-    return ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff, rpib)
+    return ACE(species, body_order, polynomial_degree,
+               rcutoff, wL, csp, r0, rpib)
 end
 
 function ACE(; species = [:X], body_order = 4, polynomial_degree = 6, 
-               wL = 1.5, csp = 1.0, r0 = 2.5, rcutoff = 5.0)
+               rcutoff = 5.0, wL = 1.5, csp = 1.0, r0 = 2.5)
     rpib = ACE1.rpi_basis(;
                 species = species,
                 N       = body_order - 1,
@@ -40,7 +42,8 @@ function ACE(; species = [:X], body_order = 4, polynomial_degree = 6,
                 rcut    = rcutoff,
                 pin     = 0,
            )
-    return ACE(species, body_order, polynomial_degree, wL, csp, r0, rcutoff, rpib)
+    return ACE(species, body_order, polynomial_degree,
+               rcutoff, wL, csp, r0, rpib)
 end
 
 function get_rpi(ace)

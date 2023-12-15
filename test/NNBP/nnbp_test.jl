@@ -24,8 +24,10 @@ system = FlexibleSystem(atoms, box * u"Å", bcs)
 # Compose Neural ACE ###########################################################
 
 # Define basis system
-basis = ACE( species = [:Ar], body_order = 3, polynomial_degree = 3, 
-             wL = 1.0, csp = 1.0, r0 = 0.4, rcutoff = 2.0)
+basis = ACE( species = [:Ar],
+             body_order = 3,
+             polynomial_degree = 3, 
+             rcutoff = 2.0)
 n_desc = 5
 
 # Define neural network besis potential
