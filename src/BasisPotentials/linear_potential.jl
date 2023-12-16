@@ -4,15 +4,15 @@
 Type covering interatomic potentials that produce energies and forces as a linear function of the basis descriptors. Typical examples include vanilla ACE/SNAP. Each struct contains the parameters of the potential, `β', and the basis system being used, `basis'.
 """
 struct LBasisPotential{T} <: LinearBasisPotential{NamedTuple{(:β, :β0)}, NamedTuple{()}}
-    β :: Vector{T}
-    β0 :: T
-    basis :: BasisSystem
+    β::Vector{T}
+    β0::Vector{T}
+    basis::BasisSystem
 end
 
 function LBasisPotential(
     basis :: BasisSystem
 )
-    return LBasisPotential(zeros(length(basis)), zeros(1)[1], basis)
+    return LBasisPotential(zeros(length(basis)), zeros(1), basis)
 end
 
 # Get all energies and forces for basis potential
@@ -22,7 +22,7 @@ function potential_energy(
     lbp::LBasisPotential{T}
 ) where T<: Real
     G = compute_global_descriptors(B, lbp)
-    return lbp.β0 + G ⋅ lbp.β
+    return lbp.β0[1] + G ⋅ lbp.β
 end
 
 function force(
