@@ -123,7 +123,7 @@ function compute_local_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     return B
 end
 
-function compute_force_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
+function compute_force_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -131,7 +131,7 @@ function compute_force_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.species), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
-    dB = [zeros(T, 3, num_coeff*length(snap.species)) for i = 1:number_of_particles]
+    dB = [zeros(3, num_coeff*length(snap.species)) for i = 1:number_of_particles]
 
     for  (i, ai) in enumerate(A.particles)
         i_element = findall(x->x==atomic_symbol(A, i), snap.species)[1]
@@ -166,7 +166,7 @@ function compute_force_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     return dB
 end
 
-function compute_virial_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
+function compute_virial_descriptors(A::AbstractSystem, snap::SNAP)
     number_of_particles = length(A.particles)
     # Produce NeighborList
     nnlist = neighborlist(A, snap)
@@ -174,7 +174,7 @@ function compute_virial_descriptors(A::AbstractSystem, snap::SNAP; T = Float64)
     num_coeff = get_num_snap_coeffs(snap.twojmax, length(snap.species), snap.chem_flag)
 
     # Initialize SNAP Bispectrum, dBispectrum, and Stress arrays
-    W = [zeros(T, 6, num_coeff*length(snap.species)) for i = 1:number_of_particles]
+    W = [zeros(6, num_coeff*length(snap.species)) for i = 1:number_of_particles]
 
     for  (i, ai) in enumerate(A.particles)
         i_element = findall(x->x==Symbol(ai.element.symbol), snap.species)[1]

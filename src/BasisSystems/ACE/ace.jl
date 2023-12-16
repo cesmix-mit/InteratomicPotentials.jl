@@ -77,7 +77,7 @@ end
 
 function compute_force_descriptors(A::AbstractSystem, ace::ACE)
     ftemp = ACE1.forces(ace.rpib, convert_system_to_atoms(A))
-    f = [zeros(T, 3, length(ace)) for i = 1:length(A)]
+    f = [zeros(3, length(ace)) for i = 1:length(A)]
     for i = 1:length(A)
         for j = 1:3 
             for k = 1:length(ace)
