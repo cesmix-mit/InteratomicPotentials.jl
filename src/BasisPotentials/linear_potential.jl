@@ -29,7 +29,7 @@ function force(
     dB::Vector{Vector{Vector{T}}},
     lbp::LBasisPotential{T}
 ) where T<: Real
-    f = [[dB_atom_comp' ⋅ lb.β for dB_atom_comp in dB_atom]
+    f = [[dB_atom_comp' ⋅ lbp.β for dB_atom_comp in dB_atom]
          for dB_atom in dB]
     return f
 end
