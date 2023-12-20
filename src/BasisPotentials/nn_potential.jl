@@ -10,10 +10,10 @@ end
 
 function potential_energy(
     B::Vector{Vector{T}},
+    s::Vector{Symbol},
     nnbp::NNBasisPotential
 ) where T<: Real
-    species = keys(nnbp.nns) # atomic_symbol.(A.particles)
-    return sum([nnbp.nns[s](d) for (s, d) in zip(species, B)])[1]
+    return sum([nnbp.nns[s](d) for (s, d) in zip(s, B)])[1]
 end
 
 function force(
