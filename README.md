@@ -6,9 +6,9 @@
 [![Docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/stable)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesmix-mit.github.io/InteratomicPotentials.jl/dev)
 
-This repository implements some basic language and syntax for manipulating interatomic potentials in Julia. The primary purpose of this package is to design a flexible package for use with data-driven and parameter-fitted interatomic potentials. This package is also being designed in order to allow users to define custom potentials and forces for use in molecular dynamics.
+This repository implements some basic language and syntax for manipulating interatomic potentials in Julia. The primary purpose of this package is to design a flexible package for use with data-driven and parameter-fitted interatomic potentials. This package is also being designed in order to allow users to define custom potentials and forces for use in molecular dynamics. This package also supports the Spectral Neighbor Analysis Potential (SNAP) potential of Thompson et al. 2015 (see documentation for bibliography) and a naive hacking of the Atomic Cluster Expansion of Drautz 2019 through the [ACE1.jl](https://github.com/ACEsuit/ACE1.jl/) julia package. We are working toward more complete implementation of these machine learning or data-driven potentials in the context of the CESMIX julia suite that seeks to fit and run these potentials for molecular dynamics. For additional details, see the [CESMIX](https://github.com/cesmix-mit) ecosystem.
 
-This package is part of the CESMIX molecular modeling suite. This package is also intended to be used with Atomistic.jl (for molecular dynamics, with Molly.jl), InteratomicBasisPotentials.jl (for machine learning potentials like SNAP and ACE), and  PotentialLearning.jl (for fitting potentials from data).
+This package is part of the CESMIX molecular modeling suite. This package is also intended to be used with Atomistic.jl (for molecular dynamics, with Molly.jl), and  PotentialLearning.jl (for fitting potentials from data).
 
 This package is a work in progress. 
 
@@ -68,7 +68,7 @@ set_parameters(lj, (ϵ = 2.0 * 1u"eV", σ = 1.0 * 1u"Å")) # Set parameters (re
 
 ## Potential Types
 
-All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. At this point, as of v2.0, there are two branches of potentials: `EmpiricalPotential` and `MixedPotentials`. A sister package, ```julia InteratomicBasisPotentials.jl``` defines a potential called `BasisPotential`, see that package for additional details.
+All interatomic potentials listed in this project are subtypes of `ArbitraryPotential`. There are three types of potentials currently implemented: `EmpiricalPotential`, `BasisPotential`, and combination potentials via `MixedPotentials`.
 
 `EmpiricalPotential`s include two-body potentials like `BornMayer`, `LennardJones`. `MixedPotential` is a convenience type for allowing the linear combination of potentials. An example would be:
 ```julia
@@ -87,7 +87,6 @@ ZBL         <: EmpiricalPotential
 
 LinearCombinationPotential <: MixedPotential
 
-# See InteratomicBasisPotentials.jl
 BasisPotential <: AbstractPotential
 SNAP           <: BasisPotential
 ACE            <: BasisPotential

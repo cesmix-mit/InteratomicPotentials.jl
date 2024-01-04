@@ -1,9 +1,16 @@
-include("helpers.jl")
+push!(Base.LOAD_PATH, "../../")
 
+using AtomsBase
+using InteratomicPotentials
+using LinearAlgebra
+using Unitful
+using UnitfulAtomic
 using BenchmarkTools
 using PProf
 
-@show N, NUM_ITER = parse.(Int, ARGS)
+include("utils.jl")
+
+@show N, NUM_ITER = parse.(Int, ARGS) # E.g. 100, 100
 
 potential = LennardJones(1.0u"eV", 1.0u"Å", 100.0u"Å", [:Ar])
 

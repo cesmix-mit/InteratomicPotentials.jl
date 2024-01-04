@@ -42,4 +42,14 @@ include("mocks.jl")
         include("integration/lj_clusters/lj_150.jl")
         include("integration/lj_clusters/lj_1000.jl")
     end
+
+    @time @testset "SNAP" begin
+        include("SNAP/snap_test_single_element.jl")
+        include("SNAP/snap_test_multi_element.jl")
+        # include("SNAP/snap_test_performance.jl")
+    end
+
+    @time @testset "ACE" begin
+        include("ACE/ace_test.jl")
+    end
 end

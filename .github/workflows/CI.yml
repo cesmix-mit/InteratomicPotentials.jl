@@ -13,8 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "1.6"
-          - "nightly"
+          - "1.9"
         os:
           - ubuntu-latest
           - macOS-latest
@@ -22,6 +21,10 @@ jobs:
         arch:
           - x64
     steps:
+      - name: Windows git setup
+        if: runner.os == 'Windows'
+        run:
+          git config --global core.autocrlf false
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
@@ -43,6 +46,8 @@ jobs:
             using Pkg
             Pkg.Registry.add("General")
             Pkg.Registry.add(RegistrySpec(url = "https://github.com/cesmix-mit/CESMIX.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/JuliaMolSim/MolSim.git"))
+            Pkg.Registry.add(RegistrySpec(url = "https://github.com/ACEsuit/ACEregistry"))
           '
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1

@@ -3,7 +3,7 @@ using Unitful
 using UnitfulAtomic
 using StaticArrays
 
-function load_data(;num_entries = 2000, file = "LJCluster/curated_lj_cluster.xyz" )
+function load_data(;num_entries = 2000, file = "curated_lj_cluster.xyz" )
     systems  = Vector{AbstractSystem}(undef, num_entries)
     energies = Vector{Float64}(undef, num_entries)
     forces    = Vector{Vector{T} where T<:SVector{3, <:Float64}}(undef, num_entries)
