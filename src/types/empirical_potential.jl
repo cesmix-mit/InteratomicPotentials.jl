@@ -65,3 +65,13 @@ function virial_stress(s::AbstractSystem, p::EmpiricalPotential)
     end
     SVector{6}(v) * ENERGY_UNIT
 end
+
+function force(s::AbstractSystem, p::EmpiricalPotential) 
+    eandf = energy_and_force(s,p)
+    eandf.f
+end
+
+function potential_energy(s::AbstractSystem, p::EmpiricalPotential) 
+    eandf = energy_and_force(s,p)
+    eandf.e
+end
