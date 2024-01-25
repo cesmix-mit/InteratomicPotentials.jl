@@ -45,4 +45,6 @@ lbp = LBasisPotential(ace)
 
 basis = get_rpi(ace);
 
-
+@testset "Reference ACE calculations" begin
+    include("reference_ace_test.jl")
+end
