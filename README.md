@@ -12,6 +12,8 @@ This package is part of the CESMIX molecular modeling suite. This package is als
 
 This package is a work in progress. 
 
+**WARNING**: As of v0.2.8, SNAP implementation is inconsistent with ACE implementation, and additionally, may produce incorrect values! (See [this issue](https://github.com/cesmix-mit/AtomisticComposableWorkflows/issues/10)).  Use at your own risk!
+
 ## Working Example
 
 In order to compute the interatomic energy of a system, or the forces between atoms in a system, the user has to
