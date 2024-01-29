@@ -77,11 +77,12 @@ end
 
 function compute_force_descriptors(A::AbstractSystem, ace::ACE)
     ftemp = ACE1.forces(ace.rpib, convert_system_to_atoms(A))
-    f = [zeros(3, length(ace)) for i = 1:length(A)]
+    # TODO: settle on efficient and consistent descriptor layout
+    f = [ [zeros(length(ace)) for _ in 1:3] for i in 1:length(A)]
     for i = 1:length(A)
         for j = 1:3 
             for k = 1:length(ace)
-                f[i][j, k] = ftemp[k][i][j]
+                f[i][j][k] = ftemp[k][i][j]
             end
         end
     end
