@@ -1,7 +1,16 @@
+authors = ["Dallas Foster <fostdall@mit.edu>"]
 name = "InteratomicPotentials"
 uuid = "a9efe35a-c65d-452d-b8a8-82646cd5cb04"
-authors = ["Dallas Foster <fostdall@mit.edu>"]
 version = "0.2.8"
+
+[compat]
+AtomsBase = "0.3"
+Distances = "0.10"
+NearestNeighbors = "0.4.9"
+StaticArrays = "1"
+Unitful = "1"
+UnitfulAtomic = "1"
+julia = "1.9"
 
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
@@ -17,11 +26,5 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 UnitfulAtomic = "a7773ee8-282e-5fa2-be4e-bd808c38a91a"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
-[compat]
-AtomsBase = "0.3"
-Distances = "0.10"
-NearestNeighbors = "0.4.9"
-StaticArrays = "1"
-Unitful = "1"
-UnitfulAtomic = "1"
-julia = "1.9"
+[extras]
+LAMMPS_jll = "5b3ab26d-9607-527c-88ea-8fe5ba57cafe"
