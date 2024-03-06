@@ -3,6 +3,7 @@
 export AbstractPotential, NonTrainablePotential, TrainablePotential, EmpiricalPotential, MixedPotential
 export BasisPotential, NeuralNetworkBasisPotential, LinearBasisPotential, BasisSystem
 export ACE, SNAP, LBasisPotential, NNBasisPotential
+export POD, LAMMPS_POD
 
 
 """
