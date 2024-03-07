@@ -6,6 +6,7 @@ version = "0.2.9"
 [deps]
 ACE1 = "e3f9bc04-086e-409a-ba78-e9769fe067bb"
 AtomsBase = "a963bdd2-2df7-4f54-a1ee-49d51e6be12a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 JuLIP = "945c410c-986d-556a-acb1-167a618e0462"
