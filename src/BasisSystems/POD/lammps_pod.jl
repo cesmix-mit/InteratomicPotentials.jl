@@ -21,6 +21,11 @@ function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_pa
     lmp_pod
 end
 
+function LBasisPotential(lmp_pod::LAMMPS_POD, coeff_fname::String)
+    coeffs = vec(readdlm(coeff_fname, ' '; skipstart=1)) 
+    LBasisPotential(coeffs,zeros(1),lmp_pod)
+end
+
 function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol})
     num_types = length(lammps_species)
     atomtype_str = ""
@@ -111,7 +116,6 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     atomids = extract_atom(lmp, "id")
     sort_idxs = sortperm(atomids)
 
-
     raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
     raw_types = extract_atom(lmp,"type")
     sorted_ld = raw_ld[sort_idxs,:]
@@ -120,19 +124,19 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     # This block is where the assumption that the species order of pod.species_map should match the POD species order matters
     # Once a param parser is implemented, I won't need this assumption (but will need a bit of extra logic)
     num_pod_types = length(pod.species_map)
-    num_perelem_ld = size(sorted_ld)[2]
-    total_num_ld = num_pod_types*(num_perelem_ld+1)# including 1-body terms
-    final_ld = zeros(total_num_ld)
-    for i in 1:size(sorted_ld)[1]
+    num_atoms = size(sorted_ld)[1]
+    num_perelem_ld = size(sorted_ld)[2] + 1 # including 1-body terms
+    total_num_ld = num_pod_types*(num_perelem_ld)
+    final_ld = [zeros(total_num_ld) for _ in 1:num_atoms] #for consistency, vec{vec} not matrix
+    for i in 1:num_atoms
         atype = sorted_types[i] 
-        final_ld[(atype-1)*(num_perelem_ld+1) + 1] += 1.0 # one-body terms
-        start = (atype-1)*(num_perelem_ld+1) + 2 # +2 accounts for both skipping 1-body term and 1-indexing
-        stop  = (atype-1)*(num_perelem_ld+1) + (num_perelem_ld+1)
-        final_ld[start:stop] += sorted_ld[i,:]
-        #@show sorted_ld[i,:]
+        final_ld[i][(atype-1)*num_perelem_ld + 1] = 1.0 # one-body terms
+        start = (atype-1)*num_perelem_ld + 2 # +2 accounts for both skipping 1-body term and 1-indexing
+        stop  = (atype-1)*num_perelem_ld + num_perelem_ld
+        final_ld[i][start:stop] = sorted_ld[i,:]
     end
 
-    @show final_ld
     command(lmp,"delete_atoms group all")
 
+    final_ld
 end
