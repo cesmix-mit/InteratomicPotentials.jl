@@ -2,12 +2,17 @@
 using LAMMPS
 using Printf: @sprintf 
 
-# species map can conceivably be separate from species in pod_spec...
-struct LAMMPS_POD <: BasisSystem 
+# species map can differ in order from species in pod_spec 
+# tradeoff between RefValue for the cache vs. just using a mutable struct?
+mutable struct LAMMPS_POD <: BasisSystem 
     lmp::LMP
     param_file::String
     species_map::Vector{Symbol} # index corresponds to lammps type
     pod_spec::Union{POD,Nothing}
+    type_cache::Matrix{Int32} # extra logic for compute dd, this is the output type we receive 
+    c_dd_cache::Int64 # extra logic for compute dd
+    
+    LAMMPS_POD(lmp,param_file,species_map,pod_spec) = new(lmp,param_file,species_map,pod_spec,Int32[-1;;],-1)
 end
 
 function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_param_file=false)
@@ -42,15 +47,14 @@ function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol
     command(lmp, "neighbor      0.5 bin")
     command(lmp, "neigh_modify  delay 0 every 1 check no")    
 
-    command(lmp, "region main prism 0.0 1.0 0.0 1.0 0.0 1.0 0.0 0.0 0.0")
+    command(lmp, "region main prism 0.0 2.0 0.0 2.0 0.0 2.0 0.0 0.0 0.0") # dummy triclinic system
     command(lmp, "create_box $(num_types) main")
-
+ 
     # Does the cutoff matter here? If it does, need to pass in cutoff, which means I'd have to parse from param file
     command(lmp, "pair_style    zero 10.0")
     command(lmp, "pair_coeff    * * ")
 
     command(lmp, """compute ld all pod/atom $(param_file) "" "" $(atomtype_str)""")
-    command(lmp, """compute dd all podd/atom $(param_file) "" "" $(atomtype_str)""")
 
     lmp
 end
@@ -64,7 +68,7 @@ function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
     atom_syms = atomic_symbol(A)
     unq_syms = unique(atom_syms)
     @assert all(in.(unq_syms, (pod.species_map,)))
-    atom_types = map(sym->findfirst(isequal(sym),pod.species_map), atom_syms)
+    atom_types = map(sym->findfirst(isequal(sym),pod.species_map), atom_syms) # atomic sybol --> lammps type based on order of symbol in pod.species_map
 
     # the way POD is constructed, the number of types initialized should equal the number of species modelled by POD
     # However, some systems will have only a subset of these species, so need to account for that here
@@ -139,4 +143,78 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     command(lmp,"delete_atoms group all")
 
     final_ld
+end
+
+function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
+    lmp = pod.lmp
+
+    atomtype_str = ""
+    for elem_symbol in pod.species_map 
+        atomtype_str = atomtype_str * " " * string(elem_symbol)
+    end
+
+    setup_lammps_system!(A,pod)
+    atomids = extract_atom(lmp, "id")
+    sort_idxs = sortperm(atomids)
+    raw_types = extract_atom(lmp,"type")
+    sorted_types = raw_types[sort_idxs,:]
+
+    #= Why is the following necessary?
+    The output of podd/atom depends on the number and types of atoms in the system, so if that changes, this compute needs to change. 
+    (When the compute is defined, it looks at the current atom list to figure out it's output)
+    Unfortunately, uncompute'ing a compute id does not free it up, and that compute id cannot be reused, hence this extra logic
+
+    For standard MD simulations, there should only be one of these podd/atom computes (unless the simulation can have variable numbers of atoms).
+
+    However, using a single LAMMPS_POD instance for computing descriptors of a training set may result in many of these computes. 
+    In the worst case scenario, for randomized diverse training sets, every time the next configuration has different #/types of atoms, a new compute is added. 
+    stochastic batch methods may be particularly problematic (at least if descriptors aren't cached). 
+
+    I'm not sure if there's any huge consequence for having many computes in terms of lammps performance (or if there are a maximum number of computes). 
+    Testing is needed
+    =#
+    if sorted_types !== pod.type_cache
+        pod.type_cache = sorted_types # this should be OK because sorted_type is a copy of the lammps types array
+        if pod.c_dd_cache == -1 
+            pod.c_dd_cache = 0
+            command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
+        else 
+            command(lmp, "uncompute dd$(pod.c_dd_cache)")
+            pod.c_dd_cache += 1
+            command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
+        end
+    end
+
+    command(lmp, "run 0")
+
+
+    # This block is needed to set up the full force descriptor array (i.e., across all elements)
+    # TODO: I probably shouldn't do this every single force/energy call... maybe set up a dummy system to get num descriptors during init
+    raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
+    num_pod_types = length(pod.species_map)
+    num_atoms = size(raw_ld)[1]
+    num_perelem_ld = size(raw_ld)[2] + 1 # including 1-body terms
+    total_num_ld = num_pod_types*(num_perelem_ld)
+    final_dd = [[zeros(total_num_ld) for _ in 1:3] for __ in 1:num_atoms] # for consistency, vec{vec{vec}}
+
+    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
+    sorted_dd = raw_dd[sort_idxs,:]
+
+    for i in 1:num_atoms
+        for alpha in 1:3
+            for j in 1:num_atoms
+                jtype = sorted_types[j]
+                fstart = (jtype-1)*(num_perelem_ld)+2 # +2 accounts for both skipping 1-body term and 1-indexing
+                fend   = fstart + num_perelem_ld -2
+                dd_start = (i-1)*3*(num_perelem_ld-1) + (alpha-1)*(num_perelem_ld-1) +1
+                dd_end = dd_start + (num_perelem_ld-1) -1
+                
+               final_dd[i][alpha][fstart:fend] += sorted_dd[j,dd_start:dd_end]
+            end
+        end
+    end
+
+    command(lmp,"delete_atoms group all")
+
+    final_dd
 end
