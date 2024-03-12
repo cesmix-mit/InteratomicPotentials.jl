@@ -52,4 +52,9 @@ include("mocks.jl")
     @time @testset "ACE" begin
         include("ACE/ace_test.jl")
     end
+
+    @time @testset "POD" begin
+        include("POD/pod_test.jl")
+    end
+
 end
