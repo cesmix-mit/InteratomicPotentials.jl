@@ -9,18 +9,20 @@ mutable struct LAMMPS_POD <: BasisSystem
     param_file::String
     species_map::Vector{Symbol} # index corresponds to lammps type
     pod_spec::Union{POD,Nothing}
+    num_perelem_ld::Int64
     type_cache::Matrix{Int32} # extra logic for compute dd, this is the output type we receive 
     c_dd_cache::Int64 # extra logic for compute dd
     
-    LAMMPS_POD(lmp,param_file,species_map,pod_spec) = new(lmp,param_file,species_map,pod_spec,Int32[-1;;],-1)
+    LAMMPS_POD(lmp,param_file,species_map,pod_spec,num_perelem_ld) = new(lmp,param_file,species_map,pod_spec,num_perelem_ld,Int32[-1;;],-1)
 end
 
 function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_param_file=false)
     lmp = initialize_pod_lammps(param_file,lammps_species)
+    num_perelem_ld = get_num_perelem_ld(lmp,lammps_species)
     if parse_param_file 
         println("Sorry, I haven't implementing parsing POD parameter files yet")
     else
-        lmp_pod = LAMMPS_POD(lmp,param_file,lammps_species,nothing)
+        lmp_pod = LAMMPS_POD(lmp,param_file,lammps_species,nothing,num_perelem_ld)
         @warn "Until POD param parser implemented, assuming species_map is the same order as species in POD parameter file"
     end
     lmp_pod
@@ -57,6 +59,23 @@ function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol
     command(lmp, """compute ld all pod/atom $(param_file) "" "" $(atomtype_str)""")
 
     lmp
+end
+
+function get_num_perelem_ld(lmp::LMP, lammps_species::Vector{Symbol})
+    # These masses will get overwritten 
+    for i in 1:length(lammps_species)
+        command(lmp, "mass $(i) 1.0")
+    end
+    # need to have one dummy atom for this to work
+    command(lmp, "create_atoms 1 single 0.25 0.25 0.25")
+    command(lmp, "run 0")
+
+    raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
+    num_perelem_ld = size(raw_ld)[2] + 1 # including 1-body terms
+
+    command(lmp,"delete_atoms group all")
+
+    num_perelem_ld
 end
 
 function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
@@ -189,13 +208,9 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
 
     command(lmp, "run 0")
 
-
-    # This block is needed to set up the full force descriptor array (i.e., across all elements)
-    # TODO: I probably shouldn't do this every single force/energy call... maybe set up a dummy system to get num descriptors during init
-    raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
     num_pod_types = length(pod.species_map)
-    num_atoms = size(raw_ld)[1]
-    num_perelem_ld = size(raw_ld)[2] + 1 # including 1-body terms
+    num_atoms = length(A) 
+    num_perelem_ld = pod.num_perelem_ld
     total_num_ld = num_pod_types*(num_perelem_ld)
     final_dd = [[zeros(total_num_ld) for _ in 1:3] for __ in 1:num_atoms] # for consistency, vec{vec{vec}}
 
