@@ -60,10 +60,10 @@ function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol
 end
 
 function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
-     # TODO: Will eventually need to ensure unit consistency
-     # For now, just trusting that it's correct.
+    # TODO: Will eventually need to ensure unit consistency
+    # For now, just trusting that it's correct.
 
-     lmp = pod.lmp
+    lmp = pod.lmp
 
     atom_syms = atomic_symbol(A)
     unq_syms = unique(atom_syms)
@@ -173,12 +173,14 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     I'm not sure if there's any huge consequence for having many computes in terms of lammps performance (or if there are a maximum number of computes). 
     Testing is needed
     =#
-    if sorted_types !== pod.type_cache
+    if sorted_types != pod.type_cache
         pod.type_cache = sorted_types # this should be OK because sorted_type is a copy of the lammps types array
         if pod.c_dd_cache == -1 
+            println("first compute!")
             pod.c_dd_cache = 0
             command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
         else 
+            println("New compute")
             command(lmp, "uncompute dd$(pod.c_dd_cache)")
             pod.c_dd_cache += 1
             command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
@@ -209,12 +211,16 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
                 dd_start = (i-1)*3*(num_perelem_ld-1) + (alpha-1)*(num_perelem_ld-1) +1
                 dd_end = dd_start + (num_perelem_ld-1) -1
                 
-               final_dd[i][alpha][fstart:fend] += sorted_dd[j,dd_start:dd_end]
+                final_dd[i][alpha][fstart:fend] += sorted_dd[j,dd_start:dd_end]
             end
         end
     end
 
     command(lmp,"delete_atoms group all")
+
+    command(lmp, "pair_style none")
+    command(lmp, "pair_style    zero 10.0")
+    command(lmp, "pair_coeff    * * ")
 
     final_dd
 end
