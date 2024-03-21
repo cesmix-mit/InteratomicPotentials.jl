@@ -28,6 +28,8 @@ function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_pa
     lmp_pod
 end
 
+Base.length(lmp_pod::LAMMPS_POD) = length(lmp_pod.species_map)*lmp_pod.num_perelem_ld
+
 function LBasisPotential(lmp_pod::LAMMPS_POD, coeff_fname::String)
     coeffs = vec(readdlm(coeff_fname, ' '; skipstart=1)) 
     LBasisPotential(coeffs,zeros(1),lmp_pod)
@@ -108,24 +110,32 @@ function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
 
     if !iszero(bbox[2][1])
         bbound_str = bbound_str * " xy final" * (@sprintf " %.27f" bbox[2][1])
+    else
+        bbound_str = bbound_str * " xy final" * (@sprintf " %.27f" 0.0)
     end
 
     if !iszero(bbox[3][1])
         bbound_str = bbound_str * " xz final" * (@sprintf " %.27f" bbox[3][1])
+    else
+        bbound_str = bbound_str * " xz final" * (@sprintf " %.27f" 0.0)
     end
 
     if !iszero(bbox[3][2])
         bbound_str = bbound_str * " yz final" * (@sprintf " %.27f" bbox[3][2])
+    else
+        bbound_str = bbound_str * " yz final" * (@sprintf " %.27f" 0.0)
     end
 
     bbound_str = bbound_str * " boundary p p p" 
     command(lmp, "change_box all" * bbound_str)
 
-    atom_pos = ustrip.(position(A))
-    for i in 1:length(atom_pos)
+    # LAMMPS needs wrapped coordinates to create_atoms
+    # If this incurs too much a perf penalty, can check to see if needed
+    wrapped_pos = wrap_positions(A)
+    for i in axes(wrapped_pos,2)
         xyz_str = ""
         for j in 1:3
-            xyz_str = xyz_str * @sprintf " %.27f" atom_pos[i][j]
+            xyz_str = xyz_str * @sprintf " %.27f" wrapped_pos[j,i]
         end
         command(lmp, "create_atoms $(atom_types[i]) single" * xyz_str)
     end
@@ -138,6 +148,7 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
 
     atomids = extract_atom(lmp, "id")
     sort_idxs = sortperm(atomids)
+    @assert length(A) == length(atomids)
 
     raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
     raw_types = extract_atom(lmp,"type")
@@ -174,6 +185,8 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
 
     setup_lammps_system!(A,pod)
     atomids = extract_atom(lmp, "id")
+    @assert length(A) == length(atomids) "$(length(A)) vs $(length(atomids))"
+
     sort_idxs = sortperm(atomids)
     raw_types = extract_atom(lmp,"type")
     sorted_types = raw_types[sort_idxs,:]
@@ -238,4 +251,28 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     command(lmp, "pair_coeff    * * ")
 
     final_dd
+end
+
+
+#This should live somewhere else eventually 
+function wrap_positions(A::AbstractSystem)
+    cart_pos = reduce(hcat,ustrip.(position(A)))
+
+    cry_to_cart = reduce(hcat, ustrip.(bounding_box(A))) # effectively performs transpose of cell matrix
+    cart_to_cry = inv(cry_to_cart)
+
+    cry_pos = cart_to_cry*cart_pos
+    new_cry_pos =zeros(size(cry_pos))
+    for i in axes(new_cry_pos,2)
+        new_cry_pos[:,i] = cry_pos[:,i]
+        for j in 1:3
+            if new_cry_pos[j,i] > 1.0
+                new_cry_pos[j,i] -= 1.0
+            elseif new_cry_pos[j,i] < 0.0
+                new_cry_pos[j,i] += 1.0
+            end
+        end
+    end
+    new_cart_pos = cry_to_cart * new_cry_pos
+    new_cart_pos
 end
