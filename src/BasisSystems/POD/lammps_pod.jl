@@ -77,6 +77,10 @@ function get_num_perelem_ld(lmp::LMP, lammps_species::Vector{Symbol})
 
     command(lmp,"delete_atoms group all")
 
+    command(lmp, "pair_style none")
+    command(lmp, "pair_style    zero 10.0")
+    command(lmp, "pair_coeff    * * ")
+
     num_perelem_ld
 end
 
@@ -85,6 +89,7 @@ function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
     # For now, just trusting that it's correct.
 
     lmp = pod.lmp
+    command(lmp,"delete_atoms group all")
 
     atom_syms = atomic_symbol(A)
     unq_syms = unique(atom_syms)
@@ -170,7 +175,9 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
         final_ld[i][start:stop] = sorted_ld[i,:]
     end
 
-    command(lmp,"delete_atoms group all")
+    command(lmp, "pair_style none")
+    command(lmp, "pair_style    zero 10.0")
+    command(lmp, "pair_coeff    * * ")
 
     final_ld
 end
