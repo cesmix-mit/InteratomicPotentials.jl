@@ -1,6 +1,7 @@
 
 using LAMMPS
 using Printf: @sprintf 
+using LinearAlgebra: norm
 
 # species map can differ in order from species in pod_spec 
 # tradeoff between RefValue for the cache vs. just using a mutable struct?
@@ -105,7 +106,8 @@ function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
         command(lmp, "mass $(atype) $(mass)")
     end
 
-    bbox = ustrip.(bounding_box(A))
+    # Doing it this way avoids the ReinterpretArray type, which is annoying for dispatch on the longest_diag fn
+    bbox = [ustrip.(box_arr) for box_arr in bounding_box(A)]
     @assert iszero([bbox[1][2],bbox[1][3],bbox[2][3]]) #needs to conform to lammps triclinic requirements
     bbound_str = ""
     cart_name = ["x", "y", "z"]
@@ -133,6 +135,10 @@ function setup_lammps_system!(A::AbstractSystem, pod::LAMMPS_POD)
 
     bbound_str = bbound_str * " boundary p p p" 
     command(lmp, "change_box all" * bbound_str)
+
+    max_diag = longest_diagonal_length(bbox[1],bbox[2],bbox[3])
+    sort_binsize = 0.5*max_diag + 1.0 # half the max diag length, plus a buffer
+    command(lmp, "atom_modify sort 1 $(sort_binsize)")
 
     # LAMMPS needs wrapped coordinates to create_atoms
     # If this incurs too much a perf penalty, can check to see if needed
@@ -282,4 +288,17 @@ function wrap_positions(A::AbstractSystem)
     end
     new_cart_pos = cry_to_cart * new_cry_pos
     new_cart_pos
+end
+
+
+function longest_diagonal_length(a::Vector{T}, b::Vector{T},c::Vector{T}) where T <: Real
+    # the four possible diagonals in the parallelepiped
+    d1 = a + b + c
+    d2 = a + b - c
+    d3 = a - b + c
+    d4 = a - b - c
+
+    max_length = maximum(map(x->norm(x), [d1,d2,d3,d4]))
+
+    max_length
 end
