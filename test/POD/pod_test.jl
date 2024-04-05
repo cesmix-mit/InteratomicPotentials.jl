@@ -1,4 +1,5 @@
 using AtomsIO
+#using PotentialLearning 
 
 sample_hfo2_sys = load_system("./POD/sample_monoclinic_HfO2.xyz")
 
@@ -36,3 +37,44 @@ pe = potential_energy(sample_hfo2_sys,hfo2_lbp)
 
 f = force(sample_hfo2_sys, hfo2_lbp)
 @test f ≈ fref
+
+
+#= Reference Stress Test
+During preliminary testing, many isues arised where the first configuration would produce correct
+forces, but later configurations would result in junk forces. Likewise, there were issues that
+only appeared with large configurations, or orthogonal systems, etc. 
+TODO: wrapped atom example, gas example beyond cutoff
+
+Reference value obtained with LAMMPS compiled w/ Apple clang version 12.0.5 (clang-1205.0.22.11)
+targetting macOS (arm64-apple-darwin22.4.0)
+
+using the eapod branch of the cesmix-mit/lammps @ the following commit:
+https://github.com/cesmix-mit/lammps/commit/adf9fc11f17efaba7b62ba332b5c5f5c9f579dee
+=#
+
+ref_configs = load_trajectory("./POD/stress_test_hfo2_configs.xyz")
+@testset "LAMMPS POD Stress Test, First Order" begin 
+    lmp_pod2 = LAMMPS_POD("./POD/sample_6body_hfo2_param.pod", [:Hf,:O])
+    hfo2_lbp2 = LBasisPotential(lmp_pod2, "./POD/sample_6body_2elem_coeffs.pod")
+
+    @testset for config_num in eachindex(ref_configs)
+        config = ref_configs[config_num]
+        check_energy = potential_energy(config,hfo2_lbp2)
+        @test check_energy ≈ config.system_data.energy
+        check_forces = force(config, hfo2_lbp2)
+        @test check_forces ≈ config.atom_data.forces
+    end
+end 
+
+@testset "LAMMPS POD Stress Test, Reverse Order" begin 
+    lmp_pod3 = LAMMPS_POD("./POD/sample_6body_hfo2_param.pod", [:Hf,:O])
+    hfo2_lbp3 = LBasisPotential(lmp_pod3, "./POD/sample_6body_2elem_coeffs.pod")
+
+    @testset for config_num in reverse(eachindex(ref_configs))
+        config = ref_configs[config_num]
+        check_energy = potential_energy(config,hfo2_lbp3)
+        @test check_energy ≈ config.system_data.energy
+        check_forces = force(config, hfo2_lbp3)
+        @test check_forces ≈ config.atom_data.forces
+    end
+end 
