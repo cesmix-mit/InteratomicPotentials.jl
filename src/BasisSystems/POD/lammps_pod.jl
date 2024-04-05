@@ -197,12 +197,14 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     end
 
     setup_lammps_system!(A,pod)
+    num_atoms = length(A)::Int64
     atomids = extract_atom(lmp, "id")
-    @assert length(A) == length(atomids) "$(length(A)) vs $(length(atomids))"
+    @assert num_atoms == length(atomids)
 
-    sort_idxs = sortperm(atomids)
-    raw_types = extract_atom(lmp,"type")
-    sorted_types = raw_types[sort_idxs,:]
+    sort_idxs = sortperm(atomids)::Vector{Int64}
+    @assert sort_idxs == [Int64(i) for i in 1:num_atoms] #so we can use raw_dd
+    raw_types = extract_atom(lmp,"type")::Vector{Int32}
+    sorted_types = raw_types[sort_idxs,:]::Array{Int32}
 
     #= Why is the following necessary?
     The output of podd/atom depends on the number and types of atoms in the system, so if that changes, this compute needs to change. 
@@ -221,11 +223,9 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     if sorted_types != pod.type_cache
         pod.type_cache = sorted_types # this should be OK because sorted_type is a copy of the lammps types array
         if pod.c_dd_cache == -1 
-            println("first compute!")
             pod.c_dd_cache = 0
             command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
         else 
-            println("New compute")
             command(lmp, "uncompute dd$(pod.c_dd_cache)")
             pod.c_dd_cache += 1
             command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
@@ -235,29 +235,30 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     command(lmp, "run 0")
 
     num_pod_types = length(pod.species_map)
-    num_atoms = length(A) 
     num_perelem_ld = pod.num_perelem_ld
     total_num_ld = num_pod_types*(num_perelem_ld)
     final_dd = [[zeros(total_num_ld) for _ in 1:3] for __ in 1:num_atoms] # for consistency, vec{vec{vec}}
 
-    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
-    sorted_dd = raw_dd[sort_idxs,:]
+    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)::Array{Float64,2}
+    raw_dd = raw_dd'
 
     for i in 1:num_atoms
+        fddi = final_dd[i]
         for alpha in 1:3
+           fddialph = fddi[alpha]
             for j in 1:num_atoms
-                jtype = sorted_types[j]
-                fstart = (jtype-1)*(num_perelem_ld)+2 # +2 accounts for both skipping 1-body term and 1-indexing
-                fend   = fstart + num_perelem_ld -2
-                dd_start = (i-1)*3*(num_perelem_ld-1) + (alpha-1)*(num_perelem_ld-1) +1
-                dd_end = dd_start + (num_perelem_ld-1) -1
+                 jtype    = sorted_types[j]
+                 fstart   = (jtype-1)*(num_perelem_ld)+2 # +2 accounts for both skipping 1-body term and 1-indexing
+                 dd_start = (i-1)*3*(num_perelem_ld-1) + (alpha-1)*(num_perelem_ld-1) +1
                 
-                final_dd[i][alpha][fstart:fend] += sorted_dd[j,dd_start:dd_end]
+                 #non-allocating, essential to prevent too many GC calls
+                 for k in 1:num_perelem_ld-1
+                    fddialph[fstart+k-1] += raw_dd[j,dd_start+k-1]
+                    #@inbounds fddialph[fstart+k-1] += raw_dd[j,dd_start+k-1] #is 2x speedup worth the risk?
+                 end
             end
         end
     end
-
-    command(lmp,"delete_atoms group all")
 
     command(lmp, "pair_style none")
     command(lmp, "pair_style    zero 10.0")
@@ -289,7 +290,6 @@ function wrap_positions(A::AbstractSystem)
     new_cart_pos = cry_to_cart * new_cry_pos
     new_cart_pos
 end
-
 
 function longest_diagonal_length(a::Vector{T}, b::Vector{T},c::Vector{T}) where T <: Real
     # the four possible diagonals in the parallelepiped
