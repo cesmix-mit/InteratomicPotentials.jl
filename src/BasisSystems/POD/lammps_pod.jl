@@ -24,7 +24,7 @@ function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_pa
         println("Sorry, I haven't implementing parsing POD parameter files yet")
     else
         lmp_pod = LAMMPS_POD(lmp,param_file,lammps_species,nothing,num_perelem_ld)
-        @warn "Until POD param parser implemented, assuming species_map is the same order as species in POD parameter file"
+        #@warn "Until POD param parser implemented, assuming species_map is the same order as species in POD parameter file"
     end
     lmp_pod
 end
