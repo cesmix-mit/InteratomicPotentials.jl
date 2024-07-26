@@ -291,7 +291,9 @@ function wrap_positions(A::AbstractSystem)
     new_cart_pos
 end
 
-function longest_diagonal_length(a::Vector{T}, b::Vector{T},c::Vector{T}) where T <: Real
+#function longest_diagonal_length(a::AbstractArray{T}, b::Vector{T},c::Vector{T}) where T <: Real
+function longest_diagonal_length(a::AbstractArray{T}, b::AbstractArray{T},c::AbstractArray{T}) where T <: Real
+
     # the four possible diagonals in the parallelepiped
     d1 = a + b + c
     d2 = a + b - c
