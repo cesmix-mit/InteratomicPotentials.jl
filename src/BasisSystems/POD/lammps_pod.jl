@@ -73,7 +73,7 @@ function get_num_perelem_ld(lmp::LMP, lammps_species::Vector{Symbol})
     command(lmp, "create_atoms 1 single 0.25 0.25 0.25")
     command(lmp, "run 0")
 
-    raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
+    raw_ld = extract_compute(lmp,"ld", STYLE_ATOM,TYPE_ARRAY)'
     num_perelem_ld = size(raw_ld)[2] + 1 # including 1-body terms
 
     command(lmp,"delete_atoms group all")
@@ -157,12 +157,12 @@ function compute_local_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     setup_lammps_system!(A,pod)
     command(lmp, "run 0")
 
-    atomids = extract_atom(lmp, "id")
+    atomids = extract_atom(lmp, "id", LAMMPS_INT)
     sort_idxs = sortperm(atomids)
     @assert length(A) == length(atomids)
 
-    raw_ld = extract_compute(lmp,"ld", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)'
-    raw_types = extract_atom(lmp,"type")
+    raw_ld = extract_compute(lmp,"ld", STYLE_ATOM,TYPE_ARRAY)'
+    raw_types = extract_atom(lmp,"type", LAMMPS_INT)
     sorted_ld = raw_ld[sort_idxs,:]
     sorted_types = raw_types[sort_idxs,:]
 
@@ -197,14 +197,14 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     end
 
     setup_lammps_system!(A,pod)
-    num_atoms = length(A)::Int64
-    atomids = extract_atom(lmp, "id")
+    num_atoms = length(A)::Int64  # Why do I have to type annotate this? Shouldn't there be a better way?
+    atomids = extract_atom(lmp, "id", LAMMPS_INT)
     @assert num_atoms == length(atomids)
 
     sort_idxs = sortperm(atomids)::Vector{Int64}
     @assert sort_idxs == [Int64(i) for i in 1:num_atoms] #so we can use raw_dd
-    raw_types = extract_atom(lmp,"type")::Vector{Int32}
-    sorted_types = raw_types[sort_idxs,:]::Array{Int32}
+    raw_types = extract_atom(lmp,"type", LAMMPS_INT)::Vector{Int32}
+    sorted_types = raw_types[sort_idxs,:]::Array{Int32} # is it Array because I'm slicing it?
 
     #= Why is the following necessary?
     The output of podd/atom depends on the number and types of atoms in the system, so if that changes, this compute needs to change. 
@@ -239,7 +239,7 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     total_num_ld = num_pod_types*(num_perelem_ld)
     final_dd = [[zeros(total_num_ld) for _ in 1:3] for __ in 1:num_atoms] # for consistency, vec{vec{vec}}
 
-    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", LAMMPS.API.LMP_STYLE_ATOM,LAMMPS.API.LMP_TYPE_ARRAY)::Array{Float64,2}
+    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", STYLE_ATOM, TYPE_ARRAY)::Array{Float64,2}
     raw_dd = raw_dd'
 
     for i in 1:num_atoms
