@@ -224,6 +224,7 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     num_perelem_ld = pod.num_perelem_ld::Int64
     total_num_ld = num_pod_types*(num_perelem_ld)
 
+    raw_dd = extract_compute(lmp, "dd$(pod.c_dd_cache)", STYLE_GLOBAL, TYPE_ARRAY)::Array{Float64,2}
     #raw_dd = extract_compute(lmp, "dd$(pod.c_dd_cache)", STYLE_GLOBAL, TYPE_ARRAY;
     #                         size_2d=(total_num_ld, 3*num_atoms+1))::Array{Float64,2}
     raw_dd = raw_dd'
