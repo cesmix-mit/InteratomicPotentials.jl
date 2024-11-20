@@ -59,7 +59,7 @@ function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol
     command(lmp, "pair_style    zero 10.0")
     command(lmp, "pair_coeff    * * ")
 
-    command(lmp, """compute ld all pod/atom $(param_file) "" "" $(atomtype_str)""")
+    command(lmp, """compute ld all pod/atom $(param_file) "" $(atomtype_str)""")
 
     lmp
 end
@@ -197,7 +197,7 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     end
 
     setup_lammps_system!(A,pod)
-    num_atoms = length(A)::Int64  # Why do I have to type annotate this? Shouldn't there be a better way?
+    num_atoms = length(A)::Int64
     atomids = extract_atom(lmp, "id", LAMMPS_INT)
     @assert num_atoms == length(atomids)
 
@@ -206,59 +206,29 @@ function compute_force_descriptors(A::AbstractSystem, pod::LAMMPS_POD)
     raw_types = extract_atom(lmp,"type", LAMMPS_INT)::Vector{Int32}
     sorted_types = raw_types[sort_idxs,:]::Array{Int32} # is it Array because I'm slicing it?
 
-    #= Why is the following necessary?
-    The output of podd/atom depends on the number and types of atoms in the system, so if that changes, this compute needs to change. 
-    (When the compute is defined, it looks at the current atom list to figure out it's output)
-    Unfortunately, uncompute'ing a compute id does not free it up, and that compute id cannot be reused, hence this extra logic
-
-    For standard MD simulations, there should only be one of these podd/atom computes (unless the simulation can have variable numbers of atoms).
-
-    However, using a single LAMMPS_POD instance for computing descriptors of a training set may result in many of these computes. 
-    In the worst case scenario, for randomized diverse training sets, every time the next configuration has different #/types of atoms, a new compute is added. 
-    stochastic batch methods may be particularly problematic (at least if descriptors aren't cached). 
-
-    I'm not sure if there's any huge consequence for having many computes in terms of lammps performance (or if there are a maximum number of computes). 
-    Testing is needed
-    =#
     if sorted_types != pod.type_cache
         pod.type_cache = sorted_types # this should be OK because sorted_type is a copy of the lammps types array
-        if pod.c_dd_cache == -1 
+        if pod.c_dd_cache == -1
             pod.c_dd_cache = 0
-            command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
+            command(lmp, """compute dd$(pod.c_dd_cache) all pod/global $(pod.param_file) "" $(atomtype_str)""")
         else 
             command(lmp, "uncompute dd$(pod.c_dd_cache)")
             pod.c_dd_cache += 1
-            command(lmp, """compute dd$(pod.c_dd_cache) all podd/atom $(pod.param_file) "" "" $(atomtype_str)""")
+            command(lmp, """compute dd$(pod.c_dd_cache) all pod/global $(pod.param_file) "" $(atomtype_str)""")
         end
     end
 
     command(lmp, "run 0")
 
-    num_pod_types = length(pod.species_map)
-    num_perelem_ld = pod.num_perelem_ld
+    num_pod_types = length(pod.species_map)::Int64
+    num_perelem_ld = pod.num_perelem_ld::Int64
     total_num_ld = num_pod_types*(num_perelem_ld)
-    final_dd = [[zeros(total_num_ld) for _ in 1:3] for __ in 1:num_atoms] # for consistency, vec{vec{vec}}
 
-    raw_dd = extract_compute(lmp,"dd$(pod.c_dd_cache)", STYLE_ATOM, TYPE_ARRAY)::Array{Float64,2}
+    #raw_dd = extract_compute(lmp, "dd$(pod.c_dd_cache)", STYLE_GLOBAL, TYPE_ARRAY;
+    #                         size_2d=(total_num_ld, 3*num_atoms+1))::Array{Float64,2}
     raw_dd = raw_dd'
 
-    for i in 1:num_atoms
-        fddi = final_dd[i]
-        for alpha in 1:3
-           fddialph = fddi[alpha]
-            for j in 1:num_atoms
-                 jtype    = sorted_types[j]
-                 fstart   = (jtype-1)*(num_perelem_ld)+2 # +2 accounts for both skipping 1-body term and 1-indexing
-                 dd_start = (i-1)*3*(num_perelem_ld-1) + (alpha-1)*(num_perelem_ld-1) +1
-                
-                 #non-allocating, essential to prevent too many GC calls
-                 for k in 1:num_perelem_ld-1
-                    fddialph[fstart+k-1] += raw_dd[j,dd_start+k-1]
-                    #@inbounds fddialph[fstart+k-1] += raw_dd[j,dd_start+k-1] #is 2x speedup worth the risk?
-                 end
-            end
-        end
-    end
+    final_dd = [[raw_dd[3*i+k+1,1:end] for k in 1:3] for i in 0:num_atoms-1]
 
     command(lmp, "pair_style none")
     command(lmp, "pair_style    zero 10.0")
