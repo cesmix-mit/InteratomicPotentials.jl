@@ -1,7 +1,8 @@
 
 using LAMMPS
 using Printf: @sprintf 
-using LinearAlgebra: norm
+using LinearAlgebra: norm, BLAS
+import OpenBLAS32_jll
 
 # species map can differ in order from species in pod_spec 
 # tradeoff between RefValue for the cache vs. just using a mutable struct?
@@ -18,6 +19,9 @@ mutable struct LAMMPS_POD <: BasisSystem
 end
 
 function LAMMPS_POD(param_file::String, lammps_species::Vector{Symbol}; parse_param_file=false)
+    # probably not the best location
+    initialize_blas()
+
     lmp = initialize_pod_lammps(param_file,lammps_species)
     num_perelem_ld = get_num_perelem_ld(lmp,lammps_species)
     if parse_param_file 
@@ -34,6 +38,14 @@ Base.length(lmp_pod::LAMMPS_POD) = length(lmp_pod.species_map)*lmp_pod.num_perel
 function LBasisPotential(lmp_pod::LAMMPS_POD, coeff_fname::String)
     coeffs = vec(readdlm(coeff_fname, ' '; skipstart=1)) 
     LBasisPotential(coeffs,zeros(1),lmp_pod)
+end
+
+# Same as https://github.com/jump-dev/Ipopt.jl/blob/ffa138dea93d994442b3aa3824688a70c598bacf/src/Ipopt.jl#L15C1-L19C8
+function initialize_blas()
+    config = LinearAlgebra.BLAS.lbt_get_config()
+    if !any(lib -> lib.interface == :lp64, config.loaded_libs)
+        LinearAlgebra.BLAS.lbt_forward(OpenBLAS32_jll.libopenblas_path)
+    end
 end
 
 function initialize_pod_lammps(param_file::String, lammps_species::Vector{Symbol})
