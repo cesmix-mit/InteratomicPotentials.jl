@@ -3,6 +3,7 @@
 export AbstractPotential, NonTrainablePotential, TrainablePotential, EmpiricalPotential, MixedPotential
 export BasisPotential, NeuralNetworkBasisPotential, LinearBasisPotential, BasisSystem
 export ACE, SNAP, LBasisPotential, NNBasisPotential
+export POD, LAMMPS_POD
 
 
 """
@@ -73,6 +74,5 @@ Abstract type to define methods for producing a set of local and force descripto
 """
 abstract type BasisSystem end 
 
-include("BasisSystems/basis_systems.jl")
 include("BasisPotentials/basis_potentials.jl")
-
+include("BasisSystems/basis_systems.jl")
