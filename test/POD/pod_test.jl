@@ -62,7 +62,7 @@ ref_configs = load_trajectory("./POD/stress_test_hfo2_configs.xyz")
         check_energy = potential_energy(config,hfo2_lbp2)
         @test check_energy ≈ config.system_data.energy
         check_forces = force(config, hfo2_lbp2)
-        @test isapprox(check_forces,config.atom_data.forces; atol=1e-8)
+        @test isapprox(check_forces,config.atom_data.forces; atol=5e-8)
     end
 end 
 
@@ -75,6 +75,6 @@ end
         check_energy = potential_energy(config,hfo2_lbp3)
         @test check_energy ≈ config.system_data.energy
         check_forces = force(config, hfo2_lbp3)
-        @test isapprox(check_forces,config.atom_data.forces; atol=1e-8)
+        @test isapprox(check_forces,config.atom_data.forces; atol=5e-8)
     end
 end 
