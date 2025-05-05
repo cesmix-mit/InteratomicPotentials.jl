@@ -71,7 +71,8 @@ function convert_system_to_atoms(system::AbstractSystem)
 end
 
 function compute_local_descriptors(A::AbstractSystem, ace::ACE)
-    return [ site_energy(ace.rpib, convert_system_to_atoms(A), i)
+    sys = convert_system_to_atoms(A)
+    return [ site_energy(ace.rpib, sys, i)
              for i = 1:length(A)]
 end
 
